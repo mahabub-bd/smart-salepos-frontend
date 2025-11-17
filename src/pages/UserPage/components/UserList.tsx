@@ -13,6 +13,7 @@ import {
   useGetUsersQuery,
 } from "../../../features/user/userApi";
 
+import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import { User } from "../../../types/auth.ts/auth";
 import UserFormModal from "./UserFormModal";
 
@@ -20,9 +21,13 @@ export default function UserList() {
   const { data, isLoading, isError } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
 
-  const users = data?.data || [];
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
+  const users = data?.data || [];
 
   function openCreateModal() {
     setEditUser(null);
@@ -32,6 +37,19 @@ export default function UserList() {
   function openEditModal(user: User) {
     setEditUser(user);
     setIsModalOpen(true);
+  }
+
+  function openDeleteDialog(user: User) {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!userToDelete) return;
+
+    await deleteUser(userToDelete.id);
+    setIsDeleteModalOpen(false);
+    setUserToDelete(null);
   }
 
   if (isLoading)
@@ -71,27 +89,21 @@ export default function UserList() {
                 <TableCell isHeader className="table-header w-[220px]">
                   User
                 </TableCell>
-
                 <TableCell isHeader className="table-header w-[200px]">
                   Email
                 </TableCell>
-
                 <TableCell isHeader className="table-header w-[150px]">
                   Phone
                 </TableCell>
-
                 <TableCell isHeader className="table-header w-[120px]">
                   Role
                 </TableCell>
-
                 <TableCell isHeader className="table-header w-[120px]">
                   Status
                 </TableCell>
-
                 <TableCell isHeader className="table-header w-[120px]">
                   Joined
                 </TableCell>
-
                 <TableCell
                   isHeader
                   className="table-header text-right w-[120px]"
@@ -167,7 +179,7 @@ export default function UserList() {
                       </button>
 
                       <button
-                        onClick={() => deleteUser(user.id)}
+                        onClick={() => openDeleteDialog(user)}
                         className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
                       >
                         Delete
@@ -181,11 +193,21 @@ export default function UserList() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* User Create/Update Modal */}
       <UserFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         user={editUser}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteModalOpen}
+        title="Delete User"
+        message={`Are you sure you want to delete "${userToDelete?.full_name}"?`}
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setIsDeleteModalOpen(false)}
       />
     </>
   );

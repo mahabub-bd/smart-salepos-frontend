@@ -14,6 +14,9 @@ import {
 } from "../../../components/ui/table";
 
 import Badge from "../../../components/ui/badge/Badge";
+
+import { toast } from "react-toastify";
+import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import RoleFormModal from "./RoleFormModal";
 
 export default function RoleList() {
@@ -22,6 +25,10 @@ export default function RoleList() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editRole, setEditRole] = useState<Role | null>(null);
+
+  // Delete confirmation dialog state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
   const roles = data?.data || [];
 
@@ -33,6 +40,20 @@ export default function RoleList() {
   function openEditModal(role: Role) {
     setEditRole(role);
     setIsModalOpen(true);
+  }
+
+  function openDeleteDialog(role: Role) {
+    setRoleToDelete(role);
+    setIsDeleteModalOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!roleToDelete) return;
+
+    await deleteRole(roleToDelete.id);
+    setIsDeleteModalOpen(false);
+    setRoleToDelete(null);
+    toast.success("Deleted Sucessfully");
   }
 
   if (isLoading) return <p className="p-6 text-gray-500">Loading roles...</p>;
@@ -106,7 +127,7 @@ export default function RoleList() {
                       </button>
 
                       <button
-                        onClick={() => deleteRole(role.id)}
+                        onClick={() => openDeleteDialog(role)}
                         className="px-3 py-1 text-xs rounded-md bg-red-500 text-white hover:bg-red-600"
                       >
                         Delete
@@ -120,11 +141,22 @@ export default function RoleList() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Create / Edit Modal */}
       <RoleFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         role={editRole}
+      />
+
+      {/* Delete Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteModalOpen}
+        title="Delete Role"
+        message={`Are you sure you want to delete the role "${roleToDelete?.name}"?`}
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setIsDeleteModalOpen(false)}
       />
     </>
   );

@@ -19,11 +19,15 @@ import Images from "./pages/UiElements/Images";
 import Videos from "./pages/UiElements/Videos";
 import UserProfiles from "./pages/UserProfiles";
 
+import { ToastContainer } from "react-toastify";
+import PermissionsPage from "./pages/PermissionPage";
+
+
 import RolesPage from "./pages/Role";
 import UsersPage from "./pages/UserPage";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
-import { ToastContainer } from "react-toastify";
+import PermissionAssignPage from "./pages/PermissionAssignPage";
 export default function App() {
   return (
     <Router>
@@ -67,7 +71,13 @@ export default function App() {
           <Route path="/form-elements" element={<FormElements />} />
           <Route path="/basic-tables" element={<BasicTables />} />
           <Route path="/users" element={<UsersPage />} />
-          roles
+
+          <Route path="/permissions" element={<PermissionsPage />} />
+          <Route
+            path="/permissions/assign-role"
+            element={<PermissionAssignPage />}
+          />
+
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />

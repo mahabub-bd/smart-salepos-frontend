@@ -1,5 +1,6 @@
 import { ApiResponse, User } from "../../types/auth.ts/auth";
 import { apiSlice } from "../apiSlice";
+
 export interface CreateUserPayload {
   username: string;
   email: string;
@@ -8,6 +9,7 @@ export interface CreateUserPayload {
   password: string;
   roles: string[];
 }
+
 export interface UpdateUserDto {
   username?: string;
   email?: string;
@@ -16,6 +18,7 @@ export interface UpdateUserDto {
   password?: string;
   roles?: string[];
 }
+
 export interface UpdateUserPayload {
   id: number | string;
   body: UpdateUserDto;
@@ -23,19 +26,23 @@ export interface UpdateUserPayload {
 
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // CREATE USER
     createUser: builder.mutation<ApiResponse<User>, CreateUserPayload>({
       query: (body) => ({
         url: "/users",
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Users"],
     }),
 
+    // GET ALL USERS
     getUsers: builder.query<ApiResponse<User[]>, void>({
       query: () => ({
         url: "/users",
         method: "GET",
       }),
+      providesTags: ["Users"],
     }),
 
     // GET USER BY ID
@@ -44,6 +51,7 @@ export const usersApi = apiSlice.injectEndpoints({
         url: `/users/${id}`,
         method: "GET",
       }),
+      providesTags: (_result, _error, id) => [{ type: "Users", id }],
     }),
 
     // UPDATE USER
@@ -53,6 +61,10 @@ export const usersApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Users",
+        { type: "Users", id },
+      ],
     }),
 
     // DELETE USER
@@ -61,6 +73,7 @@ export const usersApi = apiSlice.injectEndpoints({
         url: `/users/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Users"],
     }),
   }),
 });

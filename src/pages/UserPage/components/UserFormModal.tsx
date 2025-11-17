@@ -16,6 +16,8 @@ import { Role } from "../../../types/role";
 // UI
 import { toast } from "react-toastify";
 import Input from "../../../components/form/input/InputField";
+
+import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
 
 // Props interface
@@ -33,6 +35,7 @@ interface FormState {
   phone: string;
   password: string;
   roles: string[];
+  status: string;
 }
 
 export default function UserFormModal({
@@ -49,25 +52,25 @@ export default function UserFormModal({
     phone: "",
     password: "",
     roles: [],
+    status: "active",
   });
 
-  // Create / Update API hooks
+  // Create & Update API
   const [createUser] = useCreateUserMutation();
   const [updateUser] = useUpdateUserMutation();
 
-  // Fetch user (only when editing)
+  // Fetch user (edit mode)
   const { data: singleUserRes, isLoading: isUserLoading } = useGetUserByIdQuery(
     user?.id!,
     { skip: !isEdit }
   );
-
   const singleUser = singleUserRes?.data;
 
-  // Fetch roles
+  // Fetch roles for multiselect
   const { data: rolesData } = useGetRolesQuery();
   const roles: Role[] = rolesData?.data || [];
 
-  // Load form values when editing or opening modal
+  // Load form values when editing
   useEffect(() => {
     if (isEdit && singleUser) {
       setForm({
@@ -77,6 +80,7 @@ export default function UserFormModal({
         phone: singleUser.phone,
         password: "",
         roles: singleUser.roles?.map((r: Role) => r.name) || [],
+        status: singleUser.status,
       });
     }
 
@@ -88,16 +92,17 @@ export default function UserFormModal({
         phone: "",
         password: "",
         roles: [],
+        status: "active",
       });
     }
   }, [singleUser, isEdit]);
 
-  // Handle input
+  // Input handler
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  // Toggle role input
+  // Toggle roles
   function toggleRole(roleName: string) {
     setForm((prev) => ({
       ...prev,
@@ -113,11 +118,7 @@ export default function UserFormModal({
 
     try {
       if (isEdit && user) {
-        await updateUser({
-          id: user.id,
-          body: form,
-        }).unwrap();
-
+        await updateUser({ id: user.id, body: form }).unwrap();
         toast.success("User updated successfully!");
       } else {
         await createUser(form).unwrap();
@@ -130,7 +131,7 @@ export default function UserFormModal({
     }
   }
 
-  // Show loading while fetching user details
+  // Loading UI for edit mode
   if (isEdit && isUserLoading) {
     return (
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
@@ -187,7 +188,24 @@ export default function UserFormModal({
           />
         )}
 
-        {/* ROLE MULTI SELECT */}
+        {/* ⭐ STATUS SELECT (Custom Component) */}
+        <div>
+          <label className="text-sm font-medium mb-1 block">User Status</label>
+
+          <Select
+            options={[
+              { value: "pending", label: "Pending" },
+              { value: "active", label: "Active" },
+              { value: "suspend", label: "Suspend" },
+              { value: "deactive", label: "Deactive" },
+            ]}
+            defaultValue={form.status}
+            placeholder="Select User Status"
+            onChange={(value) => setForm({ ...form, status: value })}
+          />
+        </div>
+
+        {/* Roles Multi-select */}
         <div>
           <label className="text-sm font-medium mb-1 block">Assign Roles</label>
 
@@ -196,11 +214,11 @@ export default function UserFormModal({
               <label
                 key={r.id}
                 className={`cursor-pointer px-3 py-1 capitalize rounded-lg border 
-                  ${
-                    form.roles.includes(r.name)
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "border-gray-300 dark:border-gray-700"
-                  }`}
+                ${
+                  form.roles.includes(r.name)
+                    ? "bg-brand-600 text-white border-brand-600"
+                    : "border-gray-300 dark:border-gray-700"
+                }`}
               >
                 <input
                   type="checkbox"

@@ -15,6 +15,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         url: "/roles",
         method: "GET",
       }),
+      providesTags: ["Roles"],
     }),
 
     // GET ROLE BY ID
@@ -23,6 +24,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         url: `/roles/${id}`,
         method: "GET",
       }),
+      providesTags: (_result, _error, id) => [{ type: "Roles", id }],
     }),
 
     // CREATE ROLE
@@ -32,6 +34,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Roles"],
     }),
 
     // UPDATE ROLE
@@ -41,6 +44,10 @@ export const rolesApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Roles",
+        { type: "Roles", id },
+      ],
     }),
 
     // DELETE ROLE
@@ -49,6 +56,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         url: `/roles/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Roles"],
     }),
   }),
 });

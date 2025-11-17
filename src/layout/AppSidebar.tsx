@@ -103,6 +103,7 @@ const navItems: NavItem[] = [
       { name: "Users", path: "/users" },
       { name: "Roles", path: "/roles" },
       { name: "Permissions", path: "/permissions" },
+      { name: "Permission Assign", path: "/permissions/assign-role" },
     ],
   },
 ];
