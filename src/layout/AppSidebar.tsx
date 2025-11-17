@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
+import { useSidebar } from "../context/SidebarContext";
 import {
   BoxCubeIcon,
   CalenderIcon,
@@ -15,8 +16,6 @@ import {
   TableIcon,
   UserCircleIcon,
 } from "../icons";
-import { useSidebar } from "../context/SidebarContext";
-import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
   name: string;
@@ -25,69 +24,98 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
+// =========================
+// SMART SALE POS – MENU SET
+// =========================
+
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    path: "/",
   },
+
+  // USERS
+
+  // CUSTOMERS
+  {
+    icon: <UserCircleIcon />,
+    name: "Customer Management",
+    path: "/customers",
+  },
+
+  // PRODUCTS & CATEGORIES
+  {
+    icon: <BoxCubeIcon />,
+    name: "Product Management",
+    subItems: [
+      { name: "Products", path: "/products" },
+      { name: "Categories", path: "/categories" },
+      { name: "Units", path: "/units" },
+    ],
+  },
+
+  // PURCHASE
   {
     icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    name: "Purchase",
+    path: "/purchase",
+  },
+
+  // INVENTORY
+  {
+    icon: <TableIcon />,
+    name: "Inventory",
+    path: "/inventory",
+  },
+
+  // SUPPLIER
+  {
+    icon: <PlugInIcon />,
+    name: "Supplier",
+    path: "/suppliers",
+  },
+
+  // SALE
+  {
+    icon: <PieChartIcon />,
+    name: "Sale",
+    path: "/sales",
+  },
+
+  // POS SCREEN
+  {
+    icon: <GridIcon />,
+    name: "POS",
+    path: "/pos",
+  },
+
+  // EXPENSE
+  {
+    icon: <ListIcon />,
+    name: "Expense",
+    path: "/expenses",
   },
   {
     icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
-  },
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
+    name: "User Management",
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "Users", path: "/users" },
+      { name: "Roles", path: "/roles" },
+      { name: "Permissions", path: "/permissions" },
     ],
   },
 ];
 
 const othersItems: NavItem[] = [
   {
-    icon: <PieChartIcon />,
-    name: "Charts",
+    icon: <PageIcon />,
+    name: "Reports",
     subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
-  },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Sales Report", path: "/reports/sales" },
+      { name: "Purchase Report", path: "/reports/purchase" },
+      { name: "Inventory Report", path: "/reports/inventory" },
+      { name: "Customer Report", path: "/reports/customers" },
     ],
   },
 ];
@@ -336,7 +364,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -352,7 +380,7 @@ const AppSidebar: React.FC = () => {
             </div>
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -368,7 +396,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );

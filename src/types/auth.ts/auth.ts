@@ -1,8 +1,5 @@
-export interface Role {
-  id: number;
-  name: string;
-  description: string;
-}
+import { Role } from "../role";
+
 
 export interface User {
   id: number;
@@ -15,6 +12,7 @@ export interface User {
   last_login_at: string | null;
   created_at: string;
   updated_at: string;
+  avatar?: string;
 }
 
 export interface LoginRequest {
