@@ -13,7 +13,10 @@ import {
   useGetUsersQuery,
 } from "../../../features/user/userApi";
 
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
+import IconButton from "../../../components/common/IconButton";
+import PageHeader from "../../../components/common/PageHeader";
 import { User } from "../../../types/auth.ts/auth";
 import UserFormModal from "./UserFormModal";
 
@@ -67,18 +70,13 @@ export default function UserList() {
   return (
     <>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-          User Management
-        </h2>
 
-        <button
-          onClick={openCreateModal}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          + Create User
-        </button>
-      </div>
+      <PageHeader
+        title=" User Management"
+        onAdd={openCreateModal}
+        addLabel="Add"
+        icon={<Plus size={16} />}
+      />
 
       {/* Desktop / Tablet Table */}
       <div className="hidden sm:block rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-x-auto">
@@ -96,7 +94,7 @@ export default function UserList() {
               </TableCell>
               <TableCell
                 isHeader
-                className="table-header w-[150px] hidden lg:table-cell"
+                className="table-header w-[150px] hidden 2xl:table-cell"
               >
                 Phone
               </TableCell>
@@ -145,7 +143,7 @@ export default function UserList() {
                 <TableCell className="table-body hidden md:table-cell">
                   {user.email}
                 </TableCell>
-                <TableCell className="table-body hidden lg:table-cell">
+                <TableCell className="table-body hidden 2xl:table-cell">
                   {user.phone}
                 </TableCell>
 
@@ -170,19 +168,17 @@ export default function UserList() {
 
                 <TableCell className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
-                    <button
+                    <IconButton
+                      icon={Pencil}
                       onClick={() => openEditModal(user)}
-                      className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      Edit
-                    </button>
+                      color="blue"
+                    />
 
-                    <button
+                    <IconButton
+                      icon={Trash2}
                       onClick={() => openDeleteDialog(user)}
-                      className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
+                      color="red"
+                    />
                   </div>
                 </TableCell>
               </TableRow>

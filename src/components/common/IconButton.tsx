@@ -1,0 +1,34 @@
+import { LucideIcon } from "lucide-react";
+import { ButtonHTMLAttributes } from "react";
+
+interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon: LucideIcon;
+  color?: "blue" | "red" | "green" | "gray";
+  size?: number;
+}
+
+export default function IconButton({
+  icon: Icon,
+  onClick,
+  color = "gray",
+  size = 14,
+  className = "",
+  ...props
+}: IconButtonProps) {
+  const colorClasses = {
+    blue: "bg-blue-500 hover:bg-blue-600 text-white",
+    red: "bg-red-500 hover:bg-red-600 text-white",
+    green: "bg-green-500 hover:bg-green-600 text-white",
+    gray: "bg-gray-500 hover:bg-gray-600 text-white",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-2 rounded flex items-center justify-center ${colorClasses[color]} ${className}`}
+      {...props}
+    >
+      <Icon size={size} />
+    </button>
+  );
+}

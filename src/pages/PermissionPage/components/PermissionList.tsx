@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import IconButton from "../../../components/common/IconButton";
+import PageHeader from "../../../components/common/PageHeader";
 import {
   Table,
   TableBody,
@@ -64,19 +67,12 @@ export default function PermissionList() {
 
   return (
     <>
-      {/* Header */}
-      <div className="flex justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-          Permissions
-        </h2>
-
-        <button
-          onClick={openCreateModal}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          + Create Permission
-        </button>
-      </div>
+      <PageHeader
+        title="Permissions Management"
+        onAdd={openCreateModal}
+        addLabel="Add"
+        icon={<Plus size={16} />}
+      />
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border bg-white dark:bg-white/5">
@@ -110,19 +106,17 @@ export default function PermissionList() {
 
                   <TableCell className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <button
+                      <IconButton
+                        icon={Pencil}
                         onClick={() => openEditModal(perm)}
-                        className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
+                        color="blue"
+                      />
 
-                      <button
+                      <IconButton
+                        icon={Trash2}
                         onClick={() => openDeleteDialog(perm)}
-                        className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
+                        color="red"
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

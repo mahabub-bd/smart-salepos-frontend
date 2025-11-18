@@ -15,8 +15,11 @@ import {
 
 import Badge from "../../../components/ui/badge/Badge";
 
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
+import IconButton from "../../../components/common/IconButton";
+import PageHeader from "../../../components/common/PageHeader";
 import RoleFormModal from "./RoleFormModal";
 
 export default function RoleList() {
@@ -63,18 +66,13 @@ export default function RoleList() {
   return (
     <>
       {/* Header */}
-      <div className="flex justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-          Role Management
-        </h2>
 
-        <button
-          onClick={openCreateModal}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          + Create Role
-        </button>
-      </div>
+      <PageHeader
+        title="Role Management"
+        onAdd={openCreateModal}
+        addLabel="Add"
+        icon={<Plus size={16} />}
+      />
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
@@ -119,19 +117,17 @@ export default function RoleList() {
 
                   <TableCell className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <button
+                      <IconButton
+                        icon={Pencil}
                         onClick={() => openEditModal(role)}
-                        className="px-3 py-1 text-xs rounded-md bg-blue-500 text-white hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
+                        color="blue"
+                      />
 
-                      <button
+                      <IconButton
+                        icon={Trash2}
                         onClick={() => openDeleteDialog(role)}
-                        className="px-3 py-1 text-xs rounded-md bg-red-500 text-white hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
+                        color="red"
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
