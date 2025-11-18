@@ -67,7 +67,7 @@ export default function UserList() {
   return (
     <>
       {/* Header */}
-      <div className="flex justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
           User Management
         </h2>
@@ -80,120 +80,181 @@ export default function UserList() {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-        <div className="max-w-full overflow-x-auto">
-          <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-white/5">
-              <TableRow>
-                <TableCell isHeader className="table-header w-[220px]">
-                  User
+      {/* Desktop / Tablet Table */}
+      <div className="hidden sm:block rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-x-auto">
+        <Table>
+          <TableHeader className="border-b border-gray-100 dark:border-white/5">
+            <TableRow>
+              <TableCell isHeader className="table-header w-[220px]">
+                User
+              </TableCell>
+              <TableCell
+                isHeader
+                className="table-header w-[200px] hidden md:table-cell"
+              >
+                Email
+              </TableCell>
+              <TableCell
+                isHeader
+                className="table-header w-[150px] hidden lg:table-cell"
+              >
+                Phone
+              </TableCell>
+              <TableCell isHeader className="table-header w-[120px]">
+                Role
+              </TableCell>
+              <TableCell isHeader className="table-header w-[120px]">
+                Status
+              </TableCell>
+              <TableCell
+                isHeader
+                className="table-header w-[120px] hidden md:table-cell"
+              >
+                Joined
+              </TableCell>
+              <TableCell isHeader className="table-header text-right w-[120px]">
+                Actions
+              </TableCell>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
+            {users.map((user: User) => (
+              <TableRow key={user.id}>
+                <TableCell className="table-body">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 dark:border-gray-800">
+                      <img
+                        src="/images/user/owner.jpg"
+                        alt={user.full_name}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="font-medium text-gray-800 dark:text-white/90">
+                        {user.full_name}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.username}
+                      </div>
+                    </div>
+                  </div>
                 </TableCell>
-                <TableCell isHeader className="table-header w-[200px]">
-                  Email
+
+                <TableCell className="table-body hidden md:table-cell">
+                  {user.email}
                 </TableCell>
-                <TableCell isHeader className="table-header w-[150px]">
-                  Phone
+                <TableCell className="table-body hidden lg:table-cell">
+                  {user.phone}
                 </TableCell>
-                <TableCell isHeader className="table-header w-[120px]">
-                  Role
+
+                <TableCell className="table-body">
+                  <Badge size="sm" color="primary">
+                    {user.roles?.[0]?.name?.toUpperCase()}
+                  </Badge>
                 </TableCell>
-                <TableCell isHeader className="table-header w-[120px]">
-                  Status
+
+                <TableCell className="table-body">
+                  <Badge
+                    size="sm"
+                    color={user.status === "active" ? "success" : "error"}
+                  >
+                    {user.status.toUpperCase()}
+                  </Badge>
                 </TableCell>
-                <TableCell isHeader className="table-header w-[120px]">
-                  Joined
+
+                <TableCell className="table-body hidden md:table-cell">
+                  {new Date(user.created_at).toLocaleDateString()}
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="table-header text-right w-[120px]"
-                >
-                  Actions
+
+                <TableCell className="px-4 py-3 text-right">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => openEditModal(user)}
+                      className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => openDeleteDialog(user)}
+                      className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
-            </TableHeader>
-
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-              {users.map((user: User) => (
-                <TableRow key={user.id}>
-                  {/* User + Avatar */}
-                  <TableCell className="table-body">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 dark:border-gray-800 shrink-0">
-                        <img
-                          src="/images/user/owner.jpg"
-                          alt={user.full_name}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-
-                      <div className="truncate">
-                        <div className="font-medium text-gray-800 dark:text-white/90 truncate">
-                          {user.full_name}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {user.username}
-                        </div>
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  {/* Email */}
-                  <TableCell className="table-body truncate max-w-[200px]">
-                    {user.email}
-                  </TableCell>
-
-                  {/* Phone */}
-                  <TableCell className="table-body">{user.phone}</TableCell>
-
-                  {/* Role */}
-                  <TableCell className="table-body">
-                    <Badge size="sm" color="primary">
-                      {user.roles?.[0]?.name?.toUpperCase()}
-                    </Badge>
-                  </TableCell>
-
-                  {/* Status */}
-                  <TableCell className="table-body">
-                    <Badge
-                      size="sm"
-                      color={user.status === "active" ? "success" : "error"}
-                    >
-                      {user.status.toUpperCase()}
-                    </Badge>
-                  </TableCell>
-
-                  {/* Joined */}
-                  <TableCell className="table-body">
-                    {new Date(user.created_at).toLocaleDateString()}
-                  </TableCell>
-
-                  {/* Actions */}
-                  <TableCell className="px-4 py-3 text-right w-[120px]">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => openEditModal(user)}
-                        className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={() => openDeleteDialog(user)}
-                        className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
-      {/* User Create/Update Modal */}
+      {/* Mobile List View */}
+      <div className="sm:hidden space-y-3">
+        {users.map((user: User) => (
+          <div
+            key={user.id}
+            className="p-3 rounded-lg border border-gray-200 bg-white dark:bg-white/3 dark:border-white/5"
+          >
+            <div className="flex gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200 dark:border-gray-800">
+                <img
+                  src="/images/user/owner.jpg"
+                  alt={user.full_name}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+
+              <div className="flex-1">
+                <div className="font-medium text-gray-800 dark:text-white/90">
+                  {user.full_name}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {user.username}
+                </div>
+
+                <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {user.email}
+                  <br />
+                  {user.phone}
+                </div>
+
+                <div className="mt-2 flex justify-between">
+                  <Badge size="sm" color="primary">
+                    {user.roles?.[0]?.name?.toUpperCase()}
+                  </Badge>
+
+                  <Badge
+                    size="sm"
+                    color={user.status === "active" ? "success" : "error"}
+                  >
+                    {user.status.toUpperCase()}
+                  </Badge>
+                </div>
+
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => openEditModal(user)}
+                    className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => openDeleteDialog(user)}
+                    className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modals */}
       <UserFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
