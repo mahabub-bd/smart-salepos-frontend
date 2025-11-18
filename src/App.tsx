@@ -22,22 +22,21 @@ import UserProfiles from "./pages/UserProfiles";
 import { ToastContainer } from "react-toastify";
 import PermissionsPage from "./pages/PermissionPage";
 
-
+import PermissionAssignPage from "./pages/PermissionAssignPage";
 import RolesPage from "./pages/Role";
 import UsersPage from "./pages/UserPage";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
-import PermissionAssignPage from "./pages/PermissionAssignPage";
 export default function App() {
   return (
     <Router>
       <ScrollToTop />
       <ToastContainer
         position="bottom-right"
-        autoClose={2000}
+        autoClose={3000}
         hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
+        newestOnTop={true}
+        closeOnClick={true}
         rtl={false}
         pauseOnFocusLoss
         draggable

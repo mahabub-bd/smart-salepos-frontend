@@ -26,6 +26,9 @@ importers:
       '@fullcalendar/timegrid':
         specifier: ^6.1.19
         version: 6.1.19(@fullcalendar/core@6.1.19)
+      '@hookform/resolvers':
+        specifier: ^5.2.2
+        version: 5.2.2(react-hook-form@7.66.1(react@19.2.0))
       '@react-jvectormap/core':
         specifier: ^1.0.4
         version: 1.0.4(jquery@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -71,6 +74,9 @@ importers:
       react-helmet-async:
         specifier: ^2.0.5
         version: 2.0.5(react@19.2.0)
+      react-hook-form:
+        specifier: ^7.66.1
+        version: 7.66.1(react@19.2.0)
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@19.2.6)(react@19.2.0)(redux@5.0.1)
@@ -92,6 +98,9 @@ importers:
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
+      zod:
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
@@ -464,6 +473,11 @@ packages:
     resolution: {integrity: sha512-OuzpUueyO9wB5OZ8rs7TWIoqvu4v3yEqdDxZ2VcsMldCpYJRiOe7yHWKr4ap5Tb0fs7Rjbserc/b6Nt7ol6BRg==}
     peerDependencies:
       '@fullcalendar/core': ~6.1.19
+
+  '@hookform/resolvers@5.2.2':
+    resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
+    peerDependencies:
+      react-hook-form: ^7.55.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1603,6 +1617,12 @@ packages:
     peerDependencies:
       react: ^16.6.0 || ^17.0.0 || ^18.0.0
 
+  react-hook-form@7.66.1:
+    resolution: {integrity: sha512-2KnjpgG2Rhbi+CIiIBQQ9Df6sMGH5ExNyFl4Hw9qO7pIqMBR8Bvu9RQyjl3JM4vehzCh9soiNUM/xYMswb2EiA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -2134,6 +2154,11 @@ snapshots:
     dependencies:
       '@fullcalendar/core': 6.1.19
       '@fullcalendar/daygrid': 6.1.19(@fullcalendar/core@6.1.19)
+
+  '@hookform/resolvers@5.2.2(react-hook-form@7.66.1(react@19.2.0))':
+    dependencies:
+      '@standard-schema/utils': 0.3.0
+      react-hook-form: 7.66.1(react@19.2.0)
 
   '@humanfs/core@0.19.1': {}
 
@@ -3224,6 +3249,10 @@ snapshots:
       react: 19.2.0
       react-fast-compare: 3.2.2
       shallowequal: 1.1.0
+
+  react-hook-form@7.66.1(react@19.2.0):
+    dependencies:
+      react: 19.2.0
 
   react-is@16.13.1: {}
 

@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
-
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { z } from "zod";
+
 import Input from "../../../components/form/input/InputField";
 import { Modal } from "../../../components/ui/modal";
 import {
@@ -9,17 +12,20 @@ import {
 } from "../../../features/permissions/permissionsApi";
 import { Permission } from "../../../types/role";
 
-// Props for the modal
+// Props Interface
 interface PermissionFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   permission: Permission | null;
 }
 
-interface FormState {
-  key: string;
-  description: string;
-}
+// 🛡 Validation Schema
+const PermissionSchema = z.object({
+  key: z.string().min(3, "Permission key must be at least 3 characters"),
+  description: z.string().min(3, "Description is required"),
+});
+
+type PermissionFormState = z.infer<typeof PermissionSchema>;
 
 export default function PermissionFormModal({
   isOpen,
@@ -28,43 +34,48 @@ export default function PermissionFormModal({
 }: PermissionFormModalProps) {
   const isEdit = !!permission;
 
-  const [form, setForm] = useState<FormState>({
-    key: "",
-    description: "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<PermissionFormState>({
+    resolver: zodResolver(PermissionSchema),
+    defaultValues: {
+      key: "",
+      description: "",
+    },
   });
 
   const [createPermission] = useCreatePermissionMutation();
   const [updatePermission] = useUpdatePermissionMutation();
 
-  // Load form values when editing
+  // Load form values if editing
   useEffect(() => {
     if (isEdit && permission) {
-      setForm({
+      reset({
         key: permission.key,
         description: permission.description,
       });
     } else {
-      setForm({ key: "", description: "" });
+      reset({
+        key: "",
+        description: "",
+      });
     }
-  }, [isEdit, permission]);
+  }, [permission, isEdit, reset]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
+  // 🚀 Submit Handler
+  const onSubmit = async (data: PermissionFormState) => {
     try {
       if (isEdit && permission) {
         const response = await updatePermission({
           id: permission.id,
-          body: form,
+          body: data,
         }).unwrap();
         toast.success(response.message || "Permission updated successfully!");
       } else {
-        const response = await createPermission(form).unwrap();
+        const response = await createPermission(data).unwrap();
         toast.success(response.message || "Permission created successfully!");
       }
 
@@ -72,7 +83,7 @@ export default function PermissionFormModal({
     } catch (err: any) {
       toast.error(err?.data?.message || "Something went wrong!");
     }
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
@@ -80,21 +91,24 @@ export default function PermissionFormModal({
         {isEdit ? "Update Permission" : "Create Permission"}
       </h2>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+        {/* Permission Key */}
         <Input
-          name="key"
-          value={form.key}
-          onChange={handleChange}
+          {...register("key")}
           placeholder="permission.create"
+          error={!!errors.key}
+          hint={errors.key?.message}
         />
 
+        {/* Description */}
         <Input
-          name="description"
-          value={form.description}
-          onChange={handleChange}
+          {...register("description")}
           placeholder="Allow creating new permissions"
+          error={!!errors.description}
+          hint={errors.description?.message}
         />
 
+        {/* Submit Button */}
         <button
           type="submit"
           className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"

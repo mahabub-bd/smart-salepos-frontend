@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 
 // API hooks
+import { useGetRolesQuery } from "../../../features/role/roleApi";
 import {
   useCreateUserMutation,
   useGetUserByIdQuery,
   useUpdateUserMutation,
 } from "../../../features/user/userApi";
-
-import { useGetRolesQuery } from "../../../features/role/roleApi";
 
 // Types
 import { User } from "../../../types/auth.ts/auth";
@@ -16,27 +18,38 @@ import { Role } from "../../../types/role";
 // UI
 import { toast } from "react-toastify";
 import Input from "../../../components/form/input/InputField";
-
 import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
 
-// Props interface
 interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: User | null; // null = create mode
+  user: User | null;
 }
 
-// Form values interface
-interface FormState {
-  username: string;
-  email: string;
-  full_name: string;
-  phone: string;
-  password: string;
-  roles: string[];
-  status: string;
-}
+// Base schema
+const BaseUserSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Invalid email"),
+  full_name: z.string().min(3, "Full name is required"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  roles: z.array(z.string()).min(1, "Select at least one role"),
+  status: z.enum(["pending", "active", "suspend", "deactive"]),
+});
+
+// Create schema (password required)
+const CreateUserSchema = BaseUserSchema.extend({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+// Update schema (password optional)
+const UpdateUserSchema = BaseUserSchema.extend({
+  password: z.string().optional(),
+});
+
+type FormState =
+  | z.infer<typeof CreateUserSchema>
+  | z.infer<typeof UpdateUserSchema>;
 
 export default function UserFormModal({
   isOpen,
@@ -45,35 +58,40 @@ export default function UserFormModal({
 }: UserFormModalProps) {
   const isEdit = !!user;
 
-  const [form, setForm] = useState<FormState>({
-    username: "",
-    email: "",
-    full_name: "",
-    phone: "",
-    password: "",
-    roles: [],
-    status: "active",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm<FormState>({
+    resolver: zodResolver(isEdit ? UpdateUserSchema : CreateUserSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      full_name: "",
+      phone: "",
+      password: "",
+      roles: [],
+      status: "active",
+    } as FormState,
   });
 
-  // Create & Update API
   const [createUser] = useCreateUserMutation();
   const [updateUser] = useUpdateUserMutation();
 
-  // Fetch user (edit mode)
   const { data: singleUserRes, isLoading: isUserLoading } = useGetUserByIdQuery(
     user?.id!,
     { skip: !isEdit }
   );
-  const singleUser = singleUserRes?.data;
 
-  // Fetch roles for multiselect
   const { data: rolesData } = useGetRolesQuery();
   const roles: Role[] = rolesData?.data || [];
+  const singleUser = singleUserRes?.data;
 
-  // Load form values when editing
   useEffect(() => {
     if (isEdit && singleUser) {
-      setForm({
+      reset({
         username: singleUser.username,
         email: singleUser.email,
         full_name: singleUser.full_name,
@@ -81,47 +99,27 @@ export default function UserFormModal({
         password: "",
         roles: singleUser.roles?.map((r: Role) => r.name) || [],
         status: singleUser.status,
-      });
+      } as FormState);
+    } else {
+      reset();
     }
+  }, [singleUser, isEdit, reset]);
 
-    if (!isEdit) {
-      setForm({
-        username: "",
-        email: "",
-        full_name: "",
-        phone: "",
-        password: "",
-        roles: [],
-        status: "active",
-      });
-    }
-  }, [singleUser, isEdit]);
-
-  // Input handler
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  // Toggle roles
-  function toggleRole(roleName: string) {
-    setForm((prev) => ({
-      ...prev,
-      roles: prev.roles.includes(roleName)
-        ? prev.roles.filter((r) => r !== roleName)
-        : [...prev.roles, roleName],
-    }));
-  }
-
-  // Submit handler
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
+  const onSubmit = async (data: FormState) => {
     try {
       if (isEdit && user) {
-        await updateUser({ id: user.id, body: form }).unwrap();
+        const updatePayload = { ...data };
+        delete (updatePayload as any).password; // 👈 remove undefined to satisfy API type
+
+        await updateUser({ id: user.id, body: updatePayload }).unwrap();
         toast.success("User updated successfully!");
       } else {
-        await createUser(form).unwrap();
+        const createPayload = {
+          ...data,
+          password: data.password || "", // 👈 ensure password exists
+        };
+
+        await createUser(createPayload).unwrap();
         toast.success("User created successfully!");
       }
 
@@ -129,9 +127,8 @@ export default function UserFormModal({
     } catch (err: any) {
       toast.error(err?.data?.message || "Something went wrong!");
     }
-  }
+  };
 
-  // Loading UI for edit mode
   if (isEdit && isUserLoading) {
     return (
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
@@ -148,90 +145,107 @@ export default function UserFormModal({
         {isEdit ? "Update User" : "Create New User"}
       </h2>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+        {/* Username */}
         <Input
-          name="username"
-          value={form.username}
-          onChange={handleChange}
+          {...register("username")}
           placeholder="Username"
+          error={!!errors.username}
+          hint={errors.username?.message}
         />
 
+        {/* Email */}
         <Input
-          name="email"
           type="email"
-          value={form.email}
-          onChange={handleChange}
+          {...register("email")}
           placeholder="Email Address"
+          error={!!errors.email}
+          hint={errors.email?.message}
         />
 
+        {/* Full Name */}
         <Input
-          name="full_name"
-          value={form.full_name}
-          onChange={handleChange}
+          {...register("full_name")}
           placeholder="Full Name"
+          error={!!errors.full_name}
+          hint={errors.full_name?.message}
         />
 
+        {/* Phone */}
         <Input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
+          {...register("phone")}
           placeholder="Phone Number"
+          error={!!errors.phone}
+          hint={errors.phone?.message}
         />
 
+        {/* Password (only for create) */}
         {!isEdit && (
           <Input
-            name="password"
             type="password"
-            value={form.password}
-            onChange={handleChange}
+            {...register("password")}
             placeholder="Password"
+            error={!!errors.password}
+            hint={errors.password?.message}
           />
         )}
 
-        {/* ⭐ STATUS SELECT (Custom Component) */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">User Status</label>
+        {/* User Status */}
+        <Controller
+          name="status"
+          control={control}
+          render={({ field }) => (
+            <Select
+              options={[
+                { value: "pending", label: "Pending" },
+                { value: "active", label: "Active" },
+                { value: "suspend", label: "Suspend" },
+                { value: "deactive", label: "Deactive" },
+              ]}
+              defaultValue={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
 
-          <Select
-            options={[
-              { value: "pending", label: "Pending" },
-              { value: "active", label: "Active" },
-              { value: "suspend", label: "Suspend" },
-              { value: "deactive", label: "Deactive" },
-            ]}
-            defaultValue={form.status}
-            placeholder="Select User Status"
-            onChange={(value) => setForm({ ...form, status: value })}
-          />
-        </div>
+        {/* Roles */}
+        <Controller
+          name="roles"
+          control={control}
+          render={({ field }) => (
+            <div className="flex flex-wrap gap-2">
+              {roles.map((r: Role) => (
+                <label
+                  key={r.id}
+                  className={`cursor-pointer px-3 py-1 capitalize rounded-lg border ${
+                    field.value.includes(r.name)
+                      ? "bg-brand-600 text-white border-brand-600"
+                      : "border-gray-300 dark:border-gray-700"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={field.value.includes(r.name)}
+                    onChange={() =>
+                      field.onChange(
+                        field.value.includes(r.name)
+                          ? field.value.filter((role) => role !== r.name)
+                          : [...field.value, r.name]
+                      )
+                    }
+                  />
+                  {r.name}
+                </label>
+              ))}
+            </div>
+          )}
+        />
+        {errors.roles && (
+          <p className="text-red-500 text-sm">{errors.roles.message}</p>
+        )}
 
-        {/* Roles Multi-select */}
-        <div>
-          <label className="text-sm font-medium mb-1 block">Assign Roles</label>
-
-          <div className="flex flex-wrap gap-2">
-            {roles.map((r: Role) => (
-              <label
-                key={r.id}
-                className={`cursor-pointer px-3 py-1 capitalize rounded-lg border 
-                ${
-                  form.roles.includes(r.name)
-                    ? "bg-brand-600 text-white border-brand-600"
-                    : "border-gray-300 dark:border-gray-700"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  className="hidden"
-                  checked={form.roles.includes(r.name)}
-                  onChange={() => toggleRole(r.name)}
-                />
-                {r.name}
-              </label>
-            ))}
-          </div>
-        </div>
-
+        {/* Submit button */}
         <button
           type="submit"
           className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
