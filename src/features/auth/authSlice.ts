@@ -13,6 +13,7 @@ const initialState: AuthState = {
   token: null,
   permissions: [],
   expiresAt: null,
+  
 };
 
 const authSlice = createSlice({
