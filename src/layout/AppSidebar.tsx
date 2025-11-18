@@ -35,13 +35,11 @@ const navItems: NavItem[] = [
     path: "/",
   },
 
-  // USERS
-
-  // CUSTOMERS
+  // POS SCREEN
   {
-    icon: <UserCircleIcon />,
-    name: "Customer Management",
-    path: "/customers",
+    icon: <GridIcon />,
+    name: "POS",
+    path: "/pos",
   },
 
   // PRODUCTS & CATEGORIES
@@ -83,18 +81,17 @@ const navItems: NavItem[] = [
     path: "/sales",
   },
 
-  // POS SCREEN
-  {
-    icon: <GridIcon />,
-    name: "POS",
-    path: "/pos",
-  },
-
   // EXPENSE
   {
     icon: <ListIcon />,
     name: "Expense",
     path: "/expenses",
+  },
+  // CUSTOMERS
+  {
+    icon: <UserCircleIcon />,
+    name: "Customer Management",
+    path: "/customers",
   },
   {
     icon: <UserCircleIcon />,
