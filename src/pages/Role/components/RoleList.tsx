@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import PageHeader from "../../../components/common/PageHeader";
+import { useHasPermission } from "../../../hooks/useHasPermission";
 import RoleFormModal from "./RoleFormModal";
 
 export default function RoleList() {
@@ -71,6 +72,7 @@ export default function RoleList() {
         title="Role Management"
         onAdd={openCreateModal}
         addLabel="Add"
+        permission="role.create"
         icon={<Plus size={16} />}
       />
 
@@ -117,17 +119,21 @@ export default function RoleList() {
 
                   <TableCell className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <IconButton
-                        icon={Pencil}
-                        onClick={() => openEditModal(role)}
-                        color="blue"
-                      />
+                      {useHasPermission("role.update") && (
+                        <IconButton
+                          icon={Pencil}
+                          onClick={() => openEditModal(role)}
+                          color="blue"
+                        />
+                      )}
 
-                      <IconButton
-                        icon={Trash2}
-                        onClick={() => openDeleteDialog(role)}
-                        color="red"
-                      />
+                      {useHasPermission("role.delete") && (
+                        <IconButton
+                          icon={Trash2}
+                          onClick={() => openDeleteDialog(role)}
+                          color="red"
+                        />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

@@ -18,13 +18,47 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setCredentials(data.data));
+          const loginData = data.data;
+
+          dispatch(
+            setCredentials({
+              token: loginData.token,
+              user: loginData.user,
+              permissions: [],
+            })
+          );
+
+          const roleName = loginData.user?.roles?.[0]?.name;
+          if (roleName) {
+            const permissionResult = await dispatch(
+              authApi.endpoints.getRolePermissions.initiate(roleName)
+            ).unwrap();
+
+            dispatch(
+              setCredentials({
+                token: loginData.token,
+                user: loginData.user,
+                permissions: permissionResult.data.map((p) => p.key),
+              })
+            );
+          }
         } catch (error) {
           console.error("Login failed:", error);
         }
       },
     }),
+
+    getRolePermissions: builder.query<
+      ApiResponse<{ id: number; key: string; description: string }[]>,
+      string
+    >({
+      query: (roleName) => ({
+        url: `/rbac/role/${roleName}/permissions`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+// Export hooks
+export const { useLoginMutation, useGetRolePermissionsQuery } = authApi;

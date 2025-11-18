@@ -19,13 +19,14 @@ import IconButton from "../../../components/common/IconButton";
 import PageHeader from "../../../components/common/PageHeader";
 import { User } from "../../../types/auth.ts/auth";
 import UserFormModal from "./UserFormModal";
+import { useHasPermission } from "../../../hooks/useHasPermission";
 
 export default function UserList() {
   const { data, isLoading, isError } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
-const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
-const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const users = data?.data || [];
@@ -73,6 +74,7 @@ const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
         title=" User Management"
         onAdd={openCreateModal}
         addLabel="Add"
+        permission="user.create"
         icon={<Plus size={16} />}
       />
 
@@ -166,17 +168,21 @@ const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
                 <TableCell className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
-                    <IconButton
-                      icon={Pencil}
-                      onClick={() => openEditModal(user)}
-                      color="blue"
-                    />
+                    {useHasPermission("user.update") && (
+                      <IconButton
+                        icon={Pencil}
+                        onClick={() => openEditModal(user)}
+                        color="blue"
+                      />
+                    )}
 
-                    <IconButton
-                      icon={Trash2}
-                      onClick={() => openDeleteDialog(user)}
-                      color="red"
-                    />
+                    {useHasPermission("user.delete") && (
+                      <IconButton
+                        icon={Trash2}
+                        onClick={() => openDeleteDialog(user)}
+                        color="red"
+                      />
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

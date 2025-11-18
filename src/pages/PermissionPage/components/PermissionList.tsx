@@ -16,6 +16,7 @@ import {
   useDeletePermissionMutation,
   useGetPermissionsQuery,
 } from "../../../features/permissions/permissionsApi";
+import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Permission } from "../../../types/role";
 import PermissionFormModal from "./PermissionFormModal";
 
@@ -71,6 +72,7 @@ export default function PermissionList() {
         title="Permissions Management"
         onAdd={openCreateModal}
         addLabel="Add"
+        permission="permission.create"
         icon={<Plus size={16} />}
       />
 
@@ -106,17 +108,21 @@ export default function PermissionList() {
 
                   <TableCell className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <IconButton
-                        icon={Pencil}
-                        onClick={() => openEditModal(perm)}
-                        color="blue"
-                      />
+                      {useHasPermission("permission.update") && (
+                        <IconButton
+                          icon={Pencil}
+                          onClick={() => openEditModal(perm)}
+                          color="blue"
+                        />
+                      )}
 
-                      <IconButton
-                        icon={Trash2}
-                        onClick={() => openDeleteDialog(perm)}
-                        color="red"
-                      />
+                      {useHasPermission("permission.delete") && (
+                        <IconButton
+                          icon={Trash2}
+                          onClick={() => openDeleteDialog(perm)}
+                          color="red"
+                        />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
