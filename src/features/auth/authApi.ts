@@ -1,3 +1,4 @@
+import { jwtDecode } from "jwt-decode";
 import {
   ApiResponse,
   LoginRequest,
@@ -5,7 +6,9 @@ import {
 } from "../../types/auth.ts/auth";
 import { apiSlice } from "../apiSlice";
 import { setCredentials } from "./authSlice";
-
+interface TokenPayload {
+  exp: number;
+}
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<ApiResponse<LoginResponse>, LoginRequest>({
@@ -19,12 +22,13 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           const loginData = data.data;
-
+          const decoded = jwtDecode<TokenPayload>(loginData.token);
           dispatch(
             setCredentials({
               token: loginData.token,
               user: loginData.user,
               permissions: [],
+              expiresAt: decoded.exp,
             })
           );
 
@@ -39,6 +43,7 @@ export const authApi = apiSlice.injectEndpoints({
                 token: loginData.token,
                 user: loginData.user,
                 permissions: permissionResult.data.map((p) => p.key),
+                expiresAt: decoded.exp,
               })
             );
           }
@@ -60,5 +65,4 @@ export const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-// Export hooks
 export const { useLoginMutation, useGetRolePermissionsQuery } = authApi;
