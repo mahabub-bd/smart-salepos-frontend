@@ -17,9 +17,9 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import PageHeader from "../../../components/common/PageHeader";
+import { useHasPermission } from "../../../hooks/useHasPermission";
 import { User } from "../../../types/auth.ts/auth";
 import UserFormModal from "./UserFormModal";
-import { useHasPermission } from "../../../hooks/useHasPermission";
 
 export default function UserList() {
   const { data, isLoading, isError } = useGetUsersQuery();
@@ -28,7 +28,8 @@ export default function UserList() {
   const [editUser, setEditUser] = useState<User | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
-
+  const canUpdate = useHasPermission("user.update");
+  const canDelete = useHasPermission("user.delete");
   const users = data?.data || [];
 
   function openCreateModal() {
@@ -168,7 +169,7 @@ export default function UserList() {
 
                 <TableCell className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
-                    {useHasPermission("user.update") && (
+                    {canUpdate && (
                       <IconButton
                         icon={Pencil}
                         onClick={() => openEditModal(user)}
@@ -176,7 +177,7 @@ export default function UserList() {
                       />
                     )}
 
-                    {useHasPermission("user.delete") && (
+                    {canDelete && (
                       <IconButton
                         icon={Trash2}
                         onClick={() => openDeleteDialog(user)}

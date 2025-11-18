@@ -33,7 +33,8 @@ export default function RoleList() {
   // Delete confirmation dialog state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
-
+  const canUpdate = useHasPermission("role.update");
+  const canDelete = useHasPermission("role.delete");
   const roles = data?.data || [];
 
   function openCreateModal() {
@@ -119,7 +120,7 @@ export default function RoleList() {
 
                   <TableCell className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      {useHasPermission("role.update") && (
+                      {canUpdate && (
                         <IconButton
                           icon={Pencil}
                           onClick={() => openEditModal(role)}
@@ -127,7 +128,7 @@ export default function RoleList() {
                         />
                       )}
 
-                      {useHasPermission("role.delete") && (
+                      {canDelete && (
                         <IconButton
                           icon={Trash2}
                           onClick={() => openDeleteDialog(role)}

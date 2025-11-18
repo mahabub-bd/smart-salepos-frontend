@@ -30,7 +30,8 @@ export default function PermissionList() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [permissionToDelete, setPermissionToDelete] =
     useState<Permission | null>(null);
-
+  const canUpdate = useHasPermission("permission.update");
+  const canDelete = useHasPermission("permission.delete");
   const permissions = data?.data || [];
 
   function openCreateModal() {
@@ -108,7 +109,7 @@ export default function PermissionList() {
 
                   <TableCell className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      {useHasPermission("permission.update") && (
+                      {canUpdate && (
                         <IconButton
                           icon={Pencil}
                           onClick={() => openEditModal(perm)}
@@ -116,7 +117,7 @@ export default function PermissionList() {
                         />
                       )}
 
-                      {useHasPermission("permission.delete") && (
+                      {canDelete && (
                         <IconButton
                           icon={Trash2}
                           onClick={() => openDeleteDialog(perm)}
