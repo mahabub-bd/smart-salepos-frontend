@@ -23,11 +23,9 @@ import UserFormModal from "./UserFormModal";
 export default function UserList() {
   const { data, isLoading, isError } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const users = data?.data || [];
