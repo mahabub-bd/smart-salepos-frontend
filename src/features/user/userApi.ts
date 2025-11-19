@@ -1,4 +1,5 @@
-import { ApiResponse, User } from "../../types/auth.ts/auth";
+
+import { ApiResponse, User } from "../../types";
 import { apiSlice } from "../apiSlice";
 
 export interface CreateUserPayload {

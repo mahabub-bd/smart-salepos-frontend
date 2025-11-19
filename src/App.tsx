@@ -22,6 +22,7 @@ import UserProfiles from "./pages/UserProfiles";
 import { ToastContainer } from "react-toastify";
 import PermissionsPage from "./pages/PermissionPage";
 
+import BrandsPage from "./pages/Brand";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import RolesPage from "./pages/Role";
 import UsersPage from "./pages/UserPage";
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/form-elements" element={<FormElements />} />
           <Route path="/basic-tables" element={<BasicTables />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/brands" element={<BrandsPage />} />
 
           <Route path="/permissions" element={<PermissionsPage />} />
           <Route

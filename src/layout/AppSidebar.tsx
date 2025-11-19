@@ -57,6 +57,12 @@ const navItems: NavItem[] = [
         path: "/products",
         requiredPermission: "product.view",
       },
+
+      {
+        name: "Brands",
+        path: "/brands",
+        requiredPermission: "brand.view",
+      },
       {
         name: "Categories",
         path: "/categories",

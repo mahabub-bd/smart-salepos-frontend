@@ -18,7 +18,8 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { User } from "../../../types/auth.ts/auth";
+
+import { User } from "../../../types";
 import UserFormModal from "./UserFormModal";
 
 export default function UserList() {

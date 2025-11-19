@@ -1,11 +1,8 @@
 import { jwtDecode } from "jwt-decode";
-import {
-  ApiResponse,
-  LoginRequest,
-  LoginResponse,
-} from "../../types/auth.ts/auth";
+
 import { apiSlice } from "../apiSlice";
 import { setCredentials } from "./authSlice";
+import { ApiResponse, LoginRequest, LoginResponse } from "../../types";
 interface TokenPayload {
   exp: number;
 }

@@ -11,8 +11,7 @@ import {
   useUpdateUserMutation,
 } from "../../../features/user/userApi";
 
-// Types
-import { User } from "../../../types/auth.ts/auth";
+
 import { Role } from "../../../types/role";
 
 // UI
@@ -20,6 +19,7 @@ import { toast } from "react-toastify";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
+import { User } from "../../../types";
 
 interface UserFormModalProps {
   isOpen: boolean;

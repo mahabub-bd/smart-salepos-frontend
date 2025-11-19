@@ -16,6 +16,7 @@ import { Role } from "../../../types/role";
 // UI
 import Input from "../../../components/form/input/InputField";
 import { Modal } from "../../../components/ui/modal";
+import Label from "../../../components/form/Label";
 
 // Props
 interface Props {
@@ -90,7 +91,7 @@ export default function RoleFormModal({ isOpen, onClose, role }: Props) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <div>
-          <label className="text-sm font-medium mb-1 block">Role Name</label>
+          <Label className="text-sm font-medium mb-1 block">Role Name</Label>
           <Input
             {...register("name")}
             placeholder="Enter role name"
@@ -100,7 +101,7 @@ export default function RoleFormModal({ isOpen, onClose, role }: Props) {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-1 block">Description</label>
+          <Label className="text-sm font-medium mb-1 block">Description</Label>
           <Input
             {...register("description")}
             placeholder="Enter description"
