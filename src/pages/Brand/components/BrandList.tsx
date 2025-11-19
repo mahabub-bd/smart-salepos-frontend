@@ -106,7 +106,7 @@ export default function BrandList() {
                         <ResponsiveImage
                           src={brand.logo_attachment.url}
                           alt={brand.name}
-                          className="h-18 w-32 rounded-md"
+                          className="h-12 w-24 rounded-md"
                         />
                       ) : (
                         <Badge size="sm" color="warning">
