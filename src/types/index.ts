@@ -50,3 +50,27 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+
+export interface Unit {
+  id: number;
+  name: string;
+  code: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateUnitRequest {
+  name: string;
+  code: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateUnitRequest extends Partial<CreateUnitRequest> {
+  id: number;
+}
+
+

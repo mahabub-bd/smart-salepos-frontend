@@ -25,6 +25,7 @@ import PermissionsPage from "./pages/PermissionPage";
 import BrandsPage from "./pages/Brand";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import RolesPage from "./pages/Role";
+import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/basic-tables" element={<BasicTables />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/units" element={<UnitPage />} />
 
           <Route path="/permissions" element={<PermissionsPage />} />
           <Route
