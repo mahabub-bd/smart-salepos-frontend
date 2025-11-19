@@ -1,4 +1,3 @@
-
 import type React from "react";
 import { cn } from "../../utlis";
 
@@ -86,7 +85,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-5 md:p-6",
+        "relative overflow-hidden rounded-2xl border p-4 md:p-4",
         bgColorClasses[bgColor],
         className
       )}
