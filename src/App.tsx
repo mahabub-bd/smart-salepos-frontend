@@ -23,8 +23,10 @@ import { ToastContainer } from "react-toastify";
 import PermissionsPage from "./pages/PermissionPage";
 
 import BrandsPage from "./pages/Brand";
+import CategoryPage from "./pages/Category";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import RolesPage from "./pages/Role";
+import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 import ProtectedRoute from "./route/protected";
@@ -82,6 +84,8 @@ export default function App() {
           />
 
           <Route path="/roles" element={<RolesPage />} />
+          <Route path="/categories" element={<CategoryPage />} />
+          <Route path="/tags" element={<TagPage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

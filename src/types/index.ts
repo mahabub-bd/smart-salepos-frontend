@@ -51,7 +51,6 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-
 export interface Unit {
   id: number;
   name: string;
@@ -73,4 +72,31 @@ export interface UpdateUnitRequest extends Partial<CreateUnitRequest> {
   id: number;
 }
 
+export interface Category {
+  id: number | string;
+  name: string;
+  slug: string;
+  description?: string | null;
 
+  parent_category_id: number | string | null;
+  parent: Category | null;
+
+  children: Category[];
+
+  logo_attachment?: Attachment | null;
+  logo_attachment_id?: string | number | null;
+
+  status: boolean;
+
+  created_at: string;
+  updated_at: string;
+}
+export interface Tag {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string | null;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+}

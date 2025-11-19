@@ -69,6 +69,11 @@ const navItems: NavItem[] = [
         requiredPermission: "category.view",
       },
       { name: "Units", path: "/units", requiredPermission: "unit.view" },
+      {
+        name: "Tags",
+        path: "/tags",
+        requiredPermission: "tag.view",
+      },
     ],
   },
   {
