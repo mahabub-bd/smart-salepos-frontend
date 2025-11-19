@@ -4,19 +4,8 @@ import { Link, useLocation } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import { RootState } from "../store";
 
-import {
-  BoxCubeIcon,
-  CalenderIcon,
-  ChevronDownIcon,
-  GridIcon,
-  HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
-} from "../icons";
+import { FileText, Package2Icon } from "lucide-react";
+import { ChevronDownIcon, HorizontaLDots } from "../icons";
 
 type NavItem = {
   name: string;
@@ -32,22 +21,35 @@ type NavItem = {
   requiredPermission?: string;
 };
 
+import {
+  Banknote,
+  CalendarDays,
+  LayoutDashboard,
+  MonitorSmartphone,
+  PieChart,
+  ShieldCheck,
+  Truck,
+  UserCircle,
+  Users,
+  Warehouse,
+} from "lucide-react";
+
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
+    icon: <LayoutDashboard />,
     name: "Dashboard",
     path: "/",
     requiredPermission: "dashboard.view",
   },
   {
-    icon: <GridIcon />,
+    icon: <MonitorSmartphone />,
     name: "POS",
     path: "/pos",
     requiredPermission: "pos.view",
   },
   {
-    icon: <BoxCubeIcon />,
-    name: "Product Management",
+    icon: <Package2Icon />,
+    name: "Products",
     requiredPermission: "product.view",
     subItems: [
       {
@@ -64,47 +66,52 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <CalenderIcon />,
+    icon: <CalendarDays />,
     name: "Purchase",
     path: "/purchase",
     requiredPermission: "purchase.view",
   },
   {
-    icon: <TableIcon />,
+    icon: <Warehouse />,
     name: "Inventory",
     path: "/inventory",
     requiredPermission: "inventory.view",
   },
   {
-    icon: <PlugInIcon />,
+    icon: <Truck />,
     name: "Supplier",
     path: "/suppliers",
     requiredPermission: "supplier.view",
   },
   {
-    icon: <PieChartIcon />,
+    icon: <PieChart />,
     name: "Sale",
     path: "/sales",
     requiredPermission: "sales.view",
   },
   {
-    icon: <ListIcon />,
+    icon: <Banknote />,
     name: "Expense",
     path: "/expenses",
     requiredPermission: "expense.view",
   },
   {
-    icon: <UserCircleIcon />,
-    name: "Customer Management",
+    icon: <UserCircle />,
+    name: "Customer",
     path: "/customers",
     requiredPermission: "customer.view",
   },
   {
-    icon: <UserCircleIcon />,
-    name: "User Management",
+    icon: <Users />,
+    name: "Users",
+    path: "/users",
     requiredPermission: "user.view",
+  },
+  {
+    icon: <ShieldCheck />,
+    name: "Roles & Permissions",
+    requiredPermission: "role.view",
     subItems: [
-      { name: "Users", path: "/users", requiredPermission: "user.view" },
       { name: "Roles", path: "/roles", requiredPermission: "role.view" },
       {
         name: "Permissions",
@@ -122,7 +129,7 @@ const navItems: NavItem[] = [
 
 const othersItems: NavItem[] = [
   {
-    icon: <PageIcon />,
+    icon: <FileText />,
     name: "Reports",
     requiredPermission: "report.view",
     subItems: [
