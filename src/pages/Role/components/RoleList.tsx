@@ -19,6 +19,7 @@ import Badge from "../../../components/ui/badge/Badge";
 
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
+import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import RoleFormModal from "./RoleFormModal";
@@ -64,7 +65,7 @@ export default function RoleList() {
   };
 
   // Loading & Error states
-  if (isLoading) return <p className="p-6 text-gray-500">Loading roles...</p>;
+  if (isLoading) return <Loading message="Loading Roles" />;
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch roles.</p>;
 

@@ -19,6 +19,7 @@ import {
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Permission } from "../../../types/role";
 import PermissionFormModal from "./PermissionFormModal";
+import Loading from "../../../components/common/Loading";
 
 export default function PermissionList() {
   const { data, isLoading, isError } = useGetPermissionsQuery();
@@ -61,8 +62,7 @@ export default function PermissionList() {
     }
   }
 
-  if (isLoading)
-    return <p className="p-5 text-gray-500">Loading permissions...</p>;
+  if (isLoading) return <Loading message="Loading Permissions" />;
 
   if (isError)
     return <p className="p-5 text-red-500">Failed to fetch permissions.</p>;

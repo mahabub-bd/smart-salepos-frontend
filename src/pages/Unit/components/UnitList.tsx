@@ -18,6 +18,7 @@ import {
 
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
+import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge";
 import UnitFormModal from "./UnitFormModal";
@@ -64,7 +65,8 @@ export default function UnitList() {
     }
   };
 
-  if (isLoading) return <p className="p-6 text-gray-500">Loading units...</p>;
+  if (isLoading) return <Loading message="Loading Units" />;
+
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch units.</p>;
 

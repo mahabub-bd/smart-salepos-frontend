@@ -25,6 +25,8 @@ import PermissionsPage from "./pages/PermissionPage";
 import BrandsPage from "./pages/Brand";
 import CategoryPage from "./pages/Category";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
+import ProductPage from "./pages/Product";
+import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import RolesPage from "./pages/Role";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
@@ -77,17 +79,20 @@ export default function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/units" element={<UnitPage />} />
-
           <Route path="/permissions" element={<PermissionsPage />} />
           <Route
             path="/permissions/assign-role"
             element={<PermissionAssignPage />}
           />
-
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/tags" element={<TagPage />} />
           <Route path="/warehouses" element={<WarehousePage />} />
+          <Route path="/products" element={<ProductPage />} />
+          // For creating a product
+          <Route path="/products/create" element={<ProductFormPage />} />
+          // For editing a product
+          <Route path="/products/edit/:id" element={<ProductFormPage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

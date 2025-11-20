@@ -22,6 +22,7 @@ import {
 
 import { Warehouse } from "../../../types";
 import WarehouseFormModal from "./WarehouseFormModal";
+import Loading from "../../../components/common/Loading";
 
 export default function WarehouseList() {
   const { data, isLoading, isError } = useGetWarehousesQuery();
@@ -67,8 +68,8 @@ export default function WarehouseList() {
     }
   };
 
-  if (isLoading)
-    return <p className="p-6 text-gray-500">Loading warehouses...</p>;
+  if (isLoading) return <Loading message="Loading Warehouses" />;
+
   if (isError)
     return <p className="p-6 text-red-500">Failed to load warehouses.</p>;
 

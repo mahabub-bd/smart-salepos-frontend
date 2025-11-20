@@ -110,3 +110,37 @@ export interface Warehouse {
   created_at: string;
   updated_at: string;
 }
+
+export interface Product {
+  id: number;
+  name: string;
+  sku: string;
+  barcode?: string;
+  description?: string;
+  selling_price: string;
+  purchase_price: string;
+  discount_price?: string;
+  status: boolean;
+  brand?: Brand;
+  category?: Category;
+  unit?: Unit;
+  tags?: Tag[];
+  images?: Attachment[];
+  created_at: string;
+  updated_at: string;
+}
+export interface ProductRequest {
+  name: string;
+  sku: string;
+  barcode?: string;
+  description?: string;
+  selling_price: number;
+  purchase_price: number;
+  discount_price?: number;
+  status?: boolean;
+  brand_id?: number;
+  category_id?: number;
+  unit_id?: number;
+  tag_ids?: number[];
+  image_ids?: number[];
+}

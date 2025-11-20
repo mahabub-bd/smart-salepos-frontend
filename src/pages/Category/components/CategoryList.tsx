@@ -25,6 +25,7 @@ import {
 } from "../../../components/ui/table";
 
 import CategoryFormModal from "./CategoryFormModal";
+import Loading from "../../../components/common/Loading";
 
 // 🔥 Flatten nested category tree into table-ready array
 const flattenCategories = (nodes: Category[]): Category[] => {
@@ -93,8 +94,7 @@ export default function CategoryList() {
     }
   };
 
-  if (isLoading)
-    return <p className="p-6 text-gray-500">Loading categories...</p>;
+  if (isLoading) return <Loading message="Loading Categories" />;
 
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch categories.</p>;

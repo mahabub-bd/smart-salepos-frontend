@@ -58,7 +58,7 @@ export default function UserDropdown() {
           className="flex items-center gap-2 px-2 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
         >
           <img className="h-5 w-5 rounded-full" src={avatar} alt={fullName} />
-          Profile
+          {fullName}
         </DropdownItem>
 
         <DropdownItem

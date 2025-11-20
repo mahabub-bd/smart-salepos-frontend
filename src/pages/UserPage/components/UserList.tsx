@@ -21,6 +21,7 @@ import { useHasPermission } from "../../../hooks/useHasPermission";
 
 import { User } from "../../../types";
 import UserFormModal from "./UserFormModal";
+import Loading from "../../../components/common/Loading";
 
 export default function UserList() {
   const { data, isLoading, isError } = useGetUsersQuery();
@@ -56,10 +57,7 @@ export default function UserList() {
     setUserToDelete(null);
   }
 
-  if (isLoading)
-    return (
-      <p className="p-6 text-gray-500 dark:text-gray-400">Loading users...</p>
-    );
+  if (isLoading) return <Loading message="Loading Users" />;
 
   if (isError)
     return (

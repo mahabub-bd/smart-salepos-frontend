@@ -22,6 +22,7 @@ import {
 } from "../../../components/ui/table";
 import { Tag } from "../../../types";
 import TagFormModal from "./TagFormModal";
+import Loading from "../../../components/common/Loading";
 
 export default function TagList() {
   const { data, isLoading, isError } = useGetTagsQuery();
@@ -63,7 +64,8 @@ export default function TagList() {
     }
   };
 
-  if (isLoading) return <p className="p-6 text-gray-500">Loading tags...</p>;
+  if (isLoading) return <Loading message="Loading Tags" />;
+
   if (isError) return <p className="p-6 text-red-500">Failed to load tags.</p>;
 
   return (

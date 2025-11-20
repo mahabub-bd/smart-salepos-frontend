@@ -17,7 +17,7 @@ export default function FileInputExample() {
         <FileInput
           onChange={handleFileChange}
           className="custom-class"
-          accept="image/*" // Supported now
+          accept="image/*" 
         />
       </div>
     </ComponentCard>

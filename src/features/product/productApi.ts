@@ -1,0 +1,70 @@
+import { ApiResponse, Product, ProductRequest } from "../../types";
+import { apiSlice } from "../apiSlice";
+
+export interface UpdateProductPayload {
+  id: string | number;
+  body: ProductRequest;
+}
+
+export const productApi = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    // 🔹 GET ALL PRODUCTS
+    getProducts: builder.query<ApiResponse<Product[]>, void>({
+      query: () => ({
+        url: "/product",
+        method: "GET",
+      }),
+      providesTags: ["Products"],
+    }),
+
+    // 🔹 GET PRODUCT BY ID
+    getProductById: builder.query<ApiResponse<Product>, string | number>({
+      query: (id) => ({
+        url: `/product/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, id) => [{ type: "Products", id }],
+    }),
+
+    // 🔹 CREATE PRODUCT
+    createProduct: builder.mutation<ApiResponse<Product>, ProductRequest>({
+      query: (body) => ({
+        url: "/product",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Products"],
+    }),
+
+    // 🔹 UPDATE PRODUCT
+    updateProduct: builder.mutation<ApiResponse<Product>, UpdateProductPayload>({
+      query: ({ id, body }) => ({
+        url: `/product/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Products",
+        { type: "Products", id },
+      ],
+    }),
+
+    // 🔹 DELETE PRODUCT
+    deleteProduct: builder.mutation<ApiResponse<{ message: string }>, string | number>({
+      query: (id) => ({
+        url: `/product/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Products"],
+    }),
+  }),
+});
+
+// 🔥 Export hooks
+export const {
+  useGetProductsQuery,
+  useGetProductByIdQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
+} = productApi;

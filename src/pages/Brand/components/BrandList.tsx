@@ -20,6 +20,7 @@ import {
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Brand } from "../../../types";
 import BrandFormModal from "./BrandFormModal";
+import Loading from "../../../components/common/Loading";
 
 export default function BrandList() {
   const { data, isLoading, isError } = useGetBrandsQuery();
@@ -63,7 +64,8 @@ export default function BrandList() {
     }
   };
 
-  if (isLoading) return <p className="p-6 text-gray-500">Loading brands...</p>;
+  if (isLoading) return <Loading message="Loading Brands" />;
+
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch brands.</p>;
 
