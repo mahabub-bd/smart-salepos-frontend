@@ -77,6 +77,7 @@ export default function ProductList() {
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch products.</p>;
 
+
   return (
     <Fragment>
       <PageHeader
