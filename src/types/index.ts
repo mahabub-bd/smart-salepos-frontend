@@ -100,3 +100,13 @@ export interface Tag {
   created_at: string;
   updated_at: string;
 }
+
+export interface Warehouse {
+  id: number;
+  name: string;
+  location?: string;
+  address?: string;
+  status?: boolean;
+  created_at: string;
+  updated_at: string;
+}

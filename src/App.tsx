@@ -29,6 +29,7 @@ import RolesPage from "./pages/Role";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
+import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
 export default function App() {
@@ -86,6 +87,7 @@ export default function App() {
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/tags" element={<TagPage />} />
+          <Route path="/warehouses" element={<WarehousePage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

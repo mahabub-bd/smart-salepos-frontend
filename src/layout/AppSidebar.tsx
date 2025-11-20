@@ -52,28 +52,11 @@ const navItems: NavItem[] = [
     name: "Products",
     requiredPermission: "product.view",
     subItems: [
-      {
-        name: "Products",
-        path: "/products",
-        requiredPermission: "product.view",
-      },
-
-      {
-        name: "Brands",
-        path: "/brands",
-        requiredPermission: "brand.view",
-      },
-      {
-        name: "Categories",
-        path: "/categories",
-        requiredPermission: "category.view",
-      },
+      { name: "Products", path: "/products", requiredPermission: "product.view" },
+      { name: "Brands", path: "/brands", requiredPermission: "brand.view" },
+      { name: "Categories", path: "/categories", requiredPermission: "category.view" },
       { name: "Units", path: "/units", requiredPermission: "unit.view" },
-      {
-        name: "Tags",
-        path: "/tags",
-        requiredPermission: "tag.view",
-      },
+      { name: "Tags", path: "/tags", requiredPermission: "tag.view" },
     ],
   },
   {
@@ -85,8 +68,19 @@ const navItems: NavItem[] = [
   {
     icon: <Warehouse />,
     name: "Inventory",
-    path: "/inventory",
     requiredPermission: "inventory.view",
+    subItems: [
+      {
+        name: "Warehouses",
+        path: "/warehouses",
+        requiredPermission: "warehouse.view",
+      },
+      {
+        name: "Inventory Movement",
+        path: "/inventory",
+        requiredPermission: "inventory.view",
+      },
+    ],
   },
   {
     icon: <Truck />,
@@ -124,11 +118,7 @@ const navItems: NavItem[] = [
     requiredPermission: "role.view",
     subItems: [
       { name: "Roles", path: "/roles", requiredPermission: "role.view" },
-      {
-        name: "Permissions",
-        path: "/permissions",
-        requiredPermission: "permission.view",
-      },
+      { name: "Permissions", path: "/permissions", requiredPermission: "permission.view" },
       {
         name: "Permission Assign",
         path: "/permissions/assign-role",
@@ -137,6 +127,7 @@ const navItems: NavItem[] = [
     ],
   },
 ];
+
 
 const othersItems: NavItem[] = [
   {

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { z } from "zod";
+import { z } from "zod"; // 🔹 FIXED import
 
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
@@ -10,37 +10,38 @@ import Switch from "../../../components/form/switch/Switch";
 import { Modal } from "../../../components/ui/modal";
 
 import {
-  useCreateTagMutation,
-  useUpdateTagMutation,
-} from "../../../features/tag/tagApi";
-import { Tag } from "../../../types";
+  useCreateWarehouseMutation,
+  useUpdateWarehouseMutation,
+} from "../../../features/warehouse/warehouseApi";
+import { Warehouse } from "../../../types";
 
-const slugify = (str: string) =>
-  str
-    .toLowerCase()
-    .trim()
-    .replace(/ /g, "-")
-    .replace(/[^\w-]/g, "");
-
-const tagSchema = z.object({
+const warehouseSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  slug: z.string().optional(),
-  description: z.string().optional(),
+  location: z.string().optional(),
+  address: z
+    .string()
+    .max(200, "Address cannot exceed 200 characters")
+    .optional(),
   status: z.boolean().default(true).optional(),
 });
 
-type TagFormValues = z.infer<typeof tagSchema>;
+export type WarehouseFormValues = z.infer<typeof warehouseSchema>;
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  tag: Tag | null;
+  warehouse: Warehouse | null;
 }
 
-export default function TagFormModal({ isOpen, onClose, tag }: Props) {
-  const isEdit = !!tag;
-  const [createTag] = useCreateTagMutation();
-  const [updateTag] = useUpdateTagMutation();
+export default function WarehouseFormModal({
+  isOpen,
+  onClose,
+  warehouse,
+}: Props) {
+  const isEdit = !!warehouse;
+
+  const [createWarehouse] = useCreateWarehouseMutation();
+  const [updateWarehouse] = useUpdateWarehouseMutation();
 
   const {
     register,
@@ -49,46 +50,39 @@ export default function TagFormModal({ isOpen, onClose, tag }: Props) {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<TagFormValues>({
-    resolver: zodResolver(tagSchema),
+  } = useForm<WarehouseFormValues>({
+    resolver: zodResolver(warehouseSchema),
     defaultValues: {
       name: "",
-      slug: "",
-      description: "",
+      location: "",
+      address: "",
       status: true,
     },
   });
 
-  // Auto-generate slug when name changes
-  const nameValue = watch("name");
-  useEffect(() => {
-    if (!isEdit) {
-      setValue("slug", slugify(nameValue), { shouldValidate: false });
-    }
-  }, [nameValue, setValue, isEdit]);
+  const statusValue = watch("status"); // 👈 Best practice
 
-  // Reset form on modal open/edit
   useEffect(() => {
-    if (isEdit && tag) {
+    if (isEdit && warehouse) {
       reset({
-        name: tag.name || "",
-        slug: tag.slug || "",
-        description: tag.description || "",
-        status: tag.status ?? true,
+        name: warehouse.name,
+        location: warehouse.location || "",
+        address: warehouse.address || "",
+        status: warehouse.status ?? true,
       });
     } else {
-      reset({ name: "", slug: "", description: "", status: true });
+      reset({ name: "", location: "", address: "", status: true });
     }
-  }, [reset, isEdit, tag]);
+  }, [warehouse, isEdit, reset]);
 
-  const onSubmit = async (data: TagFormValues) => {
+  const onSubmit = async (data: WarehouseFormValues) => {
     try {
-      if (isEdit && tag) {
-        await updateTag({ id: tag.id, body: data }).unwrap();
-        toast.success("Tag updated");
+      if (isEdit && warehouse) {
+        await updateWarehouse({ id: warehouse.id, body: data }).unwrap();
+        toast.success("Warehouse updated");
       } else {
-        await createTag(data).unwrap();
-        toast.success("Tag created");
+        await createWarehouse(data).unwrap();
+        toast.success("Warehouse created");
       }
       onClose();
     } catch (err: any) {
@@ -99,11 +93,10 @@ export default function TagFormModal({ isOpen, onClose, tag }: Props) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
       <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Tag" : "Create New Tag"}
+        {isEdit ? "Update Warehouse" : "Create New Warehouse"}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {/* Name */}
         <div>
           <Label>Name</Label>
           <Input {...register("name")} />
@@ -112,29 +105,32 @@ export default function TagFormModal({ isOpen, onClose, tag }: Props) {
           )}
         </div>
 
-        {/* Slug */}
         <div>
-          <Label>Slug</Label>
-          <Input {...register("slug")} />
+          <Label>Location</Label>
+          <Input {...register("location")} />
         </div>
 
-        {/* Description */}
         <div>
-          <Label>Description</Label>
-          <Input {...register("description")} />
+          <Label>Address</Label>
+          <Input {...register("address")} />
+          {errors.address && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.address.message}
+            </p>
+          )}
         </div>
 
-        {/* Status */}
         <div className="flex items-center gap-3">
           <Label>Status</Label>
           <Switch
             label="Active"
-            defaultChecked={watch("status")}
-            onChange={(checked) => setValue("status", checked)}
+            defaultChecked={statusValue}
+            onChange={(checked) =>
+              setValue("status", checked, { shouldValidate: true })
+            }
           />
         </div>
 
-        {/* Buttons */}
         <div className="flex justify-end gap-2 mt-4">
           <button
             type="button"
