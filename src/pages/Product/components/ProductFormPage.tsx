@@ -31,6 +31,7 @@ import {
 import { useGetTagsQuery } from "../../../features/tag/tagApi";
 import { useGetUnitsQuery } from "../../../features/unit/unitApi";
 
+import Button from "../../../components/ui/button/Button";
 import { ProductRequest } from "../../../types";
 
 // Update your validation schema
@@ -84,6 +85,7 @@ export default function ProductFormPage() {
     register,
     handleSubmit,
     setValue,
+    getValues,
     reset,
     formState: { errors },
   } = useForm<ProductFormValues>({
@@ -101,7 +103,9 @@ export default function ProductFormPage() {
         description: product.description,
         selling_price: Number(product.selling_price),
         purchase_price: Number(product.purchase_price),
-        discount_price: product.discount_price ? Number(product.discount_price) : undefined,
+        discount_price: product.discount_price
+          ? Number(product.discount_price)
+          : undefined,
         brand_id: Number(product.brand?.id ?? 0),
         category_id: Number(product.category?.id ?? 0),
         unit_id: Number(product.unit?.id ?? 0),
@@ -115,7 +119,24 @@ export default function ProductFormPage() {
   // Show loading while fetching product
   if (isProductLoading && isEditMode)
     return <Loading message="Loading product..." />;
+  // Generate 6-digit random number
+  const randomNumber = () => Math.floor(100000 + Math.random() * 900000);
 
+  // SKU Example: PROD-XXXXXX
+  const generateSKU = (name?: string) => {
+    const prefix = name
+      ? name
+          .slice(0, 3)
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "")
+      : "PRD";
+    return `${prefix}-${randomNumber()}`;
+  };
+
+  // Barcode Example: 13-digit EAN (random)
+  const generateBarcode = () => {
+    return String(Date.now()).slice(-13);
+  };
   // Upload only new images
   const handleImageUpload = async () => {
     if (selectedImages.length === 0) return [];
@@ -173,16 +194,52 @@ export default function ProductFormPage() {
 
       <div className="p-6 bg-white rounded-xl shadow dark:bg-dark-900">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <FormField label="Product Name" error={errors.name?.message}>
-            <Input {...register("name")} />
-          </FormField>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="Product Name" error={errors.name?.message}>
+              <Input {...register("name")} />
+            </FormField>
+            <FormField label="Description" error={errors.description?.message}>
+              <Input
+                {...register("description")}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+            </FormField>
+          </div>
 
-          <FormField label="SKU" error={errors.sku?.message}>
-            <Input {...register("sku")} />
-          </FormField>
+          <div className="grid grid-cols-4 gap-4">
+            {/* SKU */}
+            <FormField label="SKU" error={errors.sku?.message}>
+              <div className="flex items-center gap-2 w-full">
+                <Input {...register("sku")} className="flex-1" />
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() =>
+                    setValue("sku", generateSKU(getValues("name")))
+                  }
+                >
+                  Generate
+                </Button>
+              </div>
+            </FormField>
+
+            {/* Barcode */}
+            <FormField label="Barcode" error={errors.barcode?.message}>
+              <div className="flex items-center gap-2 w-full">
+                <Input {...register("barcode")} className="flex-1" />
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => setValue("barcode", generateBarcode())}
+                >
+                  Generate
+                </Button>
+              </div>
+            </FormField>
+          </div>
 
           {/* Prices */}
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <FormField label="Selling Price">
               <Input type="number" {...register("selling_price")} />
             </FormField>
@@ -195,7 +252,7 @@ export default function ProductFormPage() {
           </div>
 
           {/* Selects */}
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <SelectField
               label="Category"
               data={categories?.data?.map((cat) => ({
@@ -245,7 +302,7 @@ export default function ProductFormPage() {
                 <img
                   src={product.images[0].url}
                   alt={product.name}
-                  className="h-24 w-24 object-cover rounded-md border"
+                  className=" object-contain w-48 h-27 rounded-md border"
                 />
                 <p className="text-xs text-gray-500 mt-1">(Current Image)</p>
               </div>

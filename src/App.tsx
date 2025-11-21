@@ -27,7 +27,10 @@ import CategoryPage from "./pages/Category";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import ProductPage from "./pages/Product";
 import ProductFormPage from "./pages/Product/components/ProductFormPage";
+import PurchasePage from "./pages/Purchase";
+import PurchaseDetailPage from "./pages/Purchase/components/PurchaseDetailPage";
 import RolesPage from "./pages/Role";
+import SuppliersPage from "./pages/Supplier";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
@@ -93,6 +96,11 @@ export default function App() {
           <Route path="/products/create" element={<ProductFormPage />} />
           // For editing a product
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
+          <Route path="/suppliers" element={<SuppliersPage />} />
+          {/* Purchase List */}
+          <Route path="/purchase" element={<PurchasePage />} />
+          {/* Purchase Detail */}
+          <Route path="/purchases/:id" element={<PurchaseDetailPage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

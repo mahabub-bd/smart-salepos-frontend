@@ -144,3 +144,54 @@ export interface ProductRequest {
   tag_ids?: number[];
   image_ids?: number[];
 }
+
+export interface Supplier {
+  id: number;
+  name: string;
+  contact_person?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  payment_terms?: string;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PurchaseProduct {
+  id: number;
+  name: string;
+  sku: string;
+  barcode: string;
+  description: string;
+  selling_price: string;
+  purchase_price: string;
+  discount_price: string;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+}
+export interface PurchaseItem {
+  id: number;
+  purchase_id: number;
+  product_id: number;
+  quantity: number;
+  price: string;
+  product: PurchaseProduct | null;
+}
+export interface Purchase {
+  id: number;
+  po_no: string;
+  supplier_id: number;
+  supplier: Supplier;
+  warehouse_id: number;
+  warehouse: Warehouse;
+
+  items: PurchaseItem[];
+
+  total: string;
+  status: "draft" | "ordered" | "received";
+
+  created_at: string;
+  updated_at: string;
+}
