@@ -193,8 +193,9 @@ export interface Purchase {
   items: PurchaseItem[];
 
   total: string;
-  status: "draft" | "ordered" | "received";
-
+  paid_amount: string;
+  due_amount: string;
+  status: PurchaseStatus;
   created_at: string;
   updated_at: string;
 }
@@ -217,3 +218,4 @@ export interface InventoryItem {
 }
 
 export type Inventory = InventoryItem[];
+export type PurchaseStatus = 'draft' | 'ordered' | 'received' | 'cancelled';

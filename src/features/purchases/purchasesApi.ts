@@ -1,4 +1,4 @@
-import { ApiResponse, Purchase } from "../../types";
+import { ApiResponse, Purchase, PurchaseStatus } from "../../types";
 import { apiSlice } from "../apiSlice";
 
 export interface ReceivePurchasePayload {
@@ -12,7 +12,8 @@ export interface UpdatePurchasePayload {
     po_no?: string;
     supplier_id?: number;
     warehouse_id?: number;
-    total?: string;
+    total?: number;
+    status?: PurchaseStatus;
     items?: {
       product_id: number;
       quantity: number;

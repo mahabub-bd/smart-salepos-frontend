@@ -5,6 +5,7 @@ import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { useGetPurchasesQuery } from "../../../features/purchases/purchasesApi";
+import PurchaseStatusBadge from "./PurchaseStatusBadge";
 
 export default function PurchaseList() {
   const { data, isLoading, isError } = useGetPurchasesQuery();
@@ -35,6 +36,8 @@ export default function PurchaseList() {
                 <th className="table-header">Supplier</th>
                 <th className="table-header">Warehouse</th>
                 <th className="table-header">Total</th>
+                <th className="table-header">Paid Amount</th>
+                <th className="table-header">Due Amount</th>
                 <th className="table-header">Status</th>
                 <th className="table-header">Created At</th>
                 <th className="table-header text-right">Actions</th>
@@ -53,7 +56,9 @@ export default function PurchaseList() {
                       {p.warehouse?.name || `Warehouse #${p.warehouse_id}`}
                     </td>
                     <td className="table-body">{p.total}</td>
-                    <td className="table-body capitalize">{p.status}</td>
+                    <td className="table-body">{p.paid_amount}</td>
+                    <td className="table-body">{p.due_amount}</td>
+                    <td className="table-body capitalize"><PurchaseStatusBadge status={p.status} /></td>
                     <td className="table-body">
                       {new Date(p.created_at).toLocaleDateString()}
                     </td>

@@ -45,7 +45,7 @@ export default function PurchaseReceiveModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-xl p-6">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-4">
       <h2 className="text-lg font-semibold mb-4">
         Receive Items – {purchase.po_no}
       </h2>

@@ -11,7 +11,7 @@ export const purchaseSchema = z.object({
   supplier_id: z.coerce.number().min(1, "Supplier is required"),
   warehouse_id: z.coerce.number().min(1, "Warehouse is required"),
   items: z.array(purchaseItemSchema).min(1, "At least 1 item is required"),
-  status: z.enum(["ordered", "received"]).optional(),
+  status: z.enum(["ordered", "received" ,"draft","cancelled"]).optional(),
 });
 
 export type PurchaseFormValues = z.infer<typeof purchaseSchema>;

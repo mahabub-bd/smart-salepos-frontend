@@ -80,6 +80,9 @@ export default function SupplierList() {
                 <th className="table-header">Phone</th>
                 <th className="table-header">Email</th>
                 <th className="table-header">Address</th>
+                <th className="table-header">Products</th>
+
+
                 <th className="table-header text-right">Actions</th>
               </tr>
             </thead>
@@ -93,6 +96,7 @@ export default function SupplierList() {
                     <td className="table-body">{s.phone || "-"}</td>
                     <td className="table-body">{s.email || "-"}</td>
                     <td className="table-body">{s.address || "-"}</td>
+                    <td className="table-body">{s.products?.length || 0}</td>
 
                     <td className="table-body text-right">
                       <div className="flex justify-end gap-2">

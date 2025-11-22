@@ -85,7 +85,7 @@ export const inventoryApi = apiSlice.injectEndpoints({
         url: "/inventory/report/product-wise",
         method: "GET",
       }),
-      providesTags: ["InventoryReport"],
+      providesTags: ["Inventory"],
     }),
 
     // 🔹 WAREHOUSE-WISE REPORT
@@ -94,7 +94,7 @@ export const inventoryApi = apiSlice.injectEndpoints({
         url: "/inventory/report/warehouse-wise",
         method: "GET",
       }),
-      providesTags: ["InventoryReport"],
+      providesTags: ["Inventory"],
     }),
   }),
 });

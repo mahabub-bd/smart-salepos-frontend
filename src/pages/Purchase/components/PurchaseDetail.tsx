@@ -6,6 +6,7 @@ import Loading from "../../../components/common/Loading";
 import { useGetPurchaseByIdQuery } from "../../../features/purchases/purchasesApi";
 import { PurchaseItem } from "../../../types";
 import PurchaseReceiveModal from "./PurchaseReceiveModal";
+import PurchaseStatusBadge from "./PurchaseStatusBadge";
 
 interface Props {
   purchaseId: string;
@@ -26,14 +27,16 @@ export default function PurchaseDetail({ purchaseId }: Props) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Purchase Details</h1>
-
-        <IconButton
-          icon={FileCheck}
-          color="green"
-          onClick={() => setIsReceiveModalOpen(true)}
-        >
-          Receive Items
-        </IconButton>
+        {
+          purchase.status === 'ordered' && (
+            <IconButton
+              icon={FileCheck}
+              color="green"
+              onClick={() => setIsReceiveModalOpen(true)}
+            >
+              Receive Items
+            </IconButton>
+          )}
       </div>
 
       {/* Purchase Info */}
@@ -44,7 +47,9 @@ export default function PurchaseDetail({ purchaseId }: Props) {
           <Info label="PO Number" value={purchase.po_no} />
           <Info label="Supplier" value={purchase.supplier?.name || "-"} />
           <Info label="Warehouse" value={purchase.warehouse?.name || "-"} />
-          <Info label="Status" value={purchase.status} />
+          <div className="inline-flex items-center gap-2"> Purchase Status:  <PurchaseStatusBadge status={purchase.status} /></div>
+          <Info label="Paid Amount" value={purchase.paid_amount} />
+          <Info label="Due Amount" value={purchase.due_amount} />
           <Info
             label="Date"
             value={new Date(purchase.created_at).toLocaleDateString()}

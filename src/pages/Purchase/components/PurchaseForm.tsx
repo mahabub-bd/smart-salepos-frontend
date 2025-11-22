@@ -24,6 +24,7 @@ import {
 import { useGetProductsQuery } from "../../../features/product/productApi";
 import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { useGetWarehousesQuery } from "../../../features/warehouse/warehouseApi";
+import { PurchaseStatus } from "../../../types";
 
 interface Props {
   mode: "create" | "edit";
@@ -72,6 +73,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
       po_no: "",
       supplier_id: 0,
       warehouse_id: 0,
+      status: "draft",
       items: [{ product_id: 0, quantity: 1, price: 0 }],
     },
   });
@@ -104,6 +106,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
 
       const formData = {
         po_no: p.po_no || "",
+        status: p.status || "draft",
         supplier_id: Number(p.supplier_id),
         warehouse_id: Number(p.warehouse_id),
         items: p.items.map((i: any) => ({
@@ -146,7 +149,8 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
 
     const payload = {
       ...values,
-      total,
+      total: Number(total),
+      status: values.status as PurchaseStatus,
       supplier_id: Number(values.supplier_id),
       warehouse_id: Number(values.warehouse_id),
       items: values.items.map((item: { product_id: any; quantity: any; price: any; }) => ({
@@ -174,6 +178,8 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
   const items = watch("items");
   const supplierId = watch("supplier_id");
   const warehouseId = watch("warehouse_id");
+  const status = watch("status");
+
 
   return (
     <div>
@@ -225,6 +231,19 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                 console.log("Warehouse changed to:", val);
                 setValue("warehouse_id", Number(val), { shouldValidate: true });
               }}
+            />
+
+            <SelectField
+              label="Status"
+              data={[
+                { id: "draft", name: "Draft" },
+                { id: "ordered", name: "Ordered" },
+                { id: "received", name: "Received" },
+                { id: "cancelled", name: "Cancelled" },
+              ]}
+              value={status || "draft"}
+              error={errors.status?.message}
+              onChange={(val) => setValue("status", val as PurchaseStatus)}
             />
           </div>
 

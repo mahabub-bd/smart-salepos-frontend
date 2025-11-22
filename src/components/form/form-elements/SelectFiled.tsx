@@ -26,7 +26,7 @@ export function SelectField({
   error,
 }: {
   label: string;
-  data?: { id: number; name: string }[];
+  data?: { id: number | string; name: string }[];
   value?: number | string;
   error?: string;
   onChange: (value: string) => void;
