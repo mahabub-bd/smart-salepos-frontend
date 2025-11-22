@@ -6,6 +6,21 @@ export interface ReceivePurchasePayload {
   body: any; // If you send quantities, items etc. I can refine it
 }
 
+export interface UpdatePurchasePayload {
+  id: string | number;
+  body: {
+    po_no?: string;
+    supplier_id?: number;
+    warehouse_id?: number;
+    total?: string;
+    items?: {
+      product_id: number;
+      quantity: number;
+      price: number;
+    }[];
+  };
+}
+
 export const purchasesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createPurchase: builder.mutation({
@@ -19,7 +34,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
     // 🔹 UPDATE PURCHASE
     updatePurchase: builder.mutation<
       ApiResponse<Purchase>,
-      { id: string | number; body: Partial<Purchase> }
+      UpdatePurchasePayload
     >({
       query: ({ id, body }) => ({
         url: `/purchases/${id}`,
@@ -55,7 +70,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
       {
         query: ({ id, body }) => ({
           url: `/purchases/${id}/receive`,
-          method: "POST",
+          method: "PATCH",
           body,
         }),
         invalidatesTags: (_result, _error, { id }) => [

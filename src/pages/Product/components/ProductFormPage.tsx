@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -22,7 +22,7 @@ import {
   useUploadSingleAttachmentMutation,
 } from "../../../features/attachment/attachmentApi";
 import { useGetBrandsQuery } from "../../../features/brand/brandApi";
-import { useGetCategoryTreeQuery } from "../../../features/category/categoryApi";
+import { useGetCategoriesQuery } from "../../../features/category/categoryApi";
 import {
   useCreateProductMutation,
   useGetProductByIdQuery,
@@ -32,6 +32,7 @@ import { useGetTagsQuery } from "../../../features/tag/tagApi";
 import { useGetUnitsQuery } from "../../../features/unit/unitApi";
 
 import Button from "../../../components/ui/button/Button";
+import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { ProductRequest } from "../../../types";
 
 // Update your validation schema
@@ -40,14 +41,40 @@ const productSchema = z.object({
   sku: z.string().min(1, "SKU is required"),
   barcode: z.string().optional(),
   description: z.string().optional(),
-  selling_price: z.number().min(0.01, "Selling price must be greater than 0"), // ✅ Changed
-  purchase_price: z.number().min(0.01, "Purchase price must be greater than 0"), // ✅ Changed
-  discount_price: z.number().optional(), // ✅ Changed
-  brand_id: z.number().min(1, "Brand is required"), // ✅ Changed
-  category_id: z.number().min(1, "Category is required"), // ✅ Changed
-  unit_id: z.number().min(1, "Unit is required"), // ✅ Changed
-  tag_ids: z.array(z.number()).optional(),
-  image_ids: z.array(z.number()).optional(),
+
+  selling_price: z.coerce
+    .number()
+    .min(0.01, "Selling price must be greater than 0"),
+  purchase_price: z.coerce
+    .number()
+    .min(0.01, "Purchase price must be greater than 0"),
+  discount_price: z.coerce.number().optional(),
+
+  brand_id: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.coerce.number({ error: "Brand is required" }).min(1, "Brand is required")
+  ),
+
+  category_id: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.coerce
+      .number({ error: "Category is required" })
+      .min(1, "Category is required")
+  ),
+
+  unit_id: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.coerce.number({ error: "Unit is required" }).min(1, "Unit is required")
+  ),
+
+  supplier_id: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.number().optional()
+  ),
+
+  tag_ids: z.array(z.coerce.number()).optional(),
+  image_ids: z.array(z.coerce.number()).optional(),
+
   status: z.boolean(),
 });
 
@@ -58,18 +85,16 @@ export default function ProductFormPage() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
 
-  // Fetch existing product if editing
   const { data: productData, isLoading: isProductLoading } =
     useGetProductByIdQuery(id!, { skip: !isEditMode });
   const product = productData?.data;
 
-  // Fetch dropdown data
   const { data: brands } = useGetBrandsQuery();
-  const { data: categories } = useGetCategoryTreeQuery();
+  const { data: categories } = useGetCategoriesQuery();
   const { data: units } = useGetUnitsQuery();
   const { data: tags } = useGetTagsQuery();
+  const { data: suppliers } = useGetSuppliersQuery();
 
-  // Mutation hooks
   const [createProduct, { isLoading: createLoading }] =
     useCreateProductMutation();
   const [updateProduct, { isLoading: updateLoading }] =
@@ -77,25 +102,44 @@ export default function ProductFormPage() {
   const [uploadSingleAttachment] = useUploadSingleAttachmentMutation();
   const [uploadMultipleAttachments] = useUploadMultipleAttachmentsMutation();
 
-  // Image upload handler
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
-  // React Hook Form setup
   const {
     register,
     handleSubmit,
     setValue,
     getValues,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
-    defaultValues: { status: true },
+    resolver: zodResolver(productSchema) as Resolver<ProductFormValues>,
+    defaultValues: {
+      name: "",
+      sku: "",
+      barcode: "",
+      description: "",
+      selling_price: 0,
+      purchase_price: 0,
+      discount_price: undefined,
+      brand_id: undefined,
+      category_id: undefined,
+      unit_id: undefined,
+      supplier_id: undefined,
+      tag_ids: [],
+      image_ids: [],
+      status: true,
+    },
   });
 
-  // Prefill values on edit
+  // Watch form values
+  const categoryId = watch("category_id");
+
+
+  const [mainCategoryId, setMainCategoryId] = useState<number | undefined>(undefined);
+
   useEffect(() => {
-    if (isEditMode && product) {
+    if (isEditMode && product && categories?.data) {
       reset({
         name: product.name,
         sku: product.sku,
@@ -109,16 +153,30 @@ export default function ProductFormPage() {
         brand_id: Number(product.brand?.id ?? 0),
         category_id: Number(product.category?.id ?? 0),
         unit_id: Number(product.unit?.id ?? 0),
+        supplier_id: product.supplier?.id ? Number(product.supplier.id) : undefined,
+
         tag_ids: product.tags?.map((t) => Number(t.id)) || [],
         image_ids: product.images?.map((img) => Number(img.id)) || [],
         status: product.status,
       });
+
+      // Set main category ID
+      if (product.category) {
+        if (product.category.parent_category_id) {
+          // It's a subcategory, so parent_category_id is the main category
+          setMainCategoryId(Number(product.category.parent_category_id));
+        } else {
+          // It's a main category
+          setMainCategoryId(Number(product.category.id));
+        }
+      }
     }
-  }, [isEditMode, product, reset]);
+  }, [isEditMode, product, categories?.data, reset]);
 
   // Show loading while fetching product
   if (isProductLoading && isEditMode)
     return <Loading message="Loading product..." />;
+
   // Generate 6-digit random number
   const randomNumber = () => Math.floor(100000 + Math.random() * 900000);
 
@@ -126,9 +184,9 @@ export default function ProductFormPage() {
   const generateSKU = (name?: string) => {
     const prefix = name
       ? name
-          .slice(0, 3)
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g, "")
+        .slice(0, 3)
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "")
       : "PRD";
     return `${prefix}-${randomNumber()}`;
   };
@@ -137,6 +195,7 @@ export default function ProductFormPage() {
   const generateBarcode = () => {
     return String(Date.now()).slice(-13);
   };
+
   // Upload only new images
   const handleImageUpload = async () => {
     if (selectedImages.length === 0) return [];
@@ -212,6 +271,7 @@ export default function ProductFormPage() {
               <div className="flex items-center gap-2 w-full">
                 <Input {...register("sku")} className="flex-1" />
                 <Button
+
                   size="sm"
                   variant="primary"
                   onClick={() =>
@@ -228,6 +288,7 @@ export default function ProductFormPage() {
               <div className="flex items-center gap-2 w-full">
                 <Input {...register("barcode")} className="flex-1" />
                 <Button
+
                   size="sm"
                   variant="primary"
                   onClick={() => setValue("barcode", generateBarcode())}
@@ -240,29 +301,65 @@ export default function ProductFormPage() {
 
           {/* Prices */}
           <div className="grid grid-cols-3 gap-4">
-            <FormField label="Selling Price">
+            <FormField label="Selling Price" error={errors.selling_price?.message}>
               <Input type="number" {...register("selling_price")} />
             </FormField>
-            <FormField label="Purchase Price">
+            <FormField label="Purchase Price" error={errors.purchase_price?.message}>
               <Input type="number" {...register("purchase_price")} />
             </FormField>
-            <FormField label="Discount Price">
+            <FormField label="Discount Price" error={errors.discount_price?.message}>
               <Input type="number" {...register("discount_price")} />
             </FormField>
           </div>
 
           {/* Selects */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             <SelectField
-              label="Category"
-              data={categories?.data?.map((cat) => ({
-                id: typeof cat.id === "string" ? Number(cat.id) : cat.id,
-                name: cat.name,
-              }))}
-              value={product?.category?.id}
-              error={errors.category_id?.message}
-              onChange={(val) => setValue("category_id", Number(val))}
+              label="Main Category"
+              data={categories?.data
+                ?.filter((cat) => !cat.parent_category_id)
+                .map((cat) => ({
+                  id: typeof cat.id === "string" ? Number(cat.id) : cat.id,
+                  name: cat.name,
+                }))}
+              value={product?.category?.parent_category_id?.toString()}
+              onChange={(val) => {
+                const id = Number(val);
+                setMainCategoryId(id);
+                const hasSub = categories?.data?.some(
+                  (c) => c.parent_category_id == id
+                );
+                if (!hasSub) {
+                  // Main category has no subcategories, set it as the category_id
+                  setValue("category_id", id, { shouldValidate: true });
+                } else {
+                  // Main category has subcategories, reset subcategory selection
+                  setValue("category_id", 0, { shouldValidate: false });
+                }
+              }}
             />
+            {mainCategoryId &&
+              categories?.data?.some(
+                (c) => c.parent_category_id == mainCategoryId
+              ) && (
+                <SelectField
+                  label="Sub Category"
+                  data={categories?.data
+                    ?.filter((cat) => cat.parent_category_id == mainCategoryId)
+                    .map((cat) => ({
+                      id: typeof cat.id === "string" ? Number(cat.id) : cat.id,
+                      name: cat.name,
+                    }))}
+                  value={categoryId}
+                  error={errors.category_id?.message}
+                  onChange={(val) =>
+                    setValue("category_id", Number(val), { shouldValidate: true })
+                  }
+                />
+              )}
+
+
+
             <SelectField
               label="Brand"
               data={brands?.data?.map((brand) => ({
@@ -271,14 +368,27 @@ export default function ProductFormPage() {
               }))}
               value={product?.brand?.id}
               error={errors.brand_id?.message}
-              onChange={(val) => setValue("brand_id", Number(val))}
+              onChange={(val) => setValue("brand_id", Number(val), { shouldValidate: true })}
             />
             <SelectField
               label="Unit"
-              data={units?.data}
+              data={units?.data?.map((unit) => ({
+                id: typeof unit.id === "string" ? Number(unit.id) : unit.id,
+                name: unit.name,
+              }))}
               value={product?.unit?.id}
               error={errors.unit_id?.message}
-              onChange={(val) => setValue("unit_id", Number(val))}
+              onChange={(val) => setValue("unit_id", Number(val), { shouldValidate: true })}
+            />
+            <SelectField
+              label="Suppliers"
+              data={suppliers?.data?.map((supplier) => ({
+                id: typeof supplier.id === "string" ? Number(supplier.id) : supplier.id,
+                name: supplier.name,
+              }))}
+              value={product?.supplier?.id}
+              error={errors.supplier_id?.message}
+              onChange={(val) => setValue("supplier_id", Number(val), { shouldValidate: true })}
             />
           </div>
 
@@ -302,7 +412,7 @@ export default function ProductFormPage() {
                 <img
                   src={product.images[0].url}
                   alt={product.name}
-                  className=" object-contain w-48 h-27 rounded-md border"
+                  className="object-contain w-48 h-27 rounded-md border"
                 />
                 <p className="text-xs text-gray-500 mt-1">(Current Image)</p>
               </div>
@@ -318,6 +428,7 @@ export default function ProductFormPage() {
           {/* Actions */}
           <div className="flex justify-end gap-3">
             <button
+              type="button"
               onClick={() => navigate("/products")}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
             >
@@ -328,7 +439,7 @@ export default function ProductFormPage() {
               disabled={createLoading || updateLoading}
               className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50"
             >
-              {isEditMode ? "Update " : "Create Product"}
+              {isEditMode ? "Update Product" : "Create Product"}
             </button>
           </div>
         </form>

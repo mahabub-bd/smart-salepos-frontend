@@ -1,47 +1,16 @@
 import { Eye, FileCheck, Pencil, Plus } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
-
 import { useGetPurchasesQuery } from "../../../features/purchases/purchasesApi";
-
-import { Purchase } from "../../../types";
-import PurchaseFormModal from "./PurchaseFormModal";
-import PurchaseReceiveModal from "./PurchaseReceiveModal";
 
 export default function PurchaseList() {
   const { data, isLoading, isError } = useGetPurchasesQuery();
   const navigate = useNavigate();
 
   const purchases = data?.data || [];
-
-  // State
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(
-    null
-  );
-
-  // Open create purchase modal
-  const openCreateModal = () => {
-    setSelectedPurchase(null); // Create mode
-    setIsFormModalOpen(true);
-  };
-
-  // Open edit modal
-  const openEditModal = (purchase: Purchase) => {
-    setSelectedPurchase(purchase);
-    setIsFormModalOpen(true);
-  };
-
-  // Open receive modal
-  const openReceiveModal = (purchase: Purchase) => {
-    setSelectedPurchase(purchase);
-    setIsReceiveModalOpen(true);
-  };
 
   if (isLoading) return <Loading message="Loading Purchases..." />;
   if (isError)
@@ -53,7 +22,7 @@ export default function PurchaseList() {
         title="Purchase Management"
         icon={<Plus size={16} />}
         addLabel="Add Purchase"
-        onAdd={openCreateModal}
+        onAdd={() => navigate("/purchases/create")} // 🚀 Go to Create Page
         permission="purchase.create"
       />
 
@@ -64,6 +33,7 @@ export default function PurchaseList() {
               <tr>
                 <th className="table-header">PO No</th>
                 <th className="table-header">Supplier</th>
+                <th className="table-header">Warehouse</th>
                 <th className="table-header">Total</th>
                 <th className="table-header">Status</th>
                 <th className="table-header">Created At</th>
@@ -78,6 +48,9 @@ export default function PurchaseList() {
                     <td className="table-body font-medium">{p.po_no}</td>
                     <td className="table-body">
                       {p.supplier?.name || `Supplier #${p.supplier_id}`}
+                    </td>
+                    <td className="table-body">
+                      {p.warehouse?.name || `Warehouse #${p.warehouse_id}`}
                     </td>
                     <td className="table-body">{p.total}</td>
                     <td className="table-body capitalize">{p.status}</td>
@@ -98,14 +71,16 @@ export default function PurchaseList() {
                         <IconButton
                           icon={FileCheck}
                           color="green"
-                          onClick={() => openReceiveModal(p)}
+                          onClick={() =>
+                            navigate(`/purchases/${p.id}?receive=true`)
+                          } // optional
                         />
 
                         {/* Edit */}
                         <IconButton
                           icon={Pencil}
                           color="blue"
-                          onClick={() => openEditModal(p)}
+                          onClick={() => navigate(`/purchases/edit/${p.id}`)}
                         />
                       </div>
                     </td>
@@ -122,22 +97,6 @@ export default function PurchaseList() {
           </table>
         </div>
       </div>
-
-      {/* Receive Modal */}
-      {selectedPurchase && (
-        <PurchaseReceiveModal
-          isOpen={isReceiveModalOpen}
-          onClose={() => setIsReceiveModalOpen(false)}
-          purchase={selectedPurchase}
-        />
-      )}
-
-      {/* Add/Edit Purchase Modal */}
-      <PurchaseFormModal
-        isOpen={isFormModalOpen}
-        onClose={() => setIsFormModalOpen(false)}
-        purchase={selectedPurchase} // null = create, object = edit
-      />
     </>
   );
 }

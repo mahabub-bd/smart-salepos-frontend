@@ -52,9 +52,17 @@ const navItems: NavItem[] = [
     name: "Products",
     requiredPermission: "product.view",
     subItems: [
-      { name: "Products", path: "/products", requiredPermission: "product.view" },
+      {
+        name: "Products",
+        path: "/products",
+        requiredPermission: "product.view",
+      },
       { name: "Brands", path: "/brands", requiredPermission: "brand.view" },
-      { name: "Categories", path: "/categories", requiredPermission: "category.view" },
+      {
+        name: "Categories",
+        path: "/categories",
+        requiredPermission: "category.view",
+      },
       { name: "Units", path: "/units", requiredPermission: "unit.view" },
       { name: "Tags", path: "/tags", requiredPermission: "tag.view" },
     ],
@@ -76,6 +84,24 @@ const navItems: NavItem[] = [
         requiredPermission: "warehouse.view",
       },
       {
+        name: "Stock Batch Wise",
+        path: "/inventory/stock-batch-wise",
+        requiredPermission: "inventory.view",
+      },
+
+      {
+        name: "Stock Product Wise",
+        path: "/inventory/stock-product-wise",
+        requiredPermission: "inventory.view",
+      },
+
+      {
+        name: "Stock Warehouse Wise",
+        path: "/inventory/stock-warehouse-wise",
+        requiredPermission: "inventory.view",
+      },
+
+      {
         name: "Inventory Movement",
         path: "/inventory",
         requiredPermission: "inventory.view",
@@ -86,7 +112,7 @@ const navItems: NavItem[] = [
     icon: <Truck />,
     name: "Supplier",
     path: "/suppliers",
-    requiredPermission: "supplier.view",
+    requiredPermission: "suppliers.view",
   },
   {
     icon: <PieChart />,
@@ -118,7 +144,11 @@ const navItems: NavItem[] = [
     requiredPermission: "role.view",
     subItems: [
       { name: "Roles", path: "/roles", requiredPermission: "role.view" },
-      { name: "Permissions", path: "/permissions", requiredPermission: "permission.view" },
+      {
+        name: "Permissions",
+        path: "/permissions",
+        requiredPermission: "permission.view",
+      },
       {
         name: "Permission Assign",
         path: "/permissions/assign-role",
@@ -127,7 +157,6 @@ const navItems: NavItem[] = [
     ],
   },
 ];
-
 
 const othersItems: NavItem[] = [
   {

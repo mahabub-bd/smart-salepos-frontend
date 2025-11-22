@@ -77,7 +77,6 @@ export default function ProductList() {
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch products.</p>;
 
-
   return (
     <Fragment>
       <PageHeader
@@ -102,7 +101,9 @@ export default function ProductList() {
                 <TableCell isHeader className="table-header">
                   SKU
                 </TableCell>
-
+                <TableCell isHeader className="table-header">
+                  Suppliers
+                </TableCell>
                 <TableCell isHeader className="table-header">
                   Brand
                 </TableCell>
@@ -150,6 +151,14 @@ export default function ProductList() {
 
                     {/* SKU */}
                     <TableCell className="table-body">{product.sku}</TableCell>
+                    {/* Suppliers */}
+                    <TableCell className="table-body">
+                      {product.supplier?.name ? (
+                        product.supplier.name
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </TableCell>
                     {/* Brand */}
                     <TableCell className="table-body">
                       {product.brand?.name || "-"}

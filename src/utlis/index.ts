@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import z from "zod";
 export const baseUrl = import.meta.env.VITE_API_URL;
 export const statusOptions = [
   { value: "pending", label: "Pending" },
@@ -23,3 +24,9 @@ export function formatCurrencyEnglish(amount: number): string {
     .format(amount)
     .replace("BDT", "৳ ");
 }
+
+export const SafeNumber = (msg: string) =>
+  z.preprocess((v) => {
+    const num = Number(v);
+    return Number.isFinite(num) ? num : null;
+  }, z.number({ error: msg }));

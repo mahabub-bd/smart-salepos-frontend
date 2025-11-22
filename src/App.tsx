@@ -28,7 +28,11 @@ import PermissionAssignPage from "./pages/PermissionAssignPage";
 import ProductPage from "./pages/Product";
 import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import PurchasePage from "./pages/Purchase";
+
+import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
+import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
 import PurchaseDetailPage from "./pages/Purchase/components/PurchaseDetailPage";
+import PurchaseEdit from "./pages/Purchase/components/PurchaseEdit";
 import RolesPage from "./pages/Role";
 import SuppliersPage from "./pages/Supplier";
 import TagPage from "./pages/Tag";
@@ -37,6 +41,8 @@ import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
+import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
+import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
 export default function App() {
   return (
     <Router>
@@ -99,8 +105,25 @@ export default function App() {
           <Route path="/suppliers" element={<SuppliersPage />} />
           {/* Purchase List */}
           <Route path="/purchase" element={<PurchasePage />} />
+          <Route path="/purchases/create" element={<PurchaseCreate />} />
+          <Route path="/purchases/edit/:id" element={<PurchaseEdit />} />
           {/* Purchase Detail */}
           <Route path="/purchases/:id" element={<PurchaseDetailPage />} />
+          <Route
+            path="/inventory/stock-batch-wise"
+            element={<InventoryPageBatchWise />}
+          />
+
+           <Route
+            path="/inventory/stock-product-wise"
+            element={<InventoryProductWisePage />}
+          />
+
+           <Route
+            path="/inventory/stock-warehouse-wise"
+            element={<InventoryProductWarehouseWise />}
+          />
+
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

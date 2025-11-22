@@ -124,6 +124,7 @@ export interface Product {
   brand?: Brand;
   category?: Category;
   unit?: Unit;
+  supplier?: Supplier;
   tags?: Tag[];
   images?: Attachment[];
   created_at: string;
@@ -141,6 +142,7 @@ export interface ProductRequest {
   brand_id?: number;
   category_id?: number;
   unit_id?: number;
+  suppliers_id?: number;
   tag_ids?: number[];
   image_ids?: number[];
 }
@@ -156,6 +158,7 @@ export interface Supplier {
   status: boolean;
   created_at: string;
   updated_at: string;
+  products: Product[];
 }
 
 export interface PurchaseProduct {
@@ -195,3 +198,22 @@ export interface Purchase {
   created_at: string;
   updated_at: string;
 }
+
+export interface InventoryItem {
+  id: number;
+  product: Product;
+  product_id: number;
+  warehouse: Warehouse;
+  warehouse_id: number;
+  batch_no: string;
+  quantity: number;
+  sold_quantity: number;
+  expiry_date: string | null;
+  purchase_price: string;
+  supplier: string;
+  purchase_item_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Inventory = InventoryItem[];
