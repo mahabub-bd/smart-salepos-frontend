@@ -13,17 +13,18 @@ import { Modal } from "../../../components/ui/modal";
 import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 import {
   useCreateCategoryMutation,
+  useCreateSubCategoryMutation,
   useGetCategoriesQuery,
   useUpdateCategoryMutation,
+  useUpdateSubCategoryMutation,
 } from "../../../features/category/categoryApi";
 import { Category } from "../../../types";
 
-
-
 const CategorySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
+  slug: z.string().min(2, "Slug must be at least 2 characters"),
   description: z.string().optional(),
-  parent_category_id: z.string().nullable().optional(),
+  category_id: z.string().nullable().optional(),
   status: z.boolean(),
 });
 
@@ -32,7 +33,7 @@ type FormValues = z.infer<typeof CategorySchema>;
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  category: Category | null;
+  category: Category | null; // For edit mode
 }
 
 export default function CategoryFormModal({
@@ -40,13 +41,16 @@ export default function CategoryFormModal({
   onClose,
   category,
 }: Props) {
-  const isEdit = !!category;
+  const isEdit = !!category?.id;
+  const isSubCategory = !!category?.category_id; // Detect if editing subcategory
 
   const { data } = useGetCategoriesQuery();
   const categories = data?.data || [];
 
   const [createCategory] = useCreateCategoryMutation();
+  const [createSubCategory] = useCreateSubCategoryMutation();
   const [updateCategory] = useUpdateCategoryMutation();
+  const [updateSubCategory] = useUpdateSubCategoryMutation();
   const [uploadLogo] = useUploadSingleAttachmentMutation();
 
   const [attachmentId, setAttachmentId] = useState<string | null>(null);
@@ -58,26 +62,31 @@ export default function CategoryFormModal({
     handleSubmit,
     reset,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(CategorySchema),
     defaultValues: {
       name: "",
+      slug: "",
       description: "",
-      parent_category_id: null,
+      category_id: null,
       status: true,
     },
   });
+
+  // Watch name field for auto-generating slug
+  const watchName = watch("name");
 
   useEffect(() => {
     if (isEdit && category) {
       reset({
         name: category.name,
+        slug: category.slug || "",
         description: category.description || "",
         status: category.status,
-        parent_category_id: category.parent_category_id
-          ? String(category.parent_category_id)
-          : null,
+        category_id: category.category_id ? String(category.category_id) : null,
       });
 
       setAttachmentId(
@@ -87,15 +96,28 @@ export default function CategoryFormModal({
     } else {
       reset({
         name: "",
+        slug: "",
         description: "",
         status: true,
-        parent_category_id: null,
+        category_id: category?.category_id
+          ? String(category.category_id)
+          : null,
       });
-
       setAttachmentId(null);
       setImageUrl(null);
     }
   }, [category, isEdit, reset]);
+
+  // Auto-generate slug from name (only for new entries)
+  useEffect(() => {
+    if (!isEdit && watchName) {
+      const generatedSlug = watchName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      setValue("slug", generatedSlug);
+    }
+  }, [watchName, isEdit, setValue]);
 
   // Upload Logo
   const handleFileChange = async (
@@ -110,7 +132,6 @@ export default function CategoryFormModal({
     try {
       setIsUploading(true);
       const res = await uploadLogo(formData).unwrap();
-
       setAttachmentId(String(res.data.id));
       setImageUrl(res.data.url);
     } catch {
@@ -133,11 +154,23 @@ export default function CategoryFormModal({
 
     try {
       if (isEdit && category) {
-        await updateCategory({ id: category.id, body: payload }).unwrap();
-        toast.success("Category updated successfully");
+        // UPDATE: Check if it's a subcategory or main category
+        if (isSubCategory) {
+          await updateSubCategory({ id: category.id, body: payload }).unwrap();
+          toast.success("Subcategory updated successfully");
+        } else {
+          await updateCategory({ id: category.id, body: payload }).unwrap();
+          toast.success("Category updated successfully");
+        }
       } else {
-        await createCategory(payload).unwrap();
-        toast.success("Category created successfully");
+        // CREATE: Check if creating subcategory or main category
+        if (payload.category_id) {
+          await createSubCategory(payload).unwrap();
+          toast.success("Subcategory created successfully");
+        } else {
+          await createCategory(payload).unwrap();
+          toast.success("Main category created successfully");
+        }
       }
       onClose();
     } catch (err: any) {
@@ -148,43 +181,74 @@ export default function CategoryFormModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-xl p-6">
       <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Category" : "Create Category"}
+        {isEdit
+          ? isSubCategory
+            ? "Update Subcategory"
+            : "Update Category"
+          : category?.category_id
+          ? "Create Subcategory"
+          : "Create Category"}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name */}
         <div>
           <Label>Name</Label>
-          <Input {...register("name")} />
+          <Input {...register("name")} placeholder="e.g., Electronics" />
           {errors.name && (
             <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
+        </div>
+
+        {/* Slug */}
+        <div>
+          <Label>Slug</Label>
+          <Input
+            {...register("slug")}
+            placeholder="e.g., electronics or electronics-laptops"
+          />
+          {errors.slug && (
+            <p className="text-red-500 text-sm">{errors.slug.message}</p>
+          )}
+          {!isEdit && (
+            <p className="text-xs text-gray-500 mt-1">
+              Auto-generated from name. You can edit it if needed.
+            </p>
           )}
         </div>
 
         {/* Description */}
         <div>
           <Label>Description</Label>
-          <Input {...register("description")} />
+          <Input
+            {...register("description")}
+            placeholder="Describe this category..."
+          />
         </div>
 
-        {/* Parent Category */}
-        <div>
-          <Label>Parent Category</Label>
-          <select
-            className="w-full border border-gray-300 rounded-lg p-2 dark:bg-white/10"
-            {...register("parent_category_id")}
-          >
-            <option value="">None</option>
-
-            {categories
-              .filter((c: Category) => c.id !== category?.id)
-              .map((c: Category) => (
+        {/* Parent Category (subcategory assign) */}
+        {!isEdit || !category?.category_id ? (
+          <div>
+            <Label>Parent Category</Label>
+            <select
+              className="w-full border rounded-lg p-2 dark:bg-gray-800 dark:border-gray-700"
+              {...register("category_id")}
+              disabled={isEdit && isSubCategory}
+            >
+              <option value="">Main Category</option>
+              {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
-          </select>
-        </div>
+            </select>
+            {isEdit && isSubCategory && (
+              <p className="text-sm text-gray-500 mt-1">
+                Cannot change parent category for existing subcategories
+              </p>
+            )}
+          </div>
+        ) : null}
 
         {/* Logo Upload */}
         <div>
@@ -203,6 +267,7 @@ export default function CategoryFormModal({
             <div className="aspect-video w-28 mt-2">
               <img
                 src={imageUrl}
+                alt="Category logo"
                 className="w-full h-full object-cover rounded-md"
               />
             </div>
@@ -227,10 +292,16 @@ export default function CategoryFormModal({
         {/* Submit */}
         <button
           type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
+          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isUploading}
         >
-          {isEdit ? "Update Category" : "Create Category"}
+          {isEdit
+            ? isSubCategory
+              ? "Update Subcategory"
+              : "Update Category"
+            : category?.category_id
+            ? "Create Subcategory"
+            : "Create Category"}
         </button>
       </form>
     </Modal>

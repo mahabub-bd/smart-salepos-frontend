@@ -33,29 +33,35 @@ export const productApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Products"],
+      invalidatesTags: ["Products", "Suppliers"],
     }),
 
     // 🔹 UPDATE PRODUCT
-    updateProduct: builder.mutation<ApiResponse<Product>, UpdateProductPayload>({
-      query: ({ id, body }) => ({
-        url: `/product/${id}`,
-        method: "PATCH",
-        body,
-      }),
-      invalidatesTags: (_result, _error, { id }) => [
-        "Products",
-        { type: "Products", id },
-      ],
-    }),
+    updateProduct: builder.mutation<ApiResponse<Product>, UpdateProductPayload>(
+      {
+        query: ({ id, body }) => ({
+          url: `/product/${id}`,
+          method: "PATCH",
+          body,
+        }),
+        invalidatesTags: (_result, _error, { id }) => [
+          "Products",
+          "Suppliers",
+          { type: "Products", id },
+        ],
+      }
+    ),
 
     // 🔹 DELETE PRODUCT
-    deleteProduct: builder.mutation<ApiResponse<{ message: string }>, string | number>({
+    deleteProduct: builder.mutation<
+      ApiResponse<{ message: string }>,
+      string | number
+    >({
       query: (id) => ({
         url: `/product/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Products"],
+      invalidatesTags: ["Products", "Suppliers"],
     }),
   }),
 });

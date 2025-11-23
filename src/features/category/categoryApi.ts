@@ -1,4 +1,4 @@
-import { ApiResponse, Category } from "../../types";
+import { ApiResponse, Category, SubCategory } from "../../types";
 import { apiSlice } from "../apiSlice";
 
 // For Category Update
@@ -6,7 +6,10 @@ export interface UpdateCategoryPayload {
   id: string | number;
   body: Partial<Category>;
 }
-
+export interface UpdateSubCategoryPayload {
+  id: string | number;
+  body: Partial<SubCategory>;
+}
 export const categoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 GET ALL CATEGORIES
@@ -17,6 +20,8 @@ export const categoryApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Categories"],
     }),
+
+    // 🔹 GET CATEGORY TREE
     getCategoryTree: builder.query<ApiResponse<Category[]>, void>({
       query: () => ({
         url: "/category/tree",
@@ -34,6 +39,18 @@ export const categoryApi = apiSlice.injectEndpoints({
       providesTags: (_res, _err, id) => [{ type: "Categories", id }],
     }),
 
+    // 🆕 🔹 GET SUBCATEGORIES BY CATEGORY ID
+    getSubCategoriesByCategoryId: builder.query<
+      ApiResponse<Category[]>,
+      string | number
+    >({
+      query: (id) => ({
+        url: `/category/${id}/subcategories`,
+        method: "GET",
+      }),
+      providesTags: ["Categories"],
+    }),
+
     // 🔹 CREATE CATEGORY
     createCategory: builder.mutation<ApiResponse<Category>, Partial<Category>>({
       query: (body) => ({
@@ -44,10 +61,38 @@ export const categoryApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Categories"],
     }),
 
+    // 🆕 🔹 CREATE SUBCATEGORY
+    createSubCategory: builder.mutation<
+      ApiResponse<Category>,
+      Partial<Category>
+    >({
+      query: (body) => ({
+        url: "/category/sub-category",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Categories"],
+    }),
+
     // 🔹 UPDATE CATEGORY
     updateCategory: builder.mutation<
       ApiResponse<Category>,
       UpdateCategoryPayload
+    >({
+      query: ({ id, body }) => ({
+        url: `/category/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Categories",
+        { type: "Categories", id },
+      ],
+    }),
+
+    updateSubCategory: builder.mutation<
+      ApiResponse<SubCategory>,
+      UpdateSubCategoryPayload
     >({
       query: ({ id, body }) => ({
         url: `/category/${id}`,
@@ -79,7 +124,10 @@ export const {
   useGetCategoriesQuery,
   useGetCategoryTreeQuery,
   useGetCategoryByIdQuery,
+  useGetSubCategoriesByCategoryIdQuery,
   useCreateCategoryMutation,
+  useCreateSubCategoryMutation,
   useUpdateCategoryMutation,
+  useUpdateSubCategoryMutation,
   useDeleteCategoryMutation,
 } = categoryApi;

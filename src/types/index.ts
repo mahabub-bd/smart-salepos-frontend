@@ -73,23 +73,24 @@ export interface UpdateUnitRequest extends Partial<CreateUnitRequest> {
 }
 
 export interface Category {
-  id: number | string;
+  id: number;
   name: string;
-  slug: string;
-  description?: string | null;
-
-  parent_category_id: number | string | null;
-  parent: Category | null;
-
-  children: Category[];
-
-  logo_attachment?: Attachment | null;
-  logo_attachment_id?: string | number | null;
-
+  slug?: string | null;
+  description?: string;
   status: boolean;
-
+  category_id?: number;
+  logo_attachment: Attachment;
+  logo_attachment_id?: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface SubCategory extends Category {
+  category_id: number;
+}
+
+export interface CategoryWithChildren extends Category {
+  children?: SubCategory[];
 }
 export interface Tag {
   id: number;
@@ -218,4 +219,4 @@ export interface InventoryItem {
 }
 
 export type Inventory = InventoryItem[];
-export type PurchaseStatus = 'draft' | 'ordered' | 'received' | 'cancelled';
+export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
