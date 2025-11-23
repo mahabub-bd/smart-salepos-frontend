@@ -9,7 +9,6 @@ import {
 
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
-import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge";
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import { useHasPermission } from "../../../hooks/useHasPermission";
@@ -22,8 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { CategoryWithChildren } from "../../../types";
+
 import CategoryFormModal from "./CategoryFormModal";
+import { CategoryWithChildren } from "../../../types";
 
 // Flattened item type
 interface FlattenedCategory {
@@ -140,38 +140,82 @@ export default function CategoryList() {
 
   return (
     <>
-      <PageHeader
-        title="Category Management"
-        icon={<Plus size={16} />}
-        addLabel="Add Category"
-        onAdd={openCreateCategoryModal}
-        permission="category.create"
-      />
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
+        <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              Category Management
+            </h3>
+          </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
+          <div className="flex items-center gap-3">
+            {canCreate && (
+              <button
+                onClick={openCreateCategoryModal}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200"
+              >
+                <Plus size={16} />
+                Add Category
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="max-w-full overflow-x-auto">
           <Table>
-            <TableHeader>
+            {/* Table Header */}
+            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell isHeader>Logo</TableCell>
-                <TableCell isHeader>Name</TableCell>
-                <TableCell isHeader>Type</TableCell>
-                <TableCell isHeader>Parent</TableCell>
-                <TableCell isHeader>Description</TableCell>
-                <TableCell isHeader>Status</TableCell>
-                <TableCell isHeader className="text-right">
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Logo
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Name
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Type
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Parent
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Description
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+                >
                   Actions
                 </TableCell>
               </TableRow>
             </TableHeader>
 
-            <TableBody>
+            {/* Table Body */}
+            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {categories.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-8 text-gray-500"
-                  >
+                  <TableCell className="text-center py-8 text-gray-500 dark:text-gray-400">
                     No categories found. Create your first category to get
                     started.
                   </TableCell>
@@ -180,7 +224,7 @@ export default function CategoryList() {
                 categories.map((cat) => (
                   <TableRow key={cat.id}>
                     {/* Logo */}
-                    <TableCell>
+                    <TableCell className="py-3">
                       {cat.logo_attachment?.url ? (
                         <div className="aspect-video w-24">
                           <ResponsiveImage
@@ -197,22 +241,24 @@ export default function CategoryList() {
                     </TableCell>
 
                     {/* Name */}
-                    <TableCell className="font-medium">
-                      {cat.parent && (
-                        <span className="text-gray-400 mr-2">└─</span>
-                      )}
-                      {cat.name}
+                    <TableCell className="py-3">
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {cat.parent && (
+                          <span className="text-gray-400 mr-2">└─</span>
+                        )}
+                        {cat.name}
+                      </p>
                     </TableCell>
 
                     {/* Type */}
-                    <TableCell>
-                      <Badge color={cat.parent ? "primary" : "secondary"}>
+                    <TableCell className="py-3">
+                      <Badge size="sm" color={cat.parent ? "primary" : "error"}>
                         {cat.parent ? "Subcategory" : "Main Category"}
                       </Badge>
                     </TableCell>
 
                     {/* Parent */}
-                    <TableCell>
+                    <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                       {cat.parent ? (
                         <span className="font-medium text-gray-700 dark:text-gray-300">
                           {cat.parent.name}
@@ -223,21 +269,21 @@ export default function CategoryList() {
                     </TableCell>
 
                     {/* Description */}
-                    <TableCell>
+                    <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                       <span className="line-clamp-2">
                         {cat.description || "-"}
                       </span>
                     </TableCell>
 
                     {/* Status */}
-                    <TableCell>
-                      <Badge color={cat.status ? "success" : "error"}>
+                    <TableCell className="py-3">
+                      <Badge size="sm" color={cat.status ? "success" : "error"}>
                         {cat.status ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell>
+                    <TableCell className="py-3">
                       <div className="flex justify-end gap-2">
                         {/* Add Subcategory - Only for main categories */}
                         {!cat.parent && canCreate && (

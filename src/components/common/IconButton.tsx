@@ -5,6 +5,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
   color?: "blue" | "red" | "green" | "gray";
   size?: number;
+  tooltip?: string;
 }
 
 export default function IconButton({
@@ -12,6 +13,7 @@ export default function IconButton({
   onClick,
   color = "gray",
   size = 14,
+  tooltip,
   className = "",
   ...props
 }: IconButtonProps) {
@@ -23,12 +25,21 @@ export default function IconButton({
   };
 
   return (
-    <button
-      onClick={onClick}
-      className={`px-3 py-2 rounded flex items-center justify-center ${colorClasses[color]} ${className}`}
-      {...props}
-    >
-      <Icon size={size} />
-    </button>
+    <div className="relative group inline-block">
+      <button
+        onClick={onClick}
+        className={`px-3 py-2 rounded flex items-center justify-center ${colorClasses[color]} ${className}`}
+        {...props}
+      >
+        <Icon size={size} />
+      </button>
+
+      {tooltip && (
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white bg-gray-900 rounded-md whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 dark:bg-gray-700">
+          {tooltip}
+          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+        </span>
+      )}
+    </div>
   );
 }

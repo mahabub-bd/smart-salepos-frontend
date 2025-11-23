@@ -76,7 +76,6 @@ export default function CategoryFormModal({
     },
   });
 
-  // Watch name field for auto-generating slug
   const watchName = watch("name");
 
   useEffect(() => {
@@ -154,7 +153,6 @@ export default function CategoryFormModal({
 
     try {
       if (isEdit && category) {
-        // UPDATE: Check if it's a subcategory or main category
         if (isSubCategory) {
           await updateSubCategory({ id: category.id, body: payload }).unwrap();
           toast.success("Subcategory updated successfully");
@@ -163,7 +161,6 @@ export default function CategoryFormModal({
           toast.success("Category updated successfully");
         }
       } else {
-        // CREATE: Check if creating subcategory or main category
         if (payload.category_id) {
           await createSubCategory(payload).unwrap();
           toast.success("Subcategory created successfully");

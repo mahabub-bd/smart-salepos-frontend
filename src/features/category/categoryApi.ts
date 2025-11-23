@@ -1,15 +1,6 @@
-import { ApiResponse, Category, SubCategory } from "../../types";
+import { ApiResponse, Category } from "../../types";
 import { apiSlice } from "../apiSlice";
 
-// For Category Update
-export interface UpdateCategoryPayload {
-  id: string | number;
-  body: Partial<Category>;
-}
-export interface UpdateSubCategoryPayload {
-  id: string | number;
-  body: Partial<SubCategory>;
-}
 export const categoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 GET ALL CATEGORIES
@@ -75,10 +66,7 @@ export const categoryApi = apiSlice.injectEndpoints({
     }),
 
     // 🔹 UPDATE CATEGORY
-    updateCategory: builder.mutation<
-      ApiResponse<Category>,
-      UpdateCategoryPayload
-    >({
+    updateCategory: builder.mutation({
       query: ({ id, body }) => ({
         url: `/category/${id}`,
         method: "PATCH",
@@ -90,10 +78,7 @@ export const categoryApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    updateSubCategory: builder.mutation<
-      ApiResponse<SubCategory>,
-      UpdateSubCategoryPayload
-    >({
+    updateSubCategory: builder.mutation({
       query: ({ id, body }) => ({
         url: `/category/${id}`,
         method: "PATCH",
