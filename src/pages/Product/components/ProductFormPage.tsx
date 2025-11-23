@@ -41,7 +41,6 @@ const productSchema = z.object({
   sku: z.string().min(1, "SKU is required"),
   barcode: z.string().optional(),
   description: z.string().optional(),
-
   selling_price: z.coerce
     .number()
     .min(0.01, "Selling price must be greater than 0"),
@@ -135,8 +134,9 @@ export default function ProductFormPage() {
   // Watch form values
   const categoryId = watch("category_id");
 
-
-  const [mainCategoryId, setMainCategoryId] = useState<number | undefined>(undefined);
+  const [mainCategoryId, setMainCategoryId] = useState<number | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (isEditMode && product && categories?.data) {
@@ -153,50 +153,44 @@ export default function ProductFormPage() {
         brand_id: Number(product.brand?.id ?? 0),
         category_id: Number(product.category?.id ?? 0),
         unit_id: Number(product.unit?.id ?? 0),
-        supplier_id: product.supplier?.id ? Number(product.supplier.id) : undefined,
+        supplier_id: product.supplier?.id
+          ? Number(product.supplier.id)
+          : undefined,
 
         tag_ids: product.tags?.map((t) => Number(t.id)) || [],
         image_ids: product.images?.map((img) => Number(img.id)) || [],
         status: product.status,
       });
 
-      // Set main category ID
       if (product.category) {
         if (product.category.parent_category_id) {
-          // It's a subcategory, so parent_category_id is the main category
           setMainCategoryId(Number(product.category.parent_category_id));
         } else {
-          // It's a main category
           setMainCategoryId(Number(product.category.id));
         }
       }
     }
   }, [isEditMode, product, categories?.data, reset]);
 
-  // Show loading while fetching product
   if (isProductLoading && isEditMode)
     return <Loading message="Loading product..." />;
 
-  // Generate 6-digit random number
   const randomNumber = () => Math.floor(100000 + Math.random() * 900000);
 
-  // SKU Example: PROD-XXXXXX
   const generateSKU = (name?: string) => {
     const prefix = name
       ? name
-        .slice(0, 3)
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "")
+          .slice(0, 3)
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "")
       : "PRD";
     return `${prefix}-${randomNumber()}`;
   };
 
-  // Barcode Example: 13-digit EAN (random)
   const generateBarcode = () => {
     return String(Date.now()).slice(-13);
   };
 
-  // Upload only new images
   const handleImageUpload = async () => {
     if (selectedImages.length === 0) return [];
 
@@ -213,7 +207,6 @@ export default function ProductFormPage() {
     }
   };
 
-  // Submit form
   const onSubmit = async (values: ProductFormValues) => {
     try {
       let image_ids = values.image_ids || [];
@@ -271,7 +264,6 @@ export default function ProductFormPage() {
               <div className="flex items-center gap-2 w-full">
                 <Input {...register("sku")} className="flex-1" />
                 <Button
-
                   size="sm"
                   variant="primary"
                   onClick={() =>
@@ -288,7 +280,6 @@ export default function ProductFormPage() {
               <div className="flex items-center gap-2 w-full">
                 <Input {...register("barcode")} className="flex-1" />
                 <Button
-
                   size="sm"
                   variant="primary"
                   onClick={() => setValue("barcode", generateBarcode())}
@@ -301,13 +292,22 @@ export default function ProductFormPage() {
 
           {/* Prices */}
           <div className="grid grid-cols-3 gap-4">
-            <FormField label="Selling Price" error={errors.selling_price?.message}>
+            <FormField
+              label="Selling Price"
+              error={errors.selling_price?.message}
+            >
               <Input type="number" {...register("selling_price")} />
             </FormField>
-            <FormField label="Purchase Price" error={errors.purchase_price?.message}>
+            <FormField
+              label="Purchase Price"
+              error={errors.purchase_price?.message}
+            >
               <Input type="number" {...register("purchase_price")} />
             </FormField>
-            <FormField label="Discount Price" error={errors.discount_price?.message}>
+            <FormField
+              label="Discount Price"
+              error={errors.discount_price?.message}
+            >
               <Input type="number" {...register("discount_price")} />
             </FormField>
           </div>
@@ -353,12 +353,12 @@ export default function ProductFormPage() {
                   value={categoryId}
                   error={errors.category_id?.message}
                   onChange={(val) =>
-                    setValue("category_id", Number(val), { shouldValidate: true })
+                    setValue("category_id", Number(val), {
+                      shouldValidate: true,
+                    })
                   }
                 />
               )}
-
-
 
             <SelectField
               label="Brand"
@@ -368,7 +368,9 @@ export default function ProductFormPage() {
               }))}
               value={product?.brand?.id}
               error={errors.brand_id?.message}
-              onChange={(val) => setValue("brand_id", Number(val), { shouldValidate: true })}
+              onChange={(val) =>
+                setValue("brand_id", Number(val), { shouldValidate: true })
+              }
             />
             <SelectField
               label="Unit"
@@ -378,17 +380,24 @@ export default function ProductFormPage() {
               }))}
               value={product?.unit?.id}
               error={errors.unit_id?.message}
-              onChange={(val) => setValue("unit_id", Number(val), { shouldValidate: true })}
+              onChange={(val) =>
+                setValue("unit_id", Number(val), { shouldValidate: true })
+              }
             />
             <SelectField
               label="Suppliers"
               data={suppliers?.data?.map((supplier) => ({
-                id: typeof supplier.id === "string" ? Number(supplier.id) : supplier.id,
+                id:
+                  typeof supplier.id === "string"
+                    ? Number(supplier.id)
+                    : supplier.id,
                 name: supplier.name,
               }))}
               value={product?.supplier?.id}
               error={errors.supplier_id?.message}
-              onChange={(val) => setValue("supplier_id", Number(val), { shouldValidate: true })}
+              onChange={(val) =>
+                setValue("supplier_id", Number(val), { shouldValidate: true })
+              }
             />
           </div>
 
