@@ -1,11 +1,10 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { Fragment, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
-import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge";
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import {
@@ -33,12 +32,19 @@ export default function ProductList() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
+  const canCreate = useHasPermission("product.create");
   const canUpdate = useHasPermission("product.update");
   const canDelete = useHasPermission("product.delete");
 
   const products = data?.data || [];
 
   // 🔹 Route Handlers
+
+  const canView = useHasPermission("product.view");
+  const openViewPage = useCallback((product: Product) => {
+    navigate(`/products/view/${product.id}`);
+  }, [navigate]);
+
   const openCreatePage = useCallback(() => {
     navigate("/products/create");
   }, [navigate]);
@@ -65,119 +71,191 @@ export default function ProductList() {
       toast.error("Failed to delete product");
     } finally {
       setIsDeleteModalOpen(false);
+      setProductToDelete(null);
     }
   }, [productToDelete, deleteProduct]);
 
   const closeDeleteModal = useCallback(() => {
     setIsDeleteModalOpen(false);
+    setProductToDelete(null);
   }, []);
 
-  // 🔹 Loading State
+  // 🔹 Loading & Error States
   if (isLoading) return <Loading message="Loading Products..." />;
   if (isError)
     return <p className="p-6 text-red-500">Failed to fetch products.</p>;
 
   return (
     <Fragment>
-      <PageHeader
-        title="Product Management"
-        icon={<Plus size={16} />}
-        addLabel="Add"
-        onAdd={openCreatePage}
-        permission="product.create"
-      />
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
+        {/* Header Section */}
+        <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              Product Management
+            </h3>
+            <p className="text-theme-sm text-gray-500 dark:text-gray-400 mt-1">
+              Total {products.length} products
+            </p>
+          </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-[#1e1e1e]">
+          <div className="flex items-center gap-3">
+           
+            {canCreate && (
+              <button
+                onClick={openCreatePage}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-theme-sm font-medium text-white shadow-theme-xs hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              >
+                <Plus size={16} />
+                Add Product
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Table Section */}
         <div className="max-w-full overflow-x-auto">
           <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-gray-700">
+            {/* Table Header */}
+            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
                   Image
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 min-w-[200px]"
+                >
                   Product Name
                 </TableCell>
-                <TableCell isHeader className="table-header">
-                  SKU
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Suppliers
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Brand
-                </TableCell>
-                <TableCell isHeader className="table-header">
+                
+                <TableCell
+                  isHeader
+                  className="hidden xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
                   Category
                 </TableCell>
-                <TableCell isHeader className="table-header">
+
+                
+
+                <TableCell
+                  isHeader
+                  className="hidden 2xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Subcategory
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="hidden xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Brand
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="hidden 2xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Supplier
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="hidden lg:table-cell py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+                >
                   Purchase Price
                 </TableCell>
-                <TableCell isHeader className="table-header">
-                  Sale Price
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+                >
+                  Selling Price
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                >
                   Status
                 </TableCell>
-                <TableCell isHeader className="table-header text-right">
+                <TableCell
+                  isHeader
+                  className="py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
+                >
                   Actions
                 </TableCell>
               </TableRow>
             </TableHeader>
 
-            <TableBody className="divide-y divide-gray-100 dark:divide-gray-700">
+            {/* Table Body */}
+            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {products.length > 0 ? (
                 products.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product.id} className="">
                     {/* Product Image */}
-                    <TableCell className="table-body">
+                    <TableCell className="py-3">
                       {product.images?.[0]?.url ? (
                         <ResponsiveImage
                           src={product.images[0].url}
                           alt={product.name}
-                          className="h-12 w-24 rounded-md"
+                          className="h-12 w-20 rounded-md object-cover"
                         />
                       ) : (
-                        <Badge size="sm" color="warning">
-                          No Image
-                        </Badge>
+                        <div className="h-12 w-20 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md">
+                          <span className="text-xs text-gray-400">
+                            No Image
+                          </span>
+                        </div>
                       )}
                     </TableCell>
 
                     {/* Product Name */}
-                    <TableCell className="table-body font-medium">
-                      {product.name}
+                    <TableCell className="py-3">
+                      <div className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                        {product.name}
+                      </div>
+                    
                     </TableCell>
 
-                    {/* SKU */}
-                    <TableCell className="table-body">{product.sku}</TableCell>
-                    {/* Suppliers */}
-                    <TableCell className="table-body">
-                      {product.supplier?.name ? (
-                        product.supplier.name
-                      ) : (
-                        <span>-</span>
+                    {/* Category */}
+                    <TableCell className="hidden xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                      {product.category?.name || (
+                        <span className="text-gray-400">-</span>
                       )}
                     </TableCell>
-                    {/* Brand */}
-                    <TableCell className="table-body">
-                      {product.brand?.name || "-"}
-                    </TableCell>
-                    {/* Category */}
-                    <TableCell className="table-body">
-                      {product.category?.name || "-"}
+
+                    {/* Subcategory */}
+                    <TableCell className="hidden 2xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                      {product.subcategory?.name || (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </TableCell>
 
-                    {/* Price */}
-                    <TableCell className="table-body">
-                      ৳{product.purchase_price}
+                    {/* Brand */}
+                    <TableCell className="hidden xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                      {product.brand?.name || (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </TableCell>
-                    <TableCell className="table-body">
-                      ৳{product.selling_price}
+
+                    {/* Supplier */}
+                    <TableCell className="hidden 2xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                      {product.supplier?.name || (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </TableCell>
+
+                    {/* Purchase Price */}
+                    <TableCell className="hidden lg:table-cell py-3 text-gray-800 text-theme-sm font-medium text-right dark:text-white/90">
+                      ৳{Number(product.purchase_price).toLocaleString()}
+                    </TableCell>
+
+                    {/* Selling Price */}
+                    <TableCell className="py-3 text-green-600 text-theme-sm font-medium text-right dark:text-green-400">
+                      ৳{Number(product.selling_price).toLocaleString()}
                     </TableCell>
 
                     {/* Status */}
-                    <TableCell className="table-body">
+                    <TableCell className="py-3 text-center">
                       <Badge
                         size="sm"
                         color={product.status ? "success" : "error"}
@@ -187,20 +265,35 @@ export default function ProductList() {
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="px-4 py-3">
+                    <TableCell className="py-3">
                       <div className="flex justify-end gap-2">
+                        {
+                          canView && (
+                            <IconButton
+                              icon={Eye}
+                              tooltip="View"
+                              onClick={() => openViewPage(product)}
+                              color="blue"
+                              title="View Product"
+                            />
+                          )
+                        }
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}
+                            tooltip="Edit"
                             onClick={() => openEditPage(product)}
                             color="blue"
+                            title="Edit Product"
                           />
                         )}
                         {canDelete && (
                           <IconButton
                             icon={Trash2}
+                            tooltip="Delete"
                             onClick={() => openDeleteDialog(product)}
                             color="red"
+                            title="Delete Product"
                           />
                         )}
                       </div>
@@ -209,8 +302,15 @@ export default function ProductList() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell className="py-6 text-center text-gray-500 dark:text-gray-400">
-                    No products found
+                  <TableCell
+                    className="py-12 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="text-lg font-medium">No products found</p>
+                      <p className="text-sm">
+                        Get started by adding your first product
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -219,11 +319,12 @@ export default function ProductList() {
         </div>
       </div>
 
+      {/* Delete Confirmation Dialog */}
       {canDelete && (
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
           title="Delete Product"
-          message={`Are you sure you want to delete "${productToDelete?.name}"?`}
+          message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}

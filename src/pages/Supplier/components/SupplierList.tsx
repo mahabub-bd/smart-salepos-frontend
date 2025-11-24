@@ -102,11 +102,13 @@ export default function SupplierList() {
                       <div className="flex justify-end gap-2">
                         <IconButton
                           icon={Pencil}
+                            tooltip="Edit"
                           color="blue"
                           onClick={() => openEdit(s)}
                         />
                         <IconButton
                           icon={Trash2}
+                          tooltip="Delete"
                           color="red"
                           onClick={() => openDelete(s)}
                         />

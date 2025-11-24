@@ -132,6 +132,7 @@ export default function RoleList() {
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}
+                            tooltip="Edit"
                             onClick={() => openEditModal(role)}
                             color="blue"
                           />
@@ -139,6 +140,7 @@ export default function RoleList() {
                         {canDelete && (
                           <IconButton
                             icon={Trash2}
+                            tooltip="Delete"
                             onClick={() => openDeleteDialog(role)}
                             color="red"
                           />

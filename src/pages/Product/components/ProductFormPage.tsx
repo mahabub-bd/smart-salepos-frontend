@@ -15,6 +15,7 @@ import {
 import FileInput from "../../../components/form/input/FileInput";
 import Input from "../../../components/form/input/InputField";
 import MultiSelect from "../../../components/form/MultiSelect";
+import Button from "../../../components/ui/button/Button";
 
 // API hooks
 import {
@@ -22,25 +23,27 @@ import {
   useUploadSingleAttachmentMutation,
 } from "../../../features/attachment/attachmentApi";
 import { useGetBrandsQuery } from "../../../features/brand/brandApi";
-import { useGetCategoriesQuery } from "../../../features/category/categoryApi";
+import {
+  useGetCategoriesQuery,
+  useGetSubCategoriesByCategoryIdQuery
+} from "../../../features/category/categoryApi";
 import {
   useCreateProductMutation,
   useGetProductByIdQuery,
   useUpdateProductMutation,
 } from "../../../features/product/productApi";
+import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { useGetTagsQuery } from "../../../features/tag/tagApi";
 import { useGetUnitsQuery } from "../../../features/unit/unitApi";
-
-import Button from "../../../components/ui/button/Button";
-import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { ProductRequest } from "../../../types";
 
-// Update your validation schema
+// Validation Schema
 const productSchema = z.object({
   name: z.string().min(1, "Product Name is required"),
   sku: z.string().min(1, "SKU is required"),
   barcode: z.string().optional(),
   description: z.string().optional(),
+  
   selling_price: z.coerce
     .number()
     .min(0.01, "Selling price must be greater than 0"),
@@ -59,6 +62,13 @@ const productSchema = z.object({
     z.coerce
       .number({ error: "Category is required" })
       .min(1, "Category is required")
+  ),
+
+  subcategory_id: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.coerce
+      .number({ error: "Subcategory is required" })
+      .min(1, "Subcategory is required")
   ),
 
   unit_id: z.preprocess(
@@ -84,6 +94,7 @@ export default function ProductFormPage() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
 
+  // API Queries
   const { data: productData, isLoading: isProductLoading } =
     useGetProductByIdQuery(id!, { skip: !isEditMode });
   const product = productData?.data;
@@ -94,6 +105,7 @@ export default function ProductFormPage() {
   const { data: tags } = useGetTagsQuery();
   const { data: suppliers } = useGetSuppliersQuery();
 
+  // API Mutations
   const [createProduct, { isLoading: createLoading }] =
     useCreateProductMutation();
   const [updateProduct, { isLoading: updateLoading }] =
@@ -101,8 +113,19 @@ export default function ProductFormPage() {
   const [uploadSingleAttachment] = useUploadSingleAttachmentMutation();
   const [uploadMultipleAttachments] = useUploadMultipleAttachmentsMutation();
 
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  // Local State
+ const [selectedImages, setSelectedImages] = useState<File[]>([]);
+const [selectedCategoryId, setSelectedCategoryId] = useState<
+  number | undefined
+>(undefined);
 
+  // Fetch subcategories when category is selected
+  const { data: subcategoriesData, isLoading: isSubcategoriesLoading } =
+    useGetSubCategoriesByCategoryIdQuery(selectedCategoryId!, {
+      skip: !selectedCategoryId,
+    });
+
+  // Form Setup
   const {
     register,
     handleSubmit,
@@ -123,6 +146,7 @@ export default function ProductFormPage() {
       discount_price: undefined,
       brand_id: undefined,
       category_id: undefined,
+      subcategory_id: undefined,
       unit_id: undefined,
       supplier_id: undefined,
       tag_ids: [],
@@ -131,52 +155,58 @@ export default function ProductFormPage() {
     },
   });
 
-  // Watch form values
   const categoryId = watch("category_id");
+  const subcategoryId = watch("subcategory_id");
+  const brandId = watch("brand_id");
+  const unitId = watch("unit_id");
+  const supplierId = watch("supplier_id");
 
-  const [mainCategoryId, setMainCategoryId] = useState<number | undefined>(
-    undefined
-  );
-
+  // Load product data in edit mode
   useEffect(() => {
-    if (isEditMode && product && categories?.data) {
+    if (isEditMode && product) {
       reset({
         name: product.name,
         sku: product.sku,
-        barcode: product.barcode,
-        description: product.description,
+        barcode: product.barcode || "",
+        description: product.description || "",
         selling_price: Number(product.selling_price),
         purchase_price: Number(product.purchase_price),
         discount_price: product.discount_price
           ? Number(product.discount_price)
           : undefined,
-        brand_id: Number(product.brand?.id ?? 0),
-        category_id: Number(product.category?.id ?? 0),
-        unit_id: Number(product.unit?.id ?? 0),
+        brand_id: product.brand?.id ? Number(product.brand.id) : undefined,
+        category_id: product.category?.id
+          ? Number(product.category.id)
+          : undefined,
+        subcategory_id: product.subcategory?.id
+          ? Number(product.subcategory.id)
+          : undefined,
+        unit_id: product.unit?.id ? Number(product.unit.id) : undefined,
         supplier_id: product.supplier?.id
           ? Number(product.supplier.id)
           : undefined,
-
         tag_ids: product.tags?.map((t) => Number(t.id)) || [],
         image_ids: product.images?.map((img) => Number(img.id)) || [],
         status: product.status,
       });
 
-      if (product.category) {
-        if (product.category.parent_category_id) {
-          setMainCategoryId(Number(product.category.parent_category_id));
-        } else {
-          setMainCategoryId(Number(product.category.id));
-        }
+      // Set the selected category for subcategory fetching
+      if (product.category?.id) {
+        setSelectedCategoryId(Number(product.category.id));
       }
     }
-  }, [isEditMode, product, categories?.data, reset]);
+  }, [isEditMode, product, reset]);
 
-  if (isProductLoading && isEditMode)
-    return <Loading message="Loading product..." />;
+  // Handle category change
+  const handleCategoryChange = (value: string | number) => {
+    const id = Number(value);
+    setValue("category_id", id, { shouldValidate: true });
+    setSelectedCategoryId(id);
+    // Reset subcategory when category changes
+    setValue("subcategory_id", undefined as unknown as number, { shouldValidate: false });
+  };
 
-  const randomNumber = () => Math.floor(100000 + Math.random() * 900000);
-
+  // Utility Functions
   const generateSKU = (name?: string) => {
     const prefix = name
       ? name
@@ -184,7 +214,8 @@ export default function ProductFormPage() {
           .toUpperCase()
           .replace(/[^A-Z0-9]/g, "")
       : "PRD";
-    return `${prefix}-${randomNumber()}`;
+    const randomNum = Math.floor(100000 + Math.random() * 900000);
+    return `${prefix}-${randomNum}`;
   };
 
   const generateBarcode = () => {
@@ -210,13 +241,28 @@ export default function ProductFormPage() {
   const onSubmit = async (values: ProductFormValues) => {
     try {
       let image_ids = values.image_ids || [];
+      
+      // Upload new images if selected
       if (selectedImages.length > 0) {
         const uploadedImages = await handleImageUpload();
         image_ids = uploadedImages;
       }
 
       const payload: ProductRequest = {
-        ...values,
+        name: values.name,
+        sku: values.sku,
+        barcode: values.barcode || "",
+        description: values.description || "",
+        selling_price: values.selling_price,
+        purchase_price: values.purchase_price,
+        discount_price: values.discount_price || 0,
+        status: values.status,
+        brand_id: values.brand_id!,
+        category_id: values.category_id!,
+        subcategory_id: values.subcategory_id!,
+        unit_id: values.unit_id!,
+        supplier_id: values.supplier_id,
+        tag_ids: values.tag_ids || [],
         image_ids,
       };
 
@@ -230,226 +276,330 @@ export default function ProductFormPage() {
 
       navigate("/products");
     } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to save product");
+      const errorMessage =
+        e?.data?.message || "Failed to save product. Please try again.";
+      toast.error(errorMessage);
+      console.error("Product save error:", e);
     }
   };
 
+  if (isProductLoading && isEditMode) {
+    return <Loading message="Loading product..." />;
+  }
+
+  const subcategories = subcategoriesData?.data || [];
+
   return (
-    <div>
+    <div className="space-y-6">
       <PageMeta
         title={isEditMode ? "Edit Product" : "Add Product"}
         description={
           isEditMode ? "Edit existing product" : "Create new product"
         }
       />
+      
       <PageHeader title={isEditMode ? "Edit Product" : "Add New Product"} />
 
-      <div className="p-6 bg-white rounded-xl shadow dark:bg-dark-900">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Product Name" error={errors.name?.message}>
-              <Input {...register("name")} />
-            </FormField>
-            <FormField label="Description" error={errors.description?.message}>
-              <Input
-                {...register("description")}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-              />
-            </FormField>
+      <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-200 dark:bg-dark-900 dark:border-gray-800">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Basic Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
+              Basic Information
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="Product Name *" error={errors.name?.message}>
+                <Input
+                  {...register("name")}
+                  placeholder="Enter product name"
+                  className="w-full"
+                />
+              </FormField>
+
+              <FormField label="Description" error={errors.description?.message}>
+                <Input
+                  {...register("description")}
+                  placeholder="Enter product description"
+                  className="w-full"
+                />
+              </FormField>
+            </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
-            {/* SKU */}
-            <FormField label="SKU" error={errors.sku?.message}>
-              <div className="flex items-center gap-2 w-full">
-                <Input {...register("sku")} className="flex-1" />
-                <Button
-                  size="sm"
-                  variant="primary"
-                  onClick={() =>
-                    setValue("sku", generateSKU(getValues("name")))
-                  }
-                >
-                  Generate
-                </Button>
-              </div>
-            </FormField>
+          {/* SKU & Barcode */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
+              Product Identifiers
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="SKU *" error={errors.sku?.message}>
+                <div className="flex gap-2">
+                  <Input
+                    {...register("sku")}
+                    placeholder="Enter SKU"
+                    className="flex-1"
+                  />
+                  <Button
+                  
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setValue("sku", generateSKU(getValues("name")))}
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </FormField>
 
-            {/* Barcode */}
-            <FormField label="Barcode" error={errors.barcode?.message}>
-              <div className="flex items-center gap-2 w-full">
-                <Input {...register("barcode")} className="flex-1" />
-                <Button
-                  size="sm"
-                  variant="primary"
-                  onClick={() => setValue("barcode", generateBarcode())}
-                >
-                  Generate
-                </Button>
-              </div>
-            </FormField>
+              <FormField label="Barcode" error={errors.barcode?.message}>
+                <div className="flex gap-2">
+                  <Input
+                    {...register("barcode")}
+                    placeholder="Enter barcode"
+                    className="flex-1"
+                  />
+                  <Button
+                  
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setValue("barcode", generateBarcode())}
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </FormField>
+            </div>
           </div>
 
-          {/* Prices */}
-          <div className="grid grid-cols-3 gap-4">
-            <FormField
-              label="Selling Price"
-              error={errors.selling_price?.message}
-            >
-              <Input type="number" {...register("selling_price")} />
-            </FormField>
-            <FormField
-              label="Purchase Price"
-              error={errors.purchase_price?.message}
-            >
-              <Input type="number" {...register("purchase_price")} />
-            </FormField>
-            <FormField
-              label="Discount Price"
-              error={errors.discount_price?.message}
-            >
-              <Input type="number" {...register("discount_price")} />
-            </FormField>
+          {/* Pricing */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
+              Pricing
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                label="Purchase Price *"
+                error={errors.purchase_price?.message}
+              >
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...register("purchase_price")}
+                  placeholder="0.00"
+                  className="w-full"
+                />
+              </FormField>
+
+              <FormField
+                label="Selling Price *"
+                error={errors.selling_price?.message}
+              >
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...register("selling_price")}
+                  placeholder="0.00"
+                  className="w-full"
+                />
+              </FormField>
+
+              <FormField
+                label="Discount Price"
+                error={errors.discount_price?.message}
+              >
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...register("discount_price")}
+                  placeholder="0.00"
+                  className="w-full"
+                />
+              </FormField>
+            </div>
           </div>
 
-          {/* Selects */}
-          <div className="grid grid-cols-5 gap-4">
-            <SelectField
-              label="Main Category"
-              data={categories?.data
-                ?.filter((cat) => !cat.parent_category_id)
-                .map((cat) => ({
-                  id: typeof cat.id === "string" ? Number(cat.id) : cat.id,
+          {/* Classification */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
+              Classification
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Category */}
+              <SelectField
+                label="Category *"
+                data={categories?.data?.map((cat) => ({
+                  id: Number(cat.id),
                   name: cat.name,
-                }))}
-              value={product?.category?.parent_category_id?.toString()}
-              onChange={(val) => {
-                const id = Number(val);
-                setMainCategoryId(id);
-                const hasSub = categories?.data?.some(
-                  (c) => c.parent_category_id == id
-                );
-                if (!hasSub) {
-                  // Main category has no subcategories, set it as the category_id
-                  setValue("category_id", id, { shouldValidate: true });
-                } else {
-                  // Main category has subcategories, reset subcategory selection
-                  setValue("category_id", 0, { shouldValidate: false });
-                }
-              }}
-            />
-            {mainCategoryId &&
-              categories?.data?.some(
-                (c) => c.parent_category_id == mainCategoryId
-              ) && (
+                })) || []}
+                value={categoryId}
+                error={errors.category_id?.message}
+                onChange={handleCategoryChange}
+              />
+
+              {/* Subcategory - Only show when category is selected */}
+              {selectedCategoryId && (
                 <SelectField
-                  label="Sub Category"
-                  data={categories?.data
-                    ?.filter((cat) => cat.parent_category_id == mainCategoryId)
-                    .map((cat) => ({
-                      id: typeof cat.id === "string" ? Number(cat.id) : cat.id,
-                      name: cat.name,
-                    }))}
-                  value={categoryId}
-                  error={errors.category_id?.message}
+                  label="Subcategory *"
+                  data={subcategories.map((subcat) => ({
+                    id: Number(subcat.id),
+                    name: subcat.name,
+                  }))}
+                  value={subcategoryId}
+                  error={errors.subcategory_id?.message}
                   onChange={(val) =>
-                    setValue("category_id", Number(val), {
+                    setValue("subcategory_id", Number(val), {
                       shouldValidate: true,
                     })
                   }
+                  disabled={isSubcategoriesLoading}
                 />
               )}
 
-            <SelectField
-              label="Brand"
-              data={brands?.data?.map((brand) => ({
-                id: typeof brand.id === "string" ? Number(brand.id) : brand.id,
-                name: brand.name,
-              }))}
-              value={product?.brand?.id}
-              error={errors.brand_id?.message}
-              onChange={(val) =>
-                setValue("brand_id", Number(val), { shouldValidate: true })
-              }
-            />
-            <SelectField
-              label="Unit"
-              data={units?.data?.map((unit) => ({
-                id: typeof unit.id === "string" ? Number(unit.id) : unit.id,
-                name: unit.name,
-              }))}
-              value={product?.unit?.id}
-              error={errors.unit_id?.message}
-              onChange={(val) =>
-                setValue("unit_id", Number(val), { shouldValidate: true })
-              }
-            />
-            <SelectField
-              label="Suppliers"
-              data={suppliers?.data?.map((supplier) => ({
-                id:
-                  typeof supplier.id === "string"
-                    ? Number(supplier.id)
-                    : supplier.id,
-                name: supplier.name,
-              }))}
-              value={product?.supplier?.id}
-              error={errors.supplier_id?.message}
-              onChange={(val) =>
-                setValue("supplier_id", Number(val), { shouldValidate: true })
-              }
-            />
+              {/* Brand */}
+              <SelectField
+                label="Brand *"
+                data={brands?.data?.map((brand) => ({
+                  id: Number(brand.id),
+                  name: brand.name,
+                })) || []}
+                value={brandId}
+                error={errors.brand_id?.message}
+                onChange={(val) =>
+                  setValue("brand_id", Number(val), { shouldValidate: true })
+                }
+              />
+
+              {/* Unit */}
+              <SelectField
+                label="Unit *"
+                data={units?.data?.map((unit) => ({
+                  id: Number(unit.id),
+                  name: unit.name,
+                })) || []}
+                value={unitId}
+                error={errors.unit_id?.message}
+                onChange={(val) =>
+                  setValue("unit_id", Number(val), { shouldValidate: true })
+                }
+              />
+
+              {/* Supplier */}
+              <SelectField
+                label="Supplier"
+                data={suppliers?.data?.map((supplier) => ({
+                  id: Number(supplier.id),
+                  name: supplier.name,
+                })) || []}
+                value={supplierId}
+                error={errors.supplier_id?.message}
+                onChange={(val) =>
+                  setValue("supplier_id", val ? Number(val) : undefined, {
+                    shouldValidate: true,
+                  })
+                }
+              />
+            </div>
+
+            {/* Loading indicator for subcategories */}
+            {isSubcategoriesLoading && selectedCategoryId && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Loading subcategories...
+              </p>
+            )}
+
+            {/* No subcategories message */}
+            {selectedCategoryId && 
+             !isSubcategoriesLoading && 
+             subcategories.length === 0 && (
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                No subcategories available for this category. Please create a subcategory first.
+              </p>
+            )}
+
+            {/* Tags */}
+            <div className="pt-2">
+              <MultiSelect
+                label="Tags"
+                options={
+                  tags?.data?.map((t) => ({
+                    value: t.id.toString(),
+                    text: t.name,
+                  })) ?? []
+                }
+                defaultSelected={product?.tags?.map((t) => t.id.toString())}
+                onChange={(vals) => setValue("tag_ids", vals.map(Number))}
+              />
+            </div>
           </div>
 
-          {/* Tags */}
-          <MultiSelect
-            label="Tags"
-            options={
-              tags?.data?.map((t) => ({
-                value: t.id.toString(),
-                text: t.name,
-              })) ?? []
-            }
-            defaultSelected={product?.tags?.map((t) => t.id.toString())}
-            onChange={(vals) => setValue("tag_ids", vals.map(Number))}
-          />
-
           {/* Image Upload */}
-          <FormField label="Upload Image">
-            {isEditMode && product?.images && product.images.length > 0 && (
-              <div className="mb-2">
-                <img
-                  src={product.images[0].url}
-                  alt={product.name}
-                  className="object-contain w-48 h-27 rounded-md border"
-                />
-                <p className="text-xs text-gray-500 mt-1">(Current Image)</p>
-              </div>
-            )}
-            <FileInput
-              accept="image/*"
-              onChange={(e) =>
-                setSelectedImages(Array.from(e.target.files || []))
-              }
-            />
-          </FormField>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
+              Product Images
+            </h3>
+            
+            <FormField label="Upload Images">
+              {isEditMode && product?.images && product.images.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    Current Images:
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    {product.images.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img.url}
+                        alt={`${product.name} ${idx + 1}`}
+                        className="h-24 w-24 object-cover rounded-md border border-gray-200 dark:border-gray-700"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <FileInput
+                accept="image/*"
+                multiple
+                onChange={(e) =>
+                  setSelectedImages(Array.from(e.target.files || []))
+                }
+              />
+              {selectedImages.length > 0 && (
+                <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+                  ✓ {selectedImages.length} new image(s) selected
+                </p>
+              )}
+            </FormField>
+          </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
+          {/* Form Actions */}
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              
+              variant="outline"
               onClick={() => navigate("/products")}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              disabled={createLoading || updateLoading}
             >
               Cancel
-            </button>
-            <button
-              type="submit"
+            </Button>
+            <Button
+           
+              variant="primary"
               disabled={createLoading || updateLoading}
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50"
             >
-              {isEditMode ? "Update Product" : "Create Product"}
-            </button>
+              {createLoading || updateLoading ? (
+                <>
+                  <span className="inline-block animate-spin mr-2">⏳</span>
+                  Saving...
+                </>
+              ) : isEditMode ? (
+                "Update Product"
+              ) : (
+                "Create Product"
+              )}
+            </Button>
           </div>
         </form>
       </div>

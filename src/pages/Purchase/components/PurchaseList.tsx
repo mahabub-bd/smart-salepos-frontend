@@ -76,6 +76,7 @@ export default function PurchaseList() {
                         <IconButton
                           icon={FileCheck}
                           color="green"
+                          tooltip="Receive"
                           onClick={() =>
                             navigate(`/purchases/${p.id}?receive=true`)
                           } // optional
@@ -84,6 +85,7 @@ export default function PurchaseList() {
                         {/* Edit */}
                         <IconButton
                           icon={Pencil}
+                          tooltip="Edit"
                           color="blue"
                           onClick={() => navigate(`/purchases/edit/${p.id}`)}
                         />

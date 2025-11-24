@@ -6,13 +6,13 @@ export default function Loading({
   message = "Loading...",
 }: FullScreenLoaderProps) {
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-white/70 dark:bg-gray-900/80 z-9999">
-      <div className="w-12 h-12 border-4 border-[#465FFF] border-t-transparent rounded-full animate-spin"></div>
-      {message && (
-        <p className="mt-4 text-sm font-medium text-[#465FFF] dark:text-[#465FFF]">
-          {message}
-        </p>
-      )}
+    <div className=" h-screen overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
+      <div className="flex items-center justify-center py-8">
+        <div className="flex flex-col items-center items-center gap-2">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+          <p className="text-gray-500 dark:text-gray-400">{message}</p>
+        </div>
+      </div>
     </div>
   );
 }

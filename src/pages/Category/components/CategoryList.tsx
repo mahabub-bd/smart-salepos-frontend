@@ -22,8 +22,8 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
-import CategoryFormModal from "./CategoryFormModal";
 import { CategoryWithChildren } from "../../../types";
+import CategoryFormModal from "./CategoryFormModal";
 
 // Flattened item type
 interface FlattenedCategory {
@@ -161,7 +161,7 @@ export default function CategoryList() {
           </div>
         </div>
 
-        <div className="max-w-full overflow-x-auto">
+        <div className="overflow-x-auto hide-scrollbar scroll-smooth">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
@@ -190,12 +190,7 @@ export default function CategoryList() {
                 >
                   Parent
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Description
-                </TableCell>
+                
                 <TableCell
                   isHeader
                   className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -268,12 +263,7 @@ export default function CategoryList() {
                       )}
                     </TableCell>
 
-                    {/* Description */}
-                    <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                      <span className="line-clamp-2">
-                        {cat.description || "-"}
-                      </span>
-                    </TableCell>
+                    
 
                     {/* Status */}
                     <TableCell className="py-3">

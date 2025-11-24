@@ -124,6 +124,7 @@ export interface Product {
   status: boolean;
   brand?: Brand;
   category?: Category;
+  subcategory?: SubCategory;
   unit?: Unit;
   supplier?: Supplier;
   tags?: Tag[];
@@ -142,8 +143,9 @@ export interface ProductRequest {
   status?: boolean;
   brand_id?: number;
   category_id?: number;
+  subcategory_id?: number;
   unit_id?: number;
-  suppliers_id?: number;
+  supplier_id?: number;
   tag_ids?: number[];
   image_ids?: number[];
 }

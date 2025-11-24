@@ -24,12 +24,14 @@ export function SelectField({
   value,
   onChange,
   error,
+  disabled,
 }: {
   label: string;
   data?: { id: number | string; name: string }[];
   value?: number | string;
   error?: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <FormField label={label} error={error}>
@@ -44,6 +46,7 @@ export function SelectField({
         onChange={(val) => {
           onChange(val);
         }}
+        disabled={disabled}
       />
     </FormField>
   );

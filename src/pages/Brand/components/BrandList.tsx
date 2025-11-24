@@ -130,6 +130,7 @@ export default function BrandList() {
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}
+                            tooltip="Edit Brand"
                             onClick={() => openEditModal(brand)}
                             color="blue"
                           />
@@ -137,6 +138,7 @@ export default function BrandList() {
                         {canDelete && (
                           <IconButton
                             icon={Trash2}
+                            tooltip="Delete Brand"
                             onClick={() => openDeleteDialog(brand)}
                             color="red"
                           />
