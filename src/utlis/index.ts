@@ -31,7 +31,6 @@ export const SafeNumber = (msg: string) =>
     return Number.isFinite(num) ? num : null;
   }, z.number({ error: msg }));
 
-
 export const badgeColors = {
   // Payment Methods
   cash: "green",
@@ -48,3 +47,20 @@ export const badgeColors = {
   // Status or fallback
   default: "gray",
 };
+
+export function getTypeColor(type: string) {
+  switch (type) {
+    case "asset":
+      return "success"; // green
+    case "liability":
+      return "warning"; // yellow
+    case "equity":
+      return "primary"; // blue
+    case "expense":
+      return "error"; // red
+    case "income":
+      return "info"; // purple
+    default:
+      return "secondary";
+  }
+}

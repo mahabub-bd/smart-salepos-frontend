@@ -13,8 +13,8 @@ const paymentSchema = z.object({
       error: "Amount is required",
     })
     .positive("Amount must be greater than 0"),
-  method: z.enum(["cash", "bank", "bkash"], {
-    errorMap: () => ({ message: "Please select a valid payment method" }),
+  method: z.enum(["cash", "bank", "bkash"] as const, {
+    message: "Please select a valid payment method",
   }),
   note: z.string().optional(),
 });
@@ -110,9 +110,8 @@ export default function PurchasePaymentModal({
           <div>
             <select
               {...register("method")}
-              className={`form-input h-11 w-full rounded-lg border px-4 ${
-                errors.method ? "border-error-500" : "border-gray-300"
-              }`}
+              className={`form-input h-11 w-full rounded-lg border px-4 ${errors.method ? "border-error-500" : "border-gray-300"
+                }`}
             >
               <option value="">Select Method</option>
               <option value="cash">Cash</option>

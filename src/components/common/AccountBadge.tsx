@@ -19,7 +19,7 @@ const AccountBadge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`px-2 py-1 text-xs rounded-md font-medium ${colors[color]} ${className}`}
+      className={`px-2 py-1 text-xs rounded-md capitalize font-medium ${colors[color]} ${className}`}
     >
       {children}
     </span>
@@ -27,4 +27,3 @@ const AccountBadge: React.FC<BadgeProps> = ({
 };
 
 export default AccountBadge;
-

@@ -30,6 +30,55 @@ export const accountsApi = apiSlice.injectEndpoints({
       query: () => `/accounts/journal`,
       providesTags: ["Accounts"],
     }),
+
+    getAccounts: builder.query({
+      query: (type?: string) => ({
+        url: type ? `/accounts?type=${type}` : "/accounts",
+        method: "GET",
+      }),
+      providesTags: ["Accounts"],
+    }),
+
+    // 🔹 Add cash to ASSET.CASH
+    addCash: builder.mutation<
+      ApiResponse<any>,
+      { amount: number; narration: string }
+    >({
+      query: (payload) => ({
+        url: `/accounts/add-cash`,
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Accounts"],
+    }),
+    addBankBalance: builder.mutation<
+      ApiResponse<any>,
+      { bankAccountCode: string; amount: number; narration: string }
+    >({
+      query: (payload) => ({
+        url: `/accounts/add-bank-balance`,
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Accounts"],
+    }),
+    // 🔹 Fund transfer (bank ⇆ cash)
+    fundTransfer: builder.mutation<
+      ApiResponse<any>,
+      {
+        fromAccountCode: string;
+        toAccountCode: string;
+        amount: number;
+        narration: string;
+      }
+    >({
+      query: (payload) => ({
+        url: `/accounts/fund-transfer`,
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Accounts"],
+    }),
   }),
 });
 
@@ -38,4 +87,8 @@ export const {
   useGetAccountByIdQuery,
   useGetAccountBalanceByCodeQuery,
   useGetAccountJournalQuery,
+  useGetAccountsQuery,
+  useAddBankBalanceMutation,
+  useAddCashMutation,
+  useFundTransferMutation,
 } = accountsApi;

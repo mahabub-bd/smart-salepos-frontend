@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetAccountBalancesQuery } from "../../../features/accounts/accountsApi";
+import { Account } from "../../../types";
 
 export default function AccountBalancePage() {
   const today = new Date().toISOString().split("T")[0];
@@ -45,6 +46,13 @@ export default function AccountBalancePage() {
                   className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Code
+                </TableCell>
+
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Account Number
                 </TableCell>
 
                 {/* Name – left */}
@@ -90,9 +98,12 @@ export default function AccountBalancePage() {
             </TableHeader>
 
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800 mx-auto">
-              {balances.map((item: any) => (
+              {balances.map((item: Account) => (
                 <TableRow key={item.code} className="border-b last:border-none">
                   {/* Code – left */}
+                  <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
+                    {item.account_number}
+                  </TableCell>
                   <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
                     {item.code}
                   </TableCell>
@@ -109,12 +120,12 @@ export default function AccountBalancePage() {
                         item.type === "asset"
                           ? "blue"
                           : item.type === "liability"
-                          ? "orange"
-                          : item.type === "equity"
-                          ? "purple"
-                          : item.type === "income"
-                          ? "green"
-                          : "red"
+                            ? "orange"
+                            : item.type === "equity"
+                              ? "purple"
+                              : item.type === "income"
+                                ? "green"
+                                : "red"
                       }
                     >
                       {item.type}
@@ -123,21 +134,20 @@ export default function AccountBalancePage() {
 
                   {/* Debit – right */}
                   <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                    {Number(item.debit).toFixed(2)}
+                    {Number(item.debit ?? 0).toFixed(2)}
                   </TableCell>
 
                   {/* Credit – right */}
                   <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                    {Number(item.credit).toFixed(2)}
+                    {Number(item.credit ?? 0).toFixed(2)}
                   </TableCell>
 
                   {/* Balance – right, colored */}
                   <TableCell
-                    className={`px-4 py-3 text-sm text-right font-medium ${
-                      item.balance < 0 ? "text-red-500" : "text-green-600"
-                    }`}
+                    className={`px-4 py-3 text-sm text-right font-medium ${(item.balance ?? 0) < 0 ? "text-red-500" : "text-green-600"
+                      }`}
                   >
-                    {Number(item.balance).toFixed(2)}
+                    {Number(item.balance ?? 0).toFixed(2)}
                   </TableCell>
                 </TableRow>
               ))}

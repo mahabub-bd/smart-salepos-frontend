@@ -1,10 +1,17 @@
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import { useGetAccountJournalQuery } from "../../../features/accounts/accountsApi";
 
 export default function JournalPage() {
-  const { data, isLoading, isError } = useGetAccountJournalQuery(); // No params needed
+  const { data, isLoading, isError } = useGetAccountJournalQuery();
   const journal = data?.data || [];
 
   if (isLoading) return <Loading message="Loading journal entries..." />;
@@ -23,42 +30,98 @@ export default function JournalPage() {
         <h1 className="text-xl font-semibold">Journal Entries</h1>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-gray-50 dark:bg-white/10">
-              <tr>
-                <th className="table-header text-left">Transaction ID</th>
-                <th className="table-header text-left">Reference</th>
-                <th className="table-header text-left">Date</th>
-                <th className="table-header text-left">Account</th>
-                <th className="table-header text-right">Debit</th>
-                <th className="table-header text-right">Credit</th>
-                <th className="table-header text-left">Narration</th>
-              </tr>
-            </thead>
+          <Table className="w-full text-sm">
+            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+              <TableRow>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Transaction ID
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Reference
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Date
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Account
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Debit
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Credit
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Narration
+                </TableCell>
+              </TableRow>
+            </TableHeader>
 
-            <tbody>
+            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {journal.map((tx: any) =>
                 tx.entries.map((entry: any, index: number) => (
-                  <tr
-                    key={`${tx.transaction_id}-${index}`}
-                    className="border-b last:border-none"
-                  >
-                    <td className="table-body">{tx.transaction_id}</td>
-                    <td className="table-body capitalize">
-                      {tx.reference_type} #{tx.reference_id}
-                    </td>
-                    <td className="table-body">
-                      {new Date(tx.date).toLocaleDateString()}
-                    </td>
-                    <td className="table-body">{entry.account_name}</td>
-                    <td className="table-body text-right">{entry.debit}</td>
-                    <td className="table-body text-right">{entry.credit}</td>
-                    <td className="table-body">{entry.narration}</td>
-                  </tr>
+                  <TableRow key={`${tx.transaction_id}-${index}`}>
+                    {index === 0 && (
+                      <>
+                        <TableCell
+                          rowSpan={tx.entries.length}
+                          className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100"
+                        >
+                          {tx.transaction_id}
+                        </TableCell>
+                        <TableCell
+                          rowSpan={tx.entries.length}
+                          className="px-4 py-3 text-sm capitalize text-left text-gray-800 dark:text-gray-100"
+                        >
+                          {tx.reference_type} #{tx.reference_id}
+                        </TableCell>
+                        <TableCell
+                          rowSpan={tx.entries.length}
+                          className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100"
+                        >
+                          {new Date(tx.date).toLocaleDateString()}
+                        </TableCell>
+                      </>
+                    )}
+
+                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
+                      {entry.account_name}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
+                      {Number(entry.debit).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
+                      {Number(entry.credit).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
+                      {entry.narration || "-"}
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

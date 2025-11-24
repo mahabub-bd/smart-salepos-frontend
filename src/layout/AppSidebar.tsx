@@ -115,6 +115,10 @@ const navItems: NavItem[] = [
     path: "/accounts",
     subItems: [
       {
+        name: "Account List",
+        path: "/accounts/list",
+      },
+      {
         name: "Balances",
         path: "/accounts/balances",
       },

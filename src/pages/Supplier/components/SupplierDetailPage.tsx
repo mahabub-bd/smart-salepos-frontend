@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
@@ -6,6 +6,8 @@ import PageMeta from "../../../components/common/PageMeta";
 
 import { useGetSupplierByIdQuery } from "../../../features/suppliers/suppliersApi";
 
+import { Eye } from "lucide-react";
+import IconButton from "../../../components/common/IconButton";
 import Badge from "../../../components/ui/badge/Badge";
 import {
   Table,
@@ -74,39 +76,46 @@ export default function SupplierDetailPage() {
                 <TableRow>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase"
+                    className="px-4 py-2 text-left text-xs font-semibold uppercase"
                   >
                     PO No
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-center text-xs font-semibold text-gray-600 uppercase"
+                    className="px-4 py-2 text-center text-xs font-semibold uppercase"
                   >
                     Status
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-right text-xs font-semibold text-gray-600 uppercase"
+                    className="px-4 py-2 text-right text-xs font-semibold uppercase"
                   >
                     Total
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-right text-xs font-semibold text-gray-600 uppercase"
+                    className="px-4 py-2 text-right text-xs font-semibold uppercase"
                   >
                     Paid
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-right text-xs font-semibold text-gray-600 uppercase"
+                    className="px-4 py-2 text-right text-xs font-semibold uppercase"
                   >
                     Due
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-center text-xs font-semibold text-gray-600 uppercase"
+                    className="px-4 py-2 text-center text-xs font-semibold uppercase"
                   >
                     Date
+                  </TableCell>
+                  {/* 👇 New column */}
+                  <TableCell
+                    isHeader
+                    className="px-4 py-2 text-center text-xs font-semibold uppercase"
+                  >
+                    Action
                   </TableCell>
                 </TableRow>
               </TableHeader>
@@ -117,24 +126,20 @@ export default function SupplierDetailPage() {
                     key={purchase.id}
                     className="border-b last:border-0"
                   >
-                    <TableCell className="px-4 py-2 text-left text-sm text-gray-800">
+                    <TableCell className="px-4 py-2 text-left">
                       {purchase.po_no}
                     </TableCell>
-
-                    <TableCell className="px-4 py-2 text-center text-sm capitalize text-gray-800">
+                    <TableCell className="px-4 py-2 text-center">
                       <PurchaseStatusBadge status={purchase.status} />
                     </TableCell>
-
-                    <TableCell className="px-4 py-2 text-right text-sm text-gray-800">
+                    <TableCell className="px-4 py-2 text-right">
                       {Number(purchase.total).toFixed(2)}
                     </TableCell>
-
-                    <TableCell className="px-4 py-2 text-right text-sm text-gray-800">
+                    <TableCell className="px-4 py-2 text-right">
                       {Number(purchase.paid_amount).toFixed(2)}
                     </TableCell>
-
                     <TableCell
-                      className={`px-4 py-2 text-right text-sm font-medium ${
+                      className={`px-4 py-2 text-right font-medium ${
                         Number(purchase.due_amount) > 0
                           ? "text-red-500"
                           : "text-green-600"
@@ -142,9 +147,20 @@ export default function SupplierDetailPage() {
                     >
                       {Number(purchase.due_amount).toFixed(2)}
                     </TableCell>
-
-                    <TableCell className="px-4 py-2 text-center text-sm text-gray-800">
+                    <TableCell className="px-4 py-2 text-center">
                       {new Date(purchase.created_at).toLocaleDateString()}
+                    </TableCell>
+
+                    {/* 👇 View Button */}
+                    <TableCell className="px-4 py-2 text-center">
+                      <Link
+                        to={`/purchases/${purchase.id}`}
+                        className="text-blue-600 hover:text-blue-700 underline text-sm"
+                      >
+                        <IconButton color="green" tooltip="View" icon={Eye}>
+                          View
+                        </IconButton>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}

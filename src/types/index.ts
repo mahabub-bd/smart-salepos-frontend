@@ -199,6 +199,7 @@ export interface Purchase {
   warehouse: Warehouse;
 
   items: PurchaseItem[];
+  payment_history: PaymentHistory[];
 
   total: string;
   paid_amount: string;
@@ -206,6 +207,16 @@ export interface Purchase {
   status: PurchaseStatus;
   created_at: string;
   updated_at: string;
+}
+export interface PaymentHistory {
+  id: number;
+  type: "supplier" | "customer";
+  amount: number;
+  method: "cash" | "bank" | "mobile";
+  note?: string;
+  supplier_id?: number;
+  purchase_id?: number;
+  created_at: string;
 }
 
 export interface InventoryItem {
@@ -227,13 +238,25 @@ export interface InventoryItem {
 
 export interface Account {
   id?: number;
+  account_number: string;
   code: string;
   name: string;
-  type: string;
+  type: "asset" | "liability" | "equity" | "income" | "expense";
+  isCash: boolean;
+  isBank: boolean;
   debit?: number;
   credit?: number;
   balance?: number;
 }
+
+export interface AccountType {
+  id: number;
+  account_number: string;
+  code: string;
+  name: string;
+  type: "asset" | "liability" | "equity" | "income" | "expense";
+}
+
 export interface JournalEntryItem {
   account_code: string;
   account_name: string;
