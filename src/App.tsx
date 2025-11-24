@@ -31,6 +31,7 @@ import PurchasePage from "./pages/Purchase";
 
 import AccountBalancePage from "./pages/Accounts/AccountBalance";
 import AccountListPage from "./pages/Accounts/AccountList";
+import CashandBank from "./pages/Accounts/CashandBank";
 import JournalPage from "./pages/Accounts/JournalPage";
 import PaymentsPage from "./pages/Accounts/payments";
 import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
@@ -131,6 +132,7 @@ export default function App() {
           <Route path="/accounts/journal" element={<JournalPage />} />
           <Route path="/accounts/payment" element={<PaymentsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
+          <Route path="/accounts/cash-bank" element={<CashandBank />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

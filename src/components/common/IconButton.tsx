@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes } from "react";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
-  color?: "blue" | "red" | "green" | "gray" | "purple";
+  color?: "blue" | "red" | "green" | "gray" | "purple" | "orange";
   size?: number;
   tooltip?: string;
 }
@@ -23,6 +23,7 @@ export default function IconButton({
     green: "bg-green-500 hover:bg-green-600 text-white",
     gray: "bg-gray-500 hover:bg-gray-600 text-white",
     purple: "bg-purple-500 hover:bg-purple-600 text-white",
+    orange: "bg-orange-500 hover:bg-orange-600 text-white",
   };
 
   return (
