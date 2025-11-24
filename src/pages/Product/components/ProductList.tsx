@@ -41,9 +41,12 @@ export default function ProductList() {
   // 🔹 Route Handlers
 
   const canView = useHasPermission("product.view");
-  const openViewPage = useCallback((product: Product) => {
-    navigate(`/products/view/${product.id}`);
-  }, [navigate]);
+  const openViewPage = useCallback(
+    (product: Product) => {
+      navigate(`/products/view/${product.id}`);
+    },
+    [navigate]
+  );
 
   const openCreatePage = useCallback(() => {
     navigate("/products/create");
@@ -100,7 +103,6 @@ export default function ProductList() {
           </div>
 
           <div className="flex items-center gap-3">
-           
             {canCreate && (
               <button
                 onClick={openCreatePage}
@@ -114,7 +116,7 @@ export default function ProductList() {
         </div>
 
         {/* Table Section */}
-        <div className="max-w-full overflow-x-auto">
+        <div className="max-w-full overflow-x-auto mx-auto">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
@@ -131,15 +133,13 @@ export default function ProductList() {
                 >
                   Product Name
                 </TableCell>
-                
+
                 <TableCell
                   isHeader
                   className="hidden xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Category
                 </TableCell>
-
-                
 
                 <TableCell
                   isHeader
@@ -187,7 +187,7 @@ export default function ProductList() {
             </TableHeader>
 
             {/* Table Body */}
-            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800 mx-auto">
               {products.length > 0 ? (
                 products.map((product) => (
                   <TableRow key={product.id} className="">
@@ -213,7 +213,6 @@ export default function ProductList() {
                       <div className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
                         {product.name}
                       </div>
-                    
                     </TableCell>
 
                     {/* Category */}
@@ -267,17 +266,15 @@ export default function ProductList() {
                     {/* Actions */}
                     <TableCell className="py-3">
                       <div className="flex justify-end gap-2">
-                        {
-                          canView && (
-                            <IconButton
-                              icon={Eye}
-                              tooltip="View"
-                              onClick={() => openViewPage(product)}
-                              color="blue"
-                              title="View Product"
-                            />
-                          )
-                        }
+                        {canView && (
+                          <IconButton
+                            icon={Eye}
+                            tooltip="View"
+                            onClick={() => openViewPage(product)}
+                            color="blue"
+                            title="View Product"
+                          />
+                        )}
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}
@@ -290,7 +287,6 @@ export default function ProductList() {
                         {canDelete && (
                           <IconButton
                             icon={Trash2}
-                            tooltip="Delete"
                             onClick={() => openDeleteDialog(product)}
                             color="red"
                             title="Delete Product"
@@ -302,10 +298,8 @@ export default function ProductList() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    className="py-12 text-center text-gray-500 dark:text-gray-400"
-                  >
-                    <div className="flex flex-col items-center gap-2">
+                  <TableCell className="py-12 text-center text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-col items-center gap-2 w-full justify-center">
                       <p className="text-lg font-medium">No products found</p>
                       <p className="text-sm">
                         Get started by adding your first product

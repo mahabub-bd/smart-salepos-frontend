@@ -12,6 +12,7 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import PageHeader from "../../../components/common/PageHeader";
 
+import Loading from "../../../components/common/Loading";
 import Badge from "../../../components/ui/badge/Badge";
 import {
   Table,
@@ -22,7 +23,6 @@ import {
 } from "../../../components/ui/table";
 import { Tag } from "../../../types";
 import TagFormModal from "./TagFormModal";
-import Loading from "../../../components/common/Loading";
 
 export default function TagList() {
   const { data, isLoading, isError } = useGetTagsQuery();
@@ -119,12 +119,14 @@ export default function TagList() {
                           <IconButton
                             icon={Pencil}
                             color="blue"
+                            tooltip="Edit"
                             onClick={() => openEdit(t)}
                           />
                         )}
                         {canDelete && (
                           <IconButton
                             icon={Trash2}
+                            tooltip="Delete"
                             color="red"
                             onClick={() => openDelete(t)}
                           />

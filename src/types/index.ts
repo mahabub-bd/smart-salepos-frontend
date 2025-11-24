@@ -1,3 +1,4 @@
+import { JSX } from "react/jsx-runtime";
 import { Role } from "./role";
 
 export interface Attachment {
@@ -78,7 +79,7 @@ export interface Category {
   slug?: string | null;
   description?: string;
   status: boolean;
-  category_id?: number;
+  category_id?: string;
   logo_attachment: Attachment;
   logo_attachment_id?: number;
   created_at: string;
@@ -86,7 +87,7 @@ export interface Category {
 }
 
 export interface SubCategory extends Category {
-  category_id: number;
+  category_id: string;
 }
 
 export interface CategoryWithChildren extends Category {
@@ -161,6 +162,9 @@ export interface Supplier {
   status: boolean;
   created_at: string;
   updated_at: string;
+  totalPurchased: number;
+  account: Account;
+  purchase_history: Purchase;
   products: Product[];
 }
 
@@ -186,6 +190,7 @@ export interface PurchaseItem {
   product: PurchaseProduct | null;
 }
 export interface Purchase {
+  map(arg0: (purchase: Purchase) => JSX.Element): import("react").ReactNode;
   id: number;
   po_no: string;
   supplier_id: number;
@@ -218,6 +223,30 @@ export interface InventoryItem {
   purchase_item_id: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface Account {
+  id?: number;
+  code: string;
+  name: string;
+  type: string;
+  debit?: number;
+  credit?: number;
+  balance?: number;
+}
+export interface JournalEntryItem {
+  account_code: string;
+  account_name: string;
+  debit: string;
+  credit: string;
+  narration: string;
+}
+export interface JournalEntry {
+  transaction_id: number;
+  reference_type: string;
+  reference_id: number;
+  date: string;
+  entries: JournalEntryItem[];
 }
 
 export type Inventory = InventoryItem[];

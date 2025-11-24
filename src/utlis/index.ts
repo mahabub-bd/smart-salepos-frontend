@@ -32,3 +32,19 @@ export const SafeNumber = (msg: string) =>
   }, z.number({ error: msg }));
 
 
+export const badgeColors = {
+  // Payment Methods
+  cash: "green",
+  bank: "blue",
+  bkash: "purple",
+
+  // Account Types
+  asset: "blue",
+  liability: "orange",
+  equity: "purple",
+  income: "green",
+  expense: "red",
+
+  // Status or fallback
+  default: "gray",
+};

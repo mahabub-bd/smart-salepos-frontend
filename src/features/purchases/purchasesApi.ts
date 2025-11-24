@@ -3,9 +3,19 @@ import { apiSlice } from "../apiSlice";
 
 export interface ReceivePurchasePayload {
   id: string | number;
-  body: any; // If you send quantities, items etc. I can refine it
+  body: any;
 }
-
+export interface PurchasePaymentPayload {
+  id: string | number;
+  body: {
+    type: "supplier";
+    supplier_id: number;
+    purchase_id: number;
+    payment_amount: number;
+    method: string;
+    note?: string;
+  };
+}
 export interface UpdatePurchasePayload {
   id: string | number;
   body: {
@@ -32,6 +42,21 @@ export const purchasesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Purchases"],
     }),
+
+    purchasePayment: builder.mutation<ApiResponse<any>, PurchasePaymentPayload>(
+      {
+        query: ({ id, body }) => ({
+          url: `/purchases/${id}/payment`,
+          method: "PATCH",
+          body,
+        }),
+        invalidatesTags: (_result, _error, { id }) => [
+          "Purchases",
+          { type: "Purchases", id },
+        ],
+      }
+    ),
+
     // 🔹 UPDATE PURCHASE
     updatePurchase: builder.mutation<
       ApiResponse<Purchase>,
@@ -89,4 +114,5 @@ export const {
   useGetPurchasesQuery,
   useGetPurchaseByIdQuery,
   useReceivePurchaseMutation,
+  usePurchasePaymentMutation,
 } = purchasesApi;

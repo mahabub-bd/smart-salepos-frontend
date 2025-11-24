@@ -1,4 +1,4 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -7,6 +7,7 @@ import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 
+import { Link } from "react-router";
 import {
   useDeleteSupplierMutation,
   useGetSuppliersQuery,
@@ -82,7 +83,6 @@ export default function SupplierList() {
                 <th className="table-header">Address</th>
                 <th className="table-header">Products</th>
 
-
                 <th className="table-header text-right">Actions</th>
               </tr>
             </thead>
@@ -100,9 +100,16 @@ export default function SupplierList() {
 
                     <td className="table-body text-right">
                       <div className="flex justify-end gap-2">
+                        <Link to={`/suppliers/${s.id}`}>
+                          <IconButton
+                            icon={Eye}
+                            tooltip="View Details"
+                            color="purple"
+                          />
+                        </Link>
                         <IconButton
                           icon={Pencil}
-                            tooltip="Edit"
+                          tooltip="Edit"
                           color="blue"
                           onClick={() => openEdit(s)}
                         />

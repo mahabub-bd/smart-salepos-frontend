@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
+import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge"; // Optional if you want badges like in RoleList
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
@@ -20,7 +21,6 @@ import {
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Brand } from "../../../types";
 import BrandFormModal from "./BrandFormModal";
-import Loading from "../../../components/common/Loading";
 
 export default function BrandList() {
   const { data, isLoading, isError } = useGetBrandsQuery();
@@ -130,7 +130,7 @@ export default function BrandList() {
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}
-                            tooltip="Edit Brand"
+                            tooltip="Edit"
                             onClick={() => openEditModal(brand)}
                             color="blue"
                           />
@@ -138,7 +138,7 @@ export default function BrandList() {
                         {canDelete && (
                           <IconButton
                             icon={Trash2}
-                            tooltip="Delete Brand"
+                            tooltip="Delete"
                             onClick={() => openDeleteDialog(brand)}
                             color="red"
                           />

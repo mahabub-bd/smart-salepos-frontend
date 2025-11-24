@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import { RootState } from "../store";
 
-import { FileText, Package2Icon } from "lucide-react";
+import { BookOpenText, FileText, Package2Icon } from "lucide-react";
 import { ChevronDownIcon, HorizontaLDots } from "../icons";
 
 type NavItem = {
@@ -105,6 +105,35 @@ const navItems: NavItem[] = [
         name: "Inventory Movement",
         path: "/inventory",
         requiredPermission: "inventory.view",
+      },
+    ],
+  },
+
+  {
+    name: "Accounts",
+    icon: <LayoutDashboard size={18} />,
+    path: "/accounts",
+    subItems: [
+      {
+        name: "Balances",
+        path: "/accounts/balances",
+      },
+      { name: "Cash in Hand", path: "/accounts/ASSET.CASH" },
+      { name: "Owner Capital", path: "/accounts/EQUITY.CAPITAL" },
+    ],
+  },
+
+  {
+    name: "Journal",
+    icon: <BookOpenText size={18} />,
+    subItems: [
+      {
+        name: "All Journals",
+        path: "/accounts/journal",
+      },
+      {
+        name: "Payments",
+        path: "/accounts/payment",
       },
     ],
   },

@@ -35,7 +35,7 @@ interface FlattenedCategory {
   logo_attachment: any;
   created_at: string;
   updated_at: string;
-  category_id?: number;
+  category_id?: string;
   parent?: CategoryWithChildren | null;
 }
 
@@ -99,7 +99,7 @@ export default function CategoryList() {
       logo_attachment: null,
       created_at: "",
       updated_at: "",
-      category_id: parent.id, // Set parent category ID
+      category_id: String(parent.id), // Set parent category ID
     });
     setIsModalOpen(true);
   };
@@ -190,7 +190,7 @@ export default function CategoryList() {
                 >
                   Parent
                 </TableCell>
-                
+
                 <TableCell
                   isHeader
                   className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -263,8 +263,6 @@ export default function CategoryList() {
                       )}
                     </TableCell>
 
-                    
-
                     {/* Status */}
                     <TableCell className="py-3">
                       <Badge size="sm" color={cat.status ? "success" : "error"}>
@@ -280,7 +278,7 @@ export default function CategoryList() {
                           <IconButton
                             icon={Plus}
                             color="green"
-                            tooltip="Add Subcategory"
+                            tooltip="Add "
                             onClick={() => openCreateSubCategoryModal(cat)}
                           />
                         )}
@@ -302,9 +300,6 @@ export default function CategoryList() {
                           <IconButton
                             icon={Trash2}
                             color="red"
-                            tooltip={`Delete ${
-                              cat.parent ? "Subcategory" : "Category"
-                            }`}
                             onClick={() => openDeleteDialog(cat)}
                           />
                         )}

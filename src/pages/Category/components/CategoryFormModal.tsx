@@ -148,7 +148,7 @@ export default function CategoryFormModal({
 
     const payload = {
       ...data,
-      category_id: data.category_id ? Number(data.category_id) : undefined,
+      category_id: data.category_id ? String(data.category_id) : undefined,
       logo_attachment_id: attachmentId ? Number(attachmentId) : undefined,
     };
 

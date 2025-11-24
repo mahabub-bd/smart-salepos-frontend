@@ -128,12 +128,14 @@ export default function UnitList() {
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}
+                            tooltip="Edit"
                             onClick={() => openEditModal(unit)}
                             color="blue"
                           />
                         )}
                         {canDelete && (
                           <IconButton
+                            tooltip="Delete"
                             icon={Trash2}
                             onClick={() => openDeleteDialog(unit)}
                             color="red"

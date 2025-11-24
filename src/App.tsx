@@ -29,20 +29,24 @@ import ProductPage from "./pages/Product";
 import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import PurchasePage from "./pages/Purchase";
 
+import AccountBalancePage from "./pages/Accounts/AccountBalance";
+import JournalPage from "./pages/Accounts/JournalPage";
+import PaymentsPage from "./pages/Accounts/payments";
 import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
+import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
+import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
 import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
 import PurchaseDetailPage from "./pages/Purchase/components/PurchaseDetailPage";
 import PurchaseEdit from "./pages/Purchase/components/PurchaseEdit";
 import RolesPage from "./pages/Role";
 import SuppliersPage from "./pages/Supplier";
+import SupplierDetailPage from "./pages/Supplier/components/SupplierDetailPage";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
-import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
-import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
 export default function App() {
   return (
     <Router>
@@ -103,6 +107,7 @@ export default function App() {
           // For editing a product
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
+          <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
           {/* Purchase List */}
           <Route path="/purchase" element={<PurchasePage />} />
           <Route path="/purchases/create" element={<PurchaseCreate />} />
@@ -113,17 +118,17 @@ export default function App() {
             path="/inventory/stock-batch-wise"
             element={<InventoryPageBatchWise />}
           />
-
-           <Route
+          <Route
             path="/inventory/stock-product-wise"
             element={<InventoryProductWisePage />}
           />
-
-           <Route
+          <Route
             path="/inventory/stock-warehouse-wise"
             element={<InventoryProductWarehouseWise />}
           />
-
+          <Route path="/accounts/balances" element={<AccountBalancePage />} />
+          <Route path="/accounts/journal" element={<JournalPage />} />
+          <Route path="/accounts/payment" element={<PaymentsPage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />
