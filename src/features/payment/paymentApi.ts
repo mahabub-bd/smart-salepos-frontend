@@ -8,6 +8,7 @@ export interface CreatePaymentPayload {
   purchase_id?: number;
   sale_id?: number;
   amount: number;
+  payment_account_code: string;
   method: "cash" | "bank" | "bkash";
   note?: string;
 }

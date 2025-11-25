@@ -22,7 +22,9 @@ export default function InventoryListProductWise() {
               <tr>
                 <th className="table-header">Product</th>
                 <th className="table-header">SKU</th>
-                <th className="table-header">Total Stock</th>
+                <th className="table-header">Purchased</th>
+                <th className="table-header">Sold</th>
+                <th className="table-header">Remaining</th>
                 <th className="table-header">Warehouses</th>
                 <th className="table-header text-right">Actions</th>
               </tr>
@@ -32,25 +34,53 @@ export default function InventoryListProductWise() {
               {inventory.length ? (
                 inventory.map((item: any) => (
                   <tr key={item.product_id} className="border-b">
+                    {/* Product Name */}
                     <td className="table-body font-semibold">
                       {item.product.name}
                     </td>
 
+                    {/* SKU */}
                     <td className="table-body text-gray-600">
                       {item.product.sku}
                     </td>
 
+                    {/* Purchased (Total Stock) */}
                     <td className="table-body font-medium">
                       {item.total_stock}
                     </td>
 
+                    {/* Sold */}
+                    <td className="table-body font-medium text-red-500">
+                      {item.total_sold_quantity}
+                    </td>
+
+                    {/* Remaining */}
+                    <td className="table-body font-medium text-green-600">
+                      {item.remaining_stock}
+                    </td>
+
+                    {/* Warehouse Details */}
                     <td className="table-body">
                       {item.warehouses.map((w: any, index: number) => (
-                        <div key={index} className="text-sm">
+                        <div key={index} className="text-sm mb-2">
                           <span className="font-medium">
                             {w.warehouse.name}
                           </span>{" "}
-                          — {w.quantity} pcs
+                          —
+                          <span className="text-blue-500">
+                            {" "}
+                            {w.purchased_quantity} purchased
+                          </span>
+                          ,
+                          <span className="text-red-500">
+                            {" "}
+                            {w.sold_quantity} sold
+                          </span>
+                          ,
+                          <span className="text-green-600">
+                            {" "}
+                            {w.remaining_quantity} left
+                          </span>
                           <br />
                           <span className="text-xs text-gray-500">
                             Batch: {w.batch_no}
@@ -59,6 +89,7 @@ export default function InventoryListProductWise() {
                       ))}
                     </td>
 
+                    {/* Action */}
                     <td className="table-body text-right">
                       <button
                         className="p-2 rounded hover:bg-gray-100"
@@ -73,7 +104,7 @@ export default function InventoryListProductWise() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="py-6 text-center text-gray-500">
+                  <td colSpan={7} className="py-6 text-center text-gray-500">
                     No inventory records found
                   </td>
                 </tr>

@@ -1,5 +1,10 @@
 import { Account, ApiResponse, JournalEntry } from "../../types";
 import { apiSlice } from "../apiSlice";
+interface GetAccountsQueryArg {
+  type?: string;
+  isCash?: boolean;
+  isBank?: boolean;
+}
 
 export const accountsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -31,11 +36,25 @@ export const accountsApi = apiSlice.injectEndpoints({
       providesTags: ["Accounts"],
     }),
 
-    getAccounts: builder.query({
-      query: (type?: string) => ({
-        url: type ? `/accounts?type=${type}` : "/accounts",
-        method: "GET",
-      }),
+    getAccounts: builder.query<any, GetAccountsQueryArg | void>({
+      query: (params) => {
+        let url = "/accounts";
+
+        if (params) {
+          const queryParams = new URLSearchParams();
+
+          if (params.type) queryParams.append("type", params.type);
+          if (params.isCash !== undefined)
+            queryParams.append("isCash", String(params.isCash));
+          if (params.isBank !== undefined)
+            queryParams.append("isBank", String(params.isBank));
+
+          const queryString = queryParams.toString();
+          if (queryString) url += `?${queryString}`;
+        }
+
+        return { url, method: "GET" };
+      },
       providesTags: ["Accounts"],
     }),
 

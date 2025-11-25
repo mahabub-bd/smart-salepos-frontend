@@ -12,6 +12,7 @@ export interface PurchasePaymentPayload {
     supplier_id: number;
     purchase_id: number;
     payment_amount: number;
+    
     method: string;
     note?: string;
   };
