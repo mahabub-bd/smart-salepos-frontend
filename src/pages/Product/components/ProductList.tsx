@@ -20,6 +20,7 @@ import {
   useGetProductsQuery,
 } from "../../../features/product/productApi";
 
+import Button from "../../../components/ui/button/Button";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Product } from "../../../types";
 
@@ -97,20 +98,14 @@ export default function ProductList() {
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
               Product Management
             </h3>
-            <p className="text-theme-sm text-gray-500 dark:text-gray-400 mt-1">
-              Total {products.length} products
-            </p>
           </div>
 
           <div className="flex items-center gap-3">
             {canCreate && (
-              <button
-                onClick={openCreatePage}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-theme-sm font-medium text-white shadow-theme-xs hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-              >
+              <Button size="sm" onClick={openCreatePage}>
                 <Plus size={16} />
-                Add Product
-              </button>
+                Add
+              </Button>
             )}
           </div>
         </div>
