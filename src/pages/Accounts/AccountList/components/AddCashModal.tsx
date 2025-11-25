@@ -5,6 +5,7 @@ import { z } from "zod";
 import Input from "../../../../components/form/input/InputField";
 import { Modal } from "../../../../components/ui/modal";
 import { useAddCashMutation } from "../../../../features/accounts/accountsApi";
+import AccountInfo from "./AccountInfo";
 
 // Validation Schema
 const addCashSchema = z.object({
@@ -17,9 +18,14 @@ type AddCashFormValues = z.infer<typeof addCashSchema>;
 interface AddCashModalProps {
   isOpen: boolean;
   onClose: () => void;
+  account: any; // contains code, name, balance
 }
 
-export default function AddCashModal({ isOpen, onClose }: AddCashModalProps) {
+export default function AddCashModal({
+  isOpen,
+  onClose,
+  account,
+}: AddCashModalProps) {
   const [addCash, { isLoading }] = useAddCashMutation();
 
   const {
@@ -47,11 +53,12 @@ export default function AddCashModal({ isOpen, onClose }: AddCashModalProps) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto"
+      className="max-w-lg p-6 min-h-[300px] max-h-screen overflow-y-auto"
     >
       <h2 className="text-xl font-semibold text-center mb-5 flex items-center justify-center gap-2">
         💵 Add Cash
       </h2>
+      <AccountInfo account={account} />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
@@ -79,8 +86,9 @@ export default function AddCashModal({ isOpen, onClose }: AddCashModalProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition ${isLoading && "opacity-50 cursor-not-allowed"
-              }`}
+            className={`px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition ${
+              isLoading && "opacity-50 cursor-not-allowed"
+            }`}
           >
             {isLoading ? "Processing..." : "Add Cash"}
           </button>

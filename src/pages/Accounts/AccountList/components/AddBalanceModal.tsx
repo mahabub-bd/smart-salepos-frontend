@@ -5,6 +5,7 @@ import { z } from "zod";
 import Input from "../../../../components/form/input/InputField";
 import { Modal } from "../../../../components/ui/modal";
 import { useAddBankBalanceMutation } from "../../../../features/accounts/accountsApi";
+import AccountInfo from "./AccountInfo";
 
 const addBankBalanceSchema = z.object({
   amount: z.number().positive("Amount must be greater than 0"),
@@ -53,14 +54,14 @@ export default function AddBalanceModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6 min-h-[300px] max-h-screen overflow-y-auto"
+    >
       <h2 className="text-lg font-semibold mb-3">Add Balance</h2>
 
-      <p className="text-sm mb-3">
-        <strong>Account:</strong> {account.name} ({account.code}) <br />
-        <strong>Current Balance:</strong>{" "}
-        {Number(account.balance).toLocaleString()}
-      </p>
+      <AccountInfo account={account} />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
@@ -89,8 +90,9 @@ export default function AddBalanceModal({
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-4 py-2 bg-green-600 text-white rounded ${isLoading && "opacity-50"
-              }`}
+            className={`px-4 py-2 bg-green-600 text-white rounded ${
+              isLoading && "opacity-50"
+            }`}
           >
             {isLoading ? "Saving..." : "Add Balance"}
           </button>

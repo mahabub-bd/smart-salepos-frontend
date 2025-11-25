@@ -15,6 +15,7 @@ interface FundTransferModalProps {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import AccountInfo from "./AccountInfo";
 import { fundTransferSchema } from "./formSchema";
 
 export default function FundTransferModal({
@@ -76,10 +77,7 @@ export default function FundTransferModal({
     >
       <h2 className="text-lg font-semibold mb-3">Fund Transfer</h2>
 
-      <p className="text-sm mb-3">
-        <strong>From:</strong> {fromAccount.name} ({fromAccount.code}) <br />
-        <strong>Balance:</strong> {fromAccount.balance.toLocaleString()}
-      </p>
+      <AccountInfo account={fromAccount} />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
@@ -130,8 +128,9 @@ export default function FundTransferModal({
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-4 py-2 bg-purple-600 rounded text-white ${isLoading && "opacity-50"
-              }`}
+            className={`px-4 py-2 bg-purple-600 rounded text-white ${
+              isLoading && "opacity-50"
+            }`}
           >
             {isLoading ? "Processing..." : "Transfer"}
           </button>
