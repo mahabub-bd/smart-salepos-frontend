@@ -14,7 +14,7 @@ import {
 import { useGetPaymentsQuery } from "../../../features/payment/paymentApi";
 
 const badgeColors: Record<string, string> = {
-  cash: "text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs",
+  cash: "text-green-600 Capitalized bg-green-50 px-2 py-1 rounded-full text-xs",
   bank: "text-blue-600 bg-blue-50 px-2 py-1 rounded-full text-xs",
   bkash: "text-pink-600 bg-pink-50 px-2 py-1 rounded-full text-xs",
 };
@@ -35,7 +35,7 @@ export default function PaymentsPage() {
       <div className="flex flex-col gap-5 min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/5">
         <h1 className="text-xl font-semibold">Payment List</h1>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto Capitalized">
           <Table>
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
@@ -101,7 +101,7 @@ export default function PaymentsPage() {
                       {Number(payment.amount).toFixed(2)}
                     </TableCell>
                     {/* CENTER   */}
-                    <TableCell className="px-4 py-3 text-sm text-center">
+                    <TableCell className="px-4 py-3 text-sm  text-center">
                       <span className={badgeColors[payment.method]}>
                         {payment.method}
                       </span>

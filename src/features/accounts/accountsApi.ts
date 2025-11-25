@@ -14,12 +14,6 @@ export const accountsApi = apiSlice.injectEndpoints({
       providesTags: ["Accounts"],
     }),
 
-    // 🔹 Get single account by ID
-    getAccountById: builder.query<ApiResponse<Account>, number>({
-      query: (id) => `/accounts/${id}`,
-      providesTags: (_result, _error, id) => [{ type: "Accounts", id }],
-    }),
-
     // 🔹 Get balance for account code
     getAccountBalanceByCode: builder.query<
       ApiResponse<Account>,
@@ -30,11 +24,7 @@ export const accountsApi = apiSlice.injectEndpoints({
       providesTags: ["Accounts"],
     }),
 
-    // 🔹 Get account journal
-    getAccountJournal: builder.query<ApiResponse<JournalEntry[]>, void>({
-      query: () => `/accounts/journal`,
-      providesTags: ["Accounts"],
-    }),
+
 
     getAccounts: builder.query<any, GetAccountsQueryArg | void>({
       query: (params) => {
@@ -58,6 +48,12 @@ export const accountsApi = apiSlice.injectEndpoints({
       providesTags: ["Accounts"],
     }),
 
+    // 🔹 Get single account by ID
+    getAccountById: builder.query<ApiResponse<Account>, number>({
+      query: (id) => `/accounts/${id}`,
+      providesTags: (_result, _error, id) => [{ type: "Accounts", id }],
+    }),
+
     // 🔹 Add cash to ASSET.CASH
     addCash: builder.mutation<
       ApiResponse<any>,
@@ -70,6 +66,7 @@ export const accountsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Accounts"],
     }),
+
     addBankBalance: builder.mutation<
       ApiResponse<any>,
       { bankAccountCode: string; amount: number; narration: string }
@@ -81,6 +78,7 @@ export const accountsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Accounts"],
     }),
+
     // 🔹 Fund transfer (bank ⇆ cash)
     fundTransfer: builder.mutation<
       ApiResponse<any>,
@@ -98,6 +96,50 @@ export const accountsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Accounts"],
     }),
+    // 🔹 Get account journal
+    getAccountJournal: builder.query<ApiResponse<JournalEntry[]>, void>({
+      query: () => `/accounts/reports/journal`,
+      providesTags: ["Accounts"],
+    }),
+    getTrialBalance: builder.query<ApiResponse<any>, string | void>({
+      query: (date) =>
+        `/accounts/reports/trial-balance${date ? `?date=${date}` : ""}`,
+      providesTags: ["Accounts"],
+    }),
+
+    // 🔹 Balance sheet report
+    getBalanceSheet: builder.query<ApiResponse<any>, string | void>({
+      query: (date) =>
+        `/accounts/reports/balance-sheet${date ? `?date=${date}` : ""}`,
+      providesTags: ["Accounts"],
+    }),
+
+    // 🔹 Profit & loss report
+    getProfitLoss: builder.query<ApiResponse<any>, string | void>({
+      query: (date) =>
+        `/accounts/reports/profit-loss${date ? `?date=${date}` : ""}`,
+      providesTags: ["Accounts"],
+    }),
+
+    getSupplierLedger: builder.query<
+      ApiResponse<any>,
+      { supplierId: number; date?: string }
+    >({
+      query: ({ supplierId, date }) =>
+        `/accounts/ledger/supplier/${supplierId}${date ? `?date=${date}` : ""
+        }`,
+      providesTags: ["Accounts"],
+    }),
+    getCashBankLedger: builder.query<
+      ApiResponse<any>,
+      { code: string; date?: string }
+    >({
+      query: ({ code, date }) =>
+        `/accounts/ledger/cash-bank/${code}${date ? `?date=${date}` : ""}`,
+      providesTags: ["Accounts"],
+    }),
+
+
   }),
 });
 
@@ -110,4 +152,10 @@ export const {
   useAddBankBalanceMutation,
   useAddCashMutation,
   useFundTransferMutation,
+  useGetTrialBalanceQuery,
+  useGetBalanceSheetQuery,
+  useGetProfitLossQuery,
+  useGetSupplierLedgerQuery,
+  useGetCashBankLedgerQuery,
+
 } = accountsApi;

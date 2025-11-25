@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import Input from "../../../components/form/input/InputField";
+import Select from "../../../components/form/Select"; // 👈 use your Select
 import Button from "../../../components/ui/button/Button";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useCreatePaymentMutation } from "../../../features/payment/paymentApi";
@@ -45,9 +46,15 @@ export default function PurchasePaymentModal({
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchemaWithLimit(dueAmount)),
+    defaultValues: {
+      method: undefined as any,
+      payment_account_code: "",
+      note: "",
+    },
   });
 
   const amount = watch("amount");
@@ -70,8 +77,8 @@ export default function PurchasePaymentModal({
     selectedMethod === "cash"
       ? acc.isCash
       : selectedMethod === "bank"
-      ? acc.isBank
-      : false
+        ? acc.isBank
+        : false
   );
 
   const onSubmit = async (values: PaymentFormValues) => {
@@ -82,7 +89,7 @@ export default function PurchasePaymentModal({
         purchase_id: purchase.id,
         amount: values.amount,
         method: values.method,
-        payment_account_code: values.payment_account_code, // 👈 SEND HERE
+        payment_account_code: values.payment_account_code,
         note: values.note,
       }).unwrap();
 
@@ -111,29 +118,40 @@ export default function PurchasePaymentModal({
           />
 
           {/* 💳 Payment Method */}
-          <select
-            {...register("method")}
-            className="form-input rounded-lg border px-4 h-11"
-          >
-            <option value="">Select Method</option>
-            <option value="cash">Cash</option>
-            <option value="bank">Bank</option>
-            <option value="bkash">Bkash</option>
-          </select>
+          <Controller
+            name="method"
+            control={control}
+            render={({ field }) => (
+              <Select
+                options={[
+                  { value: "cash", label: "Cash" },
+                  { value: "bank", label: "Bank" },
+                  { value: "bkash", label: "Bkash" },
+                ]}
+                placeholder="Select Method"
+                defaultValue={field.value}
+                onChange={(value) => field.onChange(value)}
+              />
+            )}
+          />
 
           {/* 🏦 Payment Account */}
           {selectedMethod && (
-            <select
-              {...register("payment_account_code")}
-              className="form-input rounded-lg border px-4 h-11"
-            >
-              <option value="">Select Account</option>
-              {filteredAccounts.map((acc: any) => (
-                <option key={acc.id} value={acc.code}>
-                  {acc.name} ({acc.account_number})
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="payment_account_code"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  options={filteredAccounts.map((acc: any) => ({
+                    value: acc.code,
+                    label: `${acc.name} - ${acc.code} - ${acc.account_number}`,
+                  }))}
+                  placeholder="Select Account"
+                  defaultValue={field.value}
+                  onChange={(value) => field.onChange(value)}
+                />
+              )}
+            />
           )}
 
           {/* 📝 Note */}

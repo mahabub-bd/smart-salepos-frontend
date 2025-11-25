@@ -45,11 +45,11 @@ export default function PurchaseReceiveModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-4">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto">
       <h2 className="text-lg font-semibold mb-4">
         Receive Items – {purchase.po_no}
       </h2>
-
+      <p>Product Received </p>
       <div className="space-y-4">
         {purchase.items.map((item, idx) => (
           <div key={item.id} className="flex justify-between items-center">
