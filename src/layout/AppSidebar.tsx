@@ -24,6 +24,7 @@ type NavItem = {
 import {
   Banknote,
   CalendarDays,
+  GitBranch,
   LayoutDashboard,
   MonitorSmartphone,
   PieChart,
@@ -31,7 +32,7 @@ import {
   Truck,
   UserCircle,
   Users,
-  Warehouse,
+  Warehouse
 } from "lucide-react";
 
 const navItems: NavItem[] = [
@@ -108,6 +109,18 @@ const navItems: NavItem[] = [
       },
     ],
   },
+  {
+    icon: <GitBranch />,
+    name: "Branch",
+    requiredPermission: "branch.view",
+    subItems: [
+      {
+        name: "Branch List",
+        path: "/branches",
+        requiredPermission: "branch.view",
+      },
+    ],
+  },
 
   {
     name: "Accounts",
@@ -148,14 +161,31 @@ const navItems: NavItem[] = [
   {
     icon: <PieChart />,
     name: "Sale",
-    path: "/sales",
     requiredPermission: "sales.view",
+    subItems: [
+      {
+        name: "Sale List",
+        path: "/sales",
+        requiredPermission: "sales.view",
+      },
+    ],
   },
   {
     icon: <Banknote />,
     name: "Expense",
-    path: "/expenses",
+
     requiredPermission: "expense.view",
+    subItems: [
+      {
+        name: "All Expenses",
+        path: "/expenses",
+      },
+
+      {
+        name: "Expense Category",
+        path: "/expenses/category",
+      },
+    ],
   },
   {
     icon: <UserCircle />,
@@ -297,30 +327,28 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.some((sub) =>
                   hasPermission(sub.requiredPermission)
                 ) && (
-                  <button
-                    onClick={() => handleSubmenuToggle(index, menuType)}
-                    className={`menu-item group ${
-                      openSubmenu?.index === index
+                    <button
+                      onClick={() => handleSubmenuToggle(index, menuType)}
+                      className={`menu-item group ${openSubmenu?.index === index
                         ? "menu-item-active"
                         : "menu-item-inactive"
-                    } `}
-                  >
-                    <span className="menu-item-icon-size">{nav.icon}</span>
-                    {(isExpanded || isHovered || isMobileOpen) && (
-                      <>
-                        <span className="menu-item-text">{nav.name}</span>
-                        <ChevronDownIcon
-                          className={`ml-auto w-5 h-5 transition-transform duration-200 ${
-                            openSubmenu?.type === menuType &&
-                            openSubmenu?.index === index
+                        } `}
+                    >
+                      <span className="menu-item-icon-size">{nav.icon}</span>
+                      {(isExpanded || isHovered || isMobileOpen) && (
+                        <>
+                          <span className="menu-item-text">{nav.name}</span>
+                          <ChevronDownIcon
+                            className={`ml-auto w-5 h-5 transition-transform duration-200 ${openSubmenu?.type === menuType &&
+                              openSubmenu?.index === index
                               ? "rotate-180 text-brand-500"
                               : ""
-                          }`}
-                        />
-                      </>
-                    )}
-                  </button>
-                )}
+                              }`}
+                          />
+                        </>
+                      )}
+                    </button>
+                  )}
 
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <div
@@ -331,7 +359,7 @@ const AppSidebar: React.FC = () => {
                     style={{
                       height:
                         openSubmenu?.type === menuType &&
-                        openSubmenu?.index === index
+                          openSubmenu?.index === index
                           ? `${subMenuHeight[`${menuType}-${index}`]}px`
                           : "0px",
                     }}
@@ -345,11 +373,10 @@ const AppSidebar: React.FC = () => {
                           <li key={subItem.name}>
                             <Link
                               to={subItem.path}
-                              className={`menu-dropdown-item ${
-                                isActive(subItem.path)
-                                  ? "menu-dropdown-item-active"
-                                  : "menu-dropdown-item-inactive"
-                              }`}
+                              className={`menu-dropdown-item ${isActive(subItem.path)
+                                ? "menu-dropdown-item-active"
+                                : "menu-dropdown-item-inactive"
+                                }`}
                             >
                               {subItem.name}
                             </Link>
@@ -364,11 +391,10 @@ const AppSidebar: React.FC = () => {
               hasPermission(nav.requiredPermission) && (
                 <Link
                   to={nav.path}
-                  className={`menu-item group ${
-                    isActive(nav.path)
-                      ? "menu-item-active"
-                      : "menu-item-inactive"
-                  }`}
+                  className={`menu-item group ${isActive(nav.path)
+                    ? "menu-item-active"
+                    : "menu-item-inactive"
+                    }`}
                 >
                   <span className="menu-item-icon-size">{nav.icon}</span>
                   {(isExpanded || isHovered || isMobileOpen) && (
@@ -385,26 +411,23 @@ const AppSidebar: React.FC = () => {
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 h-screen transition-all duration-300 ease-in-out z-50 border-r
-      ${
-        isExpanded || isMobileOpen
+      ${isExpanded || isMobileOpen
           ? "w-[290px]"
           : isHovered
-          ? "w-[290px]"
-          : "w-[90px]"
-      }
-      ${
-        isMobileOpen
+            ? "w-[290px]"
+            : "w-[90px]"
+        }
+      ${isMobileOpen
           ? "translate-x-0 bg-white dark:bg-gray-900"
           : "-translate-x-full"
-      } lg:translate-x-0`}
+        } lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo Section */}
       <div
-        className={`py-8 flex ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-        }`}
+        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+          }`}
       >
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (

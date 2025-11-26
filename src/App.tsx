@@ -34,6 +34,8 @@ import AccountListPage from "./pages/Accounts/AccountList";
 import CashandBank from "./pages/Accounts/CashandBank";
 import JournalPage from "./pages/Accounts/JournalPage";
 import PaymentsPage from "./pages/Accounts/payments";
+import BranchPage from "./pages/Branch";
+import CustomerPage from "./pages/Customer";
 import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
 import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
 import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
@@ -49,6 +51,7 @@ import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
+import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
 export default function App() {
   return (
     <Router>
@@ -133,6 +136,10 @@ export default function App() {
           <Route path="/accounts/payment" element={<PaymentsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
+          <Route path="/branches" element={<BranchPage />} />
+          <Route path="customers" element={<CustomerPage />} />
+          <Route path="customers/:id" element={<CustomerDetailPage />} />
+
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

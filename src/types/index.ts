@@ -271,6 +271,94 @@ export interface JournalEntry {
   date: string;
   entries: JournalEntryItem[];
 }
+export interface Branch {
+  id: number;
+  code: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  is_active: boolean;
+  default_warehouse_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+export interface Customer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  status: boolean;
+  account: Account;
+  account_id: number;
+  sales: Sale[];
+  created_at: string;
+  updated_at: string;
+}
 
+export interface Sale {
+  id: number;
+  invoice_no: string;
+
+  subtotal: number;
+  discount: number;
+  tax: number;
+  total: number;
+  paid_amount: number;
+
+  items: SaleItem[];
+  payments: SalePayment[];
+
+  status: "held" | "completed" | "refunded" | "partial_refund" | "draft";
+
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaleItem {
+  id: number;
+  product?: any;
+  quantity: number;
+  warehouse_id: number;
+  unit_price: number;
+  discount: number;
+  tax: number;
+  line_total: number;
+}
+
+export interface SalePayment {
+  id: number;
+  method: string;
+  amount: number;
+  account_code: string;
+  reference?: string;
+  created_at: string;
+}
+
+
+// Pagination Meta (for when pagination is included)
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Response can be either paginated or simple array
+export interface CustomerListResponse {
+  data: Customer[];
+  meta?: PaginationMeta; // Optional, in case API adds it later
+}
+
+// Expense Category Type
+export interface ExpenseCategory {
+  id: number;
+  name: string;
+  description: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 export type Inventory = InventoryItem[];
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
