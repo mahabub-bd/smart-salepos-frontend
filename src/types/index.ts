@@ -379,7 +379,7 @@ export interface Expense {
 
 export interface CreateExpensePayload {
   title: string;
-  description: string;
+  description?: string;
   amount: number;
   category_id: number;
   receipt_url?: string;
