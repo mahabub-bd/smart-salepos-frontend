@@ -336,7 +336,6 @@ export interface SalePayment {
   created_at: string;
 }
 
-
 // Pagination Meta (for when pagination is included)
 export interface PaginationMeta {
   total: number;
@@ -359,6 +358,38 @@ export interface ExpenseCategory {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface Expense {
+  id: number;
+  title: string;
+  description: string;
+  amount: string;
+  category: ExpenseCategory;
+  category_id: number;
+  receipt_url: string | null;
+  branch: Branch | null;
+  branch_id?: number | null;
+  payment_method?: string;
+  account_code?: string;
+  created_by: User;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateExpensePayload {
+  title: string;
+  description: string;
+  amount: number;
+  category_id: number;
+  receipt_url?: string;
+  branch_id?: number;
+  payment_method?: string;
+  account_code?: string;
+}
+
+export interface UpdateExpensePayload extends Partial<CreateExpensePayload> {
+  id: number;
 }
 export type Inventory = InventoryItem[];
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
