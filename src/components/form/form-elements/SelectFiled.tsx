@@ -42,7 +42,7 @@ export function SelectField({
             label: item.name,
           })) ?? []
         }
-        defaultValue={value?.toString()}
+        value={value?.toString()}
         onChange={(val) => {
           onChange(val);
         }}
