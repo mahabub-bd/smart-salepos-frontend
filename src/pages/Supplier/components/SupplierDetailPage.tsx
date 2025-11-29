@@ -71,49 +71,31 @@ export default function SupplierDetailPage() {
           <h2 className="text-lg font-medium mb-3">Purchase History</h2>
 
           {supplier.purchase_history ? (
-            <Table className="w-full text-sm">
-              <TableHeader className="border-b bg-gray-100 dark:bg-gray-700">
+            <Table >
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-2 text-left text-xs font-semibold uppercase"
-                  >
-                    PO No
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-2 text-center text-xs font-semibold uppercase"
-                  >
-                    Status
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-2 text-right text-xs font-semibold uppercase"
-                  >
-                    Total
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-2 text-right text-xs font-semibold uppercase"
-                  >
+                  <TableCell isHeader>PO No</TableCell>
+                  <TableCell isHeader>Status</TableCell>
+                  <TableCell isHeader>Total</TableCell>
+                  <TableCell isHeader>
                     Paid
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-right text-xs font-semibold uppercase"
+
                   >
                     Due
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-center text-xs font-semibold uppercase"
+
                   >
                     Date
                   </TableCell>
                   {/* 👇 New column */}
                   <TableCell
                     isHeader
-                    className="px-4 py-2 text-center text-xs font-semibold uppercase"
+
                   >
                     Action
                   </TableCell>
@@ -126,33 +108,32 @@ export default function SupplierDetailPage() {
                     key={purchase.id}
                     className="border-b last:border-0"
                   >
-                    <TableCell className="px-4 py-2 text-left">
+                    <TableCell >
                       {purchase.po_no}
                     </TableCell>
-                    <TableCell className="px-4 py-2 text-center">
+                    <TableCell >
                       <PurchaseStatusBadge status={purchase.status} />
                     </TableCell>
-                    <TableCell className="px-4 py-2 text-right">
+                    <TableCell >
                       {Number(purchase.total).toFixed(2)}
                     </TableCell>
-                    <TableCell className="px-4 py-2 text-right">
+                    <TableCell          >
                       {Number(purchase.paid_amount).toFixed(2)}
                     </TableCell>
                     <TableCell
-                      className={`px-4 py-2 text-right font-medium ${
-                        Number(purchase.due_amount) > 0
-                          ? "text-red-500"
-                          : "text-green-600"
-                      }`}
+                      className={` ${Number(purchase.due_amount) > 0
+                        ? "text-red-500"
+                        : "text-green-600"
+                        }`}
                     >
                       {Number(purchase.due_amount).toFixed(2)}
                     </TableCell>
-                    <TableCell className="px-4 py-2 text-center">
+                    <TableCell >
                       {new Date(purchase.created_at).toLocaleDateString()}
                     </TableCell>
 
                     {/* 👇 View Button */}
-                    <TableCell className="px-4 py-2 text-center">
+                    <TableCell >
                       <Link
                         to={`/purchases/${purchase.id}`}
                         className="text-blue-600 hover:text-blue-700 underline text-sm"
@@ -172,7 +153,7 @@ export default function SupplierDetailPage() {
         </div>
 
         {/* Total Purchased */}
-        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 flex items-center justify-between">
           <h2 className="text-lg font-medium">Total Purchased</h2>
           <p className="text-lg font-semibold text-green-600">
             {Number(supplier.totalPurchased).toFixed(2)} ৳

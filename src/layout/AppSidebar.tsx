@@ -168,8 +168,14 @@ const navItems: NavItem[] = [
         path: "/sales",
         requiredPermission: "sales.view",
       },
+      {
+        name: "Sales Return",
+        path: "/sales-return",
+        requiredPermission: "salesreturn.view", // use permission if you have
+      },
     ],
   },
+
   {
     icon: <Banknote />,
     name: "Expense",

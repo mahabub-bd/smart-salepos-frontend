@@ -65,35 +65,35 @@ export default function AccountListPage({
         </h2>
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+            <TableHeader >
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-4 py-3 text-left text-sm  font-medium text-gray-500 dark:text-gray-400"
+
                 >
                   Account Number
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+
                 >
                   Code
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+
                 >
                   Name
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+
                 >
                   Action
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+
                 >
                   Type
                 </TableCell>
@@ -106,10 +106,10 @@ export default function AccountListPage({
                   <TableCell className="px-4 py-2">
                     {acc.account_number}
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
+                  <TableCell >
                     {acc.code}
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
+                  <TableCell >
                     {acc.name}
                   </TableCell>
 
@@ -161,12 +161,12 @@ export default function AccountListPage({
                         acc.type === "asset"
                           ? "blue"
                           : acc.type === "liability"
-                          ? "orange"
-                          : acc.type === "equity"
-                          ? "purple"
-                          : acc.type === "income"
-                          ? "green"
-                          : "red"
+                            ? "orange"
+                            : acc.type === "equity"
+                              ? "purple"
+                              : acc.type === "income"
+                                ? "green"
+                                : "red"
                       }
                     >
                       {acc.type}

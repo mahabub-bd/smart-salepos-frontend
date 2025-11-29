@@ -1,4 +1,12 @@
-import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
@@ -22,7 +30,6 @@ import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Customer } from "../../../types";
 import CustomerFormModal from "./CustomerFormModal";
 
-
 export default function CustomerList() {
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -45,9 +52,8 @@ export default function CustomerList() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(searchInput);
-            setPage(1); // Reset to page 1 on new search
+            setPage(1);
         }, 500);
-
         return () => clearTimeout(timer);
     }, [searchInput]);
 
@@ -60,6 +66,10 @@ export default function CustomerList() {
     const [deleteCustomer] = useDeleteCustomerMutation();
 
     const customers = data?.data || [];
+    const totalItems = data?.meta?.total || 0;
+    const totalPages = data?.meta?.totalPages || 1;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + customers.length;
 
     const openCreateModal = () => {
         setEditCustomer(null);
@@ -89,7 +99,6 @@ export default function CustomerList() {
     };
 
     if (isLoading) return <Loading message="Loading Customers" />;
-
     if (isError)
         return <p className="p-6 text-red-500">Failed to fetch customers.</p>;
 
@@ -119,42 +128,22 @@ export default function CustomerList() {
                     />
                 </div>
 
-                <select
-                    value={limit}
-                    onChange={(e) => {
-                        setLimit(Number(e.target.value));
-                        setPage(1);
-                    }}
-                    className="px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                >
-                    <option value={10}>10 per page</option>
-                    <option value={25}>25 per page</option>
-                    <option value={50}>50 per page</option>
-                    <option value={100}>100 per page</option>
-                </select>
+
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
-                <div className="max-w-full overflow-x-auto">
+            {/* Table */}
+            <div className=" rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
+                <div className=" overflow-x-auto">
                     <Table>
                         <TableHeader className="border-b border-gray-100 dark:border-white/5">
                             <TableRow>
-                                <TableCell isHeader className="table-header">
-                                    Customer Name
-                                </TableCell>
-                                <TableCell isHeader className="table-header">
-                                    Contact
-                                </TableCell>
-                                <TableCell isHeader className="table-header">
-                                    Address
-                                </TableCell>
-                                <TableCell isHeader className="table-header">
-                                    Account
-                                </TableCell>
-                                <TableCell isHeader className="table-header">
-                                    Status
-                                </TableCell>
-                                <TableCell isHeader className="table-header text-right">
+                                <TableCell isHeader>Customer Code</TableCell>
+                                <TableCell isHeader>Customer Name</TableCell>
+                                <TableCell isHeader>Contact</TableCell>
+                                <TableCell isHeader>Address</TableCell>
+                                <TableCell isHeader>Account</TableCell>
+                                <TableCell isHeader>Status</TableCell>
+                                <TableCell isHeader className="text-right">
                                     Actions
                                 </TableCell>
                             </TableRow>
@@ -164,44 +153,13 @@ export default function CustomerList() {
                             {customers.length > 0 ? (
                                 customers.map((customer) => (
                                     <TableRow key={customer.id}>
-                                        <TableCell className="table-body">
-                                            <div>
-                                                <p className="font-medium text-gray-900 dark:text-white">
-                                                    {customer.name}
-                                                </p>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    ID: {customer.id}
-                                                </p>
-                                            </div>
-                                        </TableCell>
-
-                                        <TableCell className="table-body">
-                                            <div className="text-sm">
-                                                <p className="text-gray-900 dark:text-white">
-                                                    {customer.phone}
-                                                </p>
-                                                <p className="text-gray-500 dark:text-gray-400">
-                                                    {customer.email}
-                                                </p>
-                                            </div>
-                                        </TableCell>
-
-                                        <TableCell className="table-body">
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                {customer.address || "-"}
-                                            </p>
-                                        </TableCell>
-
-                                        <TableCell className="table-body">
+                                        <TableCell>{customer.customer_code}</TableCell>
+                                        <TableCell>{customer.name}</TableCell>
+                                        <TableCell>{customer.phone}</TableCell>
+                                        <TableCell>{customer.address}</TableCell>
+                                        <TableCell>
                                             {customer.account ? (
-                                                <div className="text-sm">
-                                                    <p className="font-medium text-gray-900 dark:text-white">
-                                                        {customer.account.code}
-                                                    </p>
-                                                    <p className="text-gray-500 dark:text-gray-400">
-                                                        {customer.account.name}
-                                                    </p>
-                                                </div>
+                                                <span>Acc No: {customer.account.account_number}</span>
                                             ) : (
                                                 <Badge size="sm" color="warning">
                                                     No Account
@@ -209,51 +167,41 @@ export default function CustomerList() {
                                             )}
                                         </TableCell>
 
-                                        <TableCell className="table-body">
-                                            <Badge
-                                                size="sm"
-                                                color={customer.status ? "success" : "error"}
-                                            >
+                                        <TableCell>
+                                            <Badge size="sm" color={customer.status ? "success" : "error"}>
                                                 {customer.status ? "Active" : "Inactive"}
                                             </Badge>
                                         </TableCell>
 
-                                        <TableCell className="px-4 py-3">
-                                            <div className="flex justify-end gap-2">
-                                                {canView && (
-                                                    <Link to={`/customers/${customer.id}`}>
-                                                        <IconButton
-                                                            icon={Eye}
-                                                            tooltip="View"
+                                        <TableCell className="flex justify-end gap-2">
+                                            {canView && (
+                                                <Link to={`/customers/${customer.id}`}>
+                                                    <IconButton icon={Eye} tooltip="View" color="green" />
+                                                </Link>
+                                            )}
+                                            {canUpdate && (
+                                                <IconButton
+                                                    icon={Pencil}
+                                                    tooltip="Edit"
+                                                    onClick={() => openEditModal(customer)}
+                                                    color="blue"
+                                                />
+                                            )}
+                                            {canDelete && (
+                                                <IconButton
+                                                    icon={Trash2}
 
-                                                            color="green"
-                                                        />
-                                                    </Link>
-                                                )}
-                                                {canUpdate && (
-                                                    <IconButton
-                                                        icon={Pencil}
-                                                        tooltip="Edit"
-                                                        onClick={() => openEditModal(customer)}
-                                                        color="blue"
-                                                    />
-                                                )}
-                                                {canDelete && (
-                                                    <IconButton
-                                                        icon={Trash2}
-                                                        tooltip="Delete"
-                                                        onClick={() => openDeleteDialog(customer)}
-                                                        color="red"
-                                                    />
-                                                )}
-                                            </div>
+                                                    onClick={() => openDeleteDialog(customer)}
+                                                    color="red"
+                                                />
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
                                     <TableCell
-                                        colSpan={6}
+                                        colSpan={7}
                                         className="py-8 text-center text-gray-500 dark:text-gray-400"
                                     >
                                         {searchInput
@@ -266,32 +214,57 @@ export default function CustomerList() {
                     </Table>
                 </div>
 
-                {/* Pagination */}
-                {customers.length > 0 && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-white/5">
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            Showing page {page} ({customers.length} items)
+                {/* 🔥 Updated Pagination Only 👇 */}
+                {totalItems > 0 && (
+                    <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4 dark:border-white/5">
+
+                        {/* Left – Items per page */}
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Show</span>
+                            <select
+                                value={limit}
+                                onChange={(e) => {
+                                    setLimit(Number(e.target.value));
+                                    setPage(1);
+                                }}
+                                className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={25}>25</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                            </select>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">per page</span>
                         </div>
 
+                        {/* Middle – Showing range */}
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                            {startIndex + 1} - {Math.min(endIndex, totalItems)} of {totalItems}
+                        </div>
+
+                        {/* Right – Icons */}
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                                className="rounded p-1 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                                aria-label="Previous Page"
                             >
-                                Previous
+                                <ChevronLeft size={20} className="text-gray-600 dark:text-gray-400" />
                             </button>
 
-                            <span className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Page {page}
+                            <span className="px-3 text-sm text-gray-700 dark:text-gray-300">
+                                Page {page} of {totalPages}
                             </span>
 
                             <button
                                 onClick={() => setPage((p) => p + 1)}
-                                disabled={customers.length < limit}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                                disabled={page === totalPages}
+                                className="rounded p-1 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                                aria-label="Next Page"
                             >
-                                Next
+                                <ChevronRight size={20} className="text-gray-600 dark:text-gray-400" />
                             </button>
                         </div>
                     </div>

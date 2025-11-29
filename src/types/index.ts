@@ -50,6 +50,7 @@ export interface ApiResponse<T> {
   statusCode: number;
   message: string;
   data: T;
+  meta?: PaginationMeta;
 }
 
 export interface Unit {
@@ -154,6 +155,7 @@ export interface ProductRequest {
 export interface Supplier {
   id: number;
   name: string;
+  supplier_code: string;
   contact_person?: string;
   phone?: string;
   email?: string;
@@ -286,6 +288,7 @@ export interface Branch {
 export interface Customer {
   id: number;
   name: string;
+  customer_code: string;
   email: string;
   phone: string;
   address: string;
@@ -297,44 +300,7 @@ export interface Customer {
   updated_at: string;
 }
 
-export interface Sale {
-  id: number;
-  invoice_no: string;
 
-  subtotal: number;
-  discount: number;
-  tax: number;
-  total: number;
-  paid_amount: number;
-
-  items: SaleItem[];
-  payments: SalePayment[];
-
-  status: "held" | "completed" | "refunded" | "partial_refund" | "draft";
-
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SaleItem {
-  id: number;
-  product?: any;
-  quantity: number;
-  warehouse_id: number;
-  unit_price: number;
-  discount: number;
-  tax: number;
-  line_total: number;
-}
-
-export interface SalePayment {
-  id: number;
-  method: string;
-  amount: number;
-  account_code: string;
-  reference?: string;
-  created_at: string;
-}
 
 // Pagination Meta (for when pagination is included)
 export interface PaginationMeta {
@@ -386,6 +352,41 @@ export interface CreateExpensePayload {
   branch_id?: number;
   payment_method?: string;
   account_code?: string;
+}
+export interface SaleItem {
+  id: number;
+  quantity: number;
+  warehouse_id: number;
+  unit_price: string;
+  discount: string;
+  tax: string;
+  line_total: string;
+  product: Product;
+}
+
+export interface SalePayment {
+  id: number;
+  method: string;
+  amount: string;
+  account_code: string;
+  created_at: string;
+  reference?: string;
+}
+
+export interface Sale {
+  id: number;
+  invoice_no: string;
+  items: SaleItem[];
+  subtotal: string;
+  discount: string;
+  tax: string;
+  total: string;
+  paid_amount: string;
+  payments: SalePayment[];
+  status: "held" | "completed" | "refunded" | "partial_refund" | "draft" | "pending" | "cancelled";
+  created_at: string;
+  updated_at: string;
+  customer: Customer;
 }
 
 export interface UpdateExpensePayload extends Partial<CreateExpensePayload> {

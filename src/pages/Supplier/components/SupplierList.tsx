@@ -6,6 +6,7 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
+import SupplierFormModal from "./SupplierFormModal";
 
 import { Link } from "react-router";
 import {
@@ -13,7 +14,15 @@ import {
   useGetSuppliersQuery,
 } from "../../../features/suppliers/suppliersApi";
 import { Supplier } from "../../../types";
-import SupplierFormModal from "./SupplierFormModal";
+
+// 🆕 Use updated table components
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 
 export default function SupplierList() {
   const { data, isLoading, isError } = useGetSuppliersQuery();
@@ -23,11 +32,8 @@ export default function SupplierList() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editSupplier, setEditSupplier] = useState<Supplier | null>(null);
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
-    null
-  );
+  const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(null);
 
   const openCreate = () => {
     setEditSupplier(null);
@@ -46,7 +52,6 @@ export default function SupplierList() {
 
   const confirmDelete = async () => {
     if (!supplierToDelete) return;
-
     try {
       await deleteSupplier(supplierToDelete.id).unwrap();
       toast.success("Supplier deleted successfully");
@@ -58,8 +63,7 @@ export default function SupplierList() {
   };
 
   if (isLoading) return <Loading message="Loading Suppliers" />;
-  if (isError)
-    return <p className="p-6 text-red-500">Failed to fetch suppliers.</p>;
+  if (isError) return <p className="p-6 text-red-500">Failed to fetch suppliers.</p>;
 
   return (
     <>
@@ -71,34 +75,37 @@ export default function SupplierList() {
         permission="suppliers.create"
       />
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b">
-              <tr>
-                <th className="table-header">Name</th>
-                <th className="table-header">Contact Person</th>
-                <th className="table-header">Phone</th>
-                <th className="table-header">Email</th>
-                <th className="table-header">Address</th>
-                <th className="table-header">Products</th>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableCell isHeader>Code</TableCell>
+                <TableCell isHeader>Name</TableCell>
 
-                <th className="table-header text-right">Actions</th>
-              </tr>
-            </thead>
+                <TableCell isHeader>Contact Person</TableCell>
+                <TableCell isHeader>Phone</TableCell>
+                <TableCell isHeader>Email</TableCell>
+                <TableCell isHeader>Address</TableCell>
+                <TableCell isHeader>Products</TableCell>
+                <TableCell isHeader className="text-right">Actions</TableCell>
+              </TableRow>
+            </TableHeader>
 
-            <tbody>
-              {suppliers.length ? (
+            <TableBody>
+              {suppliers.length > 0 ? (
                 suppliers.map((s) => (
-                  <tr key={s.id} className="border-b">
-                    <td className="table-body">{s.name}</td>
-                    <td className="table-body">{s.contact_person || "-"}</td>
-                    <td className="table-body">{s.phone || "-"}</td>
-                    <td className="table-body">{s.email || "-"}</td>
-                    <td className="table-body">{s.address || "-"}</td>
-                    <td className="table-body">{s.products?.length || 0}</td>
+                  <TableRow key={s.id}>
+                    <TableCell>{s.supplier_code || "-"}</TableCell>
+                    <TableCell>{s.name}</TableCell>
 
-                    <td className="table-body text-right">
+                    <TableCell>{s.contact_person || "-"}</TableCell>
+                    <TableCell>{s.phone || "-"}</TableCell>
+                    <TableCell>{s.email || "-"}</TableCell>
+                    <TableCell>{s.address || "-"}</TableCell>
+                    <TableCell>{s.products?.length || 0}</TableCell>
+
+                    <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Link to={`/suppliers/${s.id}`}>
                           <IconButton
@@ -107,12 +114,14 @@ export default function SupplierList() {
                             color="purple"
                           />
                         </Link>
+
                         <IconButton
                           icon={Pencil}
                           tooltip="Edit"
                           color="blue"
                           onClick={() => openEdit(s)}
                         />
+
                         <IconButton
                           icon={Trash2}
                           tooltip="Delete"
@@ -120,21 +129,21 @@ export default function SupplierList() {
                           onClick={() => openDelete(s)}
                         />
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td
-                    colSpan={6}
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
                     className="py-6 text-center text-gray-500 dark:text-gray-400"
                   >
                     No suppliers found
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 

@@ -108,7 +108,7 @@ export default function AccountBalancePage() {
 
           <StatCard
             icon={TrendingUp}
-            title="Total Income"
+            title="Sales Revenue"
             value={`৳${totals.income.toFixed(2)}`}
             bgColor="green"
             badge={{

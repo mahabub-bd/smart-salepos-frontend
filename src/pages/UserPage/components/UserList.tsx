@@ -19,9 +19,9 @@ import IconButton from "../../../components/common/IconButton";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 
+import Loading from "../../../components/common/Loading";
 import { User } from "../../../types";
 import UserFormModal from "./UserFormModal";
-import Loading from "../../../components/common/Loading";
 
 export default function UserList() {
   const { data, isLoading, isError } = useGetUsersQuery();
@@ -81,42 +81,40 @@ export default function UserList() {
       {/* Desktop / Tablet Table */}
       <div className="hidden sm:block rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-x-auto">
         <Table>
-          <TableHeader className="border-b border-gray-100 dark:border-white/5">
+          <TableHeader>
             <TableRow>
-              <TableCell isHeader className="table-header w-[220px]">
+              <TableCell isHeader>
                 User
               </TableCell>
               <TableCell
                 isHeader
-                className="table-header w-[200px] hidden md:table-cell"
               >
                 Email
               </TableCell>
               <TableCell
                 isHeader
-                className="table-header w-[150px] hidden 2xl:table-cell"
               >
                 Phone
               </TableCell>
-              <TableCell isHeader className="table-header w-[120px]">
+              <TableCell isHeader>
                 Role
               </TableCell>
-              <TableCell isHeader className="table-header w-[120px]">
+              <TableCell isHeader>
                 Status
               </TableCell>
               <TableCell
                 isHeader
-                className="table-header w-[120px] hidden md:table-cell"
+
               >
                 Joined
               </TableCell>
-              <TableCell isHeader className="table-header text-right w-[120px]">
+              <TableCell isHeader>
                 Actions
               </TableCell>
             </TableRow>
           </TableHeader>
 
-          <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
+          <TableBody  >
             {users.map((user: User) => (
               <TableRow key={user.id}>
                 <TableCell className="table-body">
@@ -140,20 +138,20 @@ export default function UserList() {
                   </div>
                 </TableCell>
 
-                <TableCell className="table-body hidden md:table-cell">
+                <TableCell >
                   {user.email}
                 </TableCell>
-                <TableCell className="table-body hidden 2xl:table-cell">
+                <TableCell >
                   {user.phone}
                 </TableCell>
 
-                <TableCell className="table-body">
+                <TableCell >
                   <Badge size="sm" color="primary">
                     {user.roles?.[0]?.name?.toUpperCase()}
                   </Badge>
                 </TableCell>
 
-                <TableCell className="table-body">
+                <TableCell >
                   <Badge
                     size="sm"
                     color={user.status === "active" ? "success" : "error"}
@@ -162,14 +160,15 @@ export default function UserList() {
                   </Badge>
                 </TableCell>
 
-                <TableCell className="table-body hidden md:table-cell">
+                <TableCell >
                   {new Date(user.created_at).toLocaleDateString()}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-2">
+                <TableCell >
+                  <div className="flex gap-2" >
                     {canUpdate && (
                       <IconButton
+                        tooltip="Edit"
                         icon={Pencil}
                         onClick={() => openEditModal(user)}
                         color="blue"
@@ -178,6 +177,7 @@ export default function UserList() {
 
                     {canDelete && (
                       <IconButton
+                        tooltip="Delete"
                         icon={Trash2}
                         onClick={() => openDeleteDialog(user)}
                         color="red"
