@@ -101,7 +101,7 @@ export default function PurchaseList() {
                           <IconButton
                             icon={Eye}
                             color="gray"
-                            tooltip="View Details"
+                            tooltip="View"
                             onClick={() => navigate(`/purchases/${p.id}`)}
                           />
 

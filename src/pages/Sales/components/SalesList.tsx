@@ -1,4 +1,4 @@
-import { Eye, Plus } from "lucide-react";
+import { Eye, Plus, Wallet } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -28,7 +28,7 @@ export default function SaleList() {
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
 
   // Modal State
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -140,7 +140,7 @@ export default function SaleList() {
                               <IconButton
                                 icon={Eye}
                                 tooltip="View"
-                                color="green"
+                                color="gray"
                               />
                             </Link>
                           )}
@@ -148,9 +148,10 @@ export default function SaleList() {
                           {/* Pay Due Button */}
                           {dueAmount > 0 && (
                             <IconButton
-                              icon={Plus}
+                              icon={Wallet}
                               tooltip="Pay Due"
-                              color="blue"
+                              color="purple"
+                              disabled={dueAmount <= 0}
                               onClick={() => {
                                 setSelectedSale(sale);
                                 setPaymentModalOpen(true);
