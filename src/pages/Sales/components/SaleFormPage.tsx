@@ -158,8 +158,8 @@ export default function SaleFormPage() {
             await createSale({ ...data, customer_id: Number(data.customer_id), invoice_no: invoiceNo }).unwrap();
             toast.success("Sale created successfully!");
             navigate("/sales");
-        } catch (error) {
-            toast.error("Failed to create sale");
+        } catch (error: any) {
+            toast.error(error?.message || "Failed to create sale");
             console.error("Sale creation error:", error);
         }
     };
@@ -266,7 +266,7 @@ export default function SaleFormPage() {
                                     control={control}
                                     render={({ field }) => (
                                         <Select
-                                            value={String(field.value)}
+                                            value={field.value === 0 ? "" : String(field.value)}
                                             onChange={(value) => field.onChange(Number(value))}
                                             placeholder="Select Warehouse"
                                             options={warehouses.map((w) => ({

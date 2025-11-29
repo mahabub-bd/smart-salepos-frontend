@@ -1,4 +1,4 @@
-import { Eye, Plus, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Plus, Wallet } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -181,28 +181,48 @@ export default function SaleList() {
       {/* Pagination */}
       {totalPages > 0 && (
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
+          {/* Showing count */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            Page {page} of {totalPages} ({total} items)
+            {((page - 1) * limit) + 1} - {Math.min(page * limit, total)} of {total}
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-3">
+
+            {/* Prev Button */}
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50 dark:border-white/10 dark:hover:bg-white/5"
+              aria-label="Previous Page"
+              className="flex items-center justify-center w-8 h-8 border rounded-full transition-all
+          hover:bg-gray-100 dark:hover:bg-white/10
+          disabled:opacity-50 disabled:cursor-not-allowed
+          dark:border-white/10 hover:scale-105"
             >
-              Previous
+              <ChevronLeft size={16} />
             </button>
+
+            {/* Current Page Indicator */}
+            <span className="text-sm px-3 py-1 rounded-md border bg-gray-50 dark:bg-white/10 dark:border-white/10">
+              Page <span className="font-medium">{page}</span> of {totalPages}
+            </span>
+
+            {/* Next Button */}
             <button
               onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
               disabled={page === totalPages}
-              className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50 dark:border-white/10 dark:hover:bg-white/5"
+              aria-label="Next Page"
+              className="flex items-center justify-center w-8 h-8 border rounded-full transition-all
+          hover:bg-gray-100 dark:hover:bg-white/10
+          disabled:opacity-50 disabled:cursor-not-allowed
+          dark:border-white/10 hover:scale-105"
             >
-              Next
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
       )}
+
 
       {/* Sale Due Payment Modal */}
       {paymentModalOpen && selectedSale && (
