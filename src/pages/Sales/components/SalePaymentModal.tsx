@@ -11,25 +11,61 @@ import Button from "../../../components/ui/button/Button";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useCreatePaymentMutation } from "../../../features/payment/paymentApi";
 
-const paymentSchema = z.object({
-  amount: z.number().positive("Amount must be > 0"),
-  method: z.enum(["cash", "bank", "bkash"]),
-  payment_account_code: z.string({ error: "Payment account required" }),
-  note: z.string().optional(),
-});
-
-const paymentSchemaWithLimit = (due: number) =>
-  paymentSchema.refine((data) => data.amount <= due, {
-    message: `Amount cannot exceed ${due}`,
-    path: ["amount"],
+// 🛡️ Validation Schema
+const paymentSchema = (due: number) =>
+  z.object({
+    amount: z
+      .number()
+      .positive("Amount must be greater than 0")
+      .refine((value) => value <= due, { message: `Amount cannot exceed ${due}` }),
+    method: z.enum(["cash", "bank", "bkash"]),
+    payment_account_code: z.string().min(1, "Payment account is required"),
+    note: z.string().optional(),
   });
 
-type PaymentFormValues = z.infer<typeof paymentSchema>;
+export type PaymentFormValues = z.infer<ReturnType<typeof paymentSchema>>;
 
 export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
   const [salePayment, { isLoading }] = useCreatePaymentMutation();
-  const dueAmount = Number(sale?.due_amount) || 0;
 
+  // 🚫 Don't render if modal is closed
+  if (!isOpen) return null;
+
+  // 🧠 Handle sale data loading
+  if (!sale) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-box max-w-md p-6">Loading sale details...</div>
+      </div>
+    );
+  }
+
+  // 🔢 Correct due amount calculation
+  const total = parseFloat(sale?.total ?? "0");
+  const paid = parseFloat(sale?.paid_amount ?? "0");
+  const dueAmount = total - paid;
+
+  // 🔎 Debug if needed
+  // console.log({ total, paid, dueAmount });
+
+  // ⛔ If no outstanding payment
+  if (dueAmount <= 0) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-box max-w-md p-6 bg-white rounded-xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-2">No Pending Due</h2>
+          <p className="text-gray-600">There is no outstanding amount to pay.</p>
+          <div className="flex justify-end mt-4">
+            <Button size="sm" variant="outline" onClick={onClose}>
+              Close
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 🔍 Get accounts
   const { data: accountsData } = useGetAccountsQuery({
     type: "asset",
     isCash: true,
@@ -37,6 +73,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
   });
   const accounts = accountsData?.data || [];
 
+  // 🧾 Setup form
   const {
     register,
     handleSubmit,
@@ -45,9 +82,9 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
     setValue,
     formState: { errors },
   } = useForm<PaymentFormValues>({
-    resolver: zodResolver(paymentSchemaWithLimit(dueAmount)),
+    resolver: zodResolver(paymentSchema(dueAmount)),
     defaultValues: {
-      amount: dueAmount, // auto full amount
+      amount: dueAmount, // Auto full payment
       method: undefined as any,
       payment_account_code: "",
       note: "",
@@ -57,7 +94,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
   const amount = watch("amount");
   const selectedMethod = watch("method");
 
-  // Auto-fill note based on full/partial payment
+  // 📝 Auto note
   useEffect(() => {
     if (!amount) return;
     const isFullPayment = Number(amount) === dueAmount;
@@ -71,17 +108,21 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
     }
   }, [amount, dueAmount, setValue, watch]);
 
-  // Filter accounts based on payment method
+  // 🏦 Account filter
   const filteredAccounts = accounts.filter((acc: any) =>
-    selectedMethod === "cash" ? acc.isCash : selectedMethod === "bank" ? acc.isBank : false
+    selectedMethod === "cash"
+      ? acc.isCash
+      : selectedMethod === "bank"
+      ? acc.isBank
+      : false
   );
 
-  // Handle form submit
+  // 🚀 Submit payment
   const onSubmit = async (values: PaymentFormValues) => {
     try {
       await salePayment({
         type: "customer",
-        customer_id: sale.customer_id,
+        customer_id: sale.customer?.id,
         sale_id: sale.id,
         amount: values.amount,
         method: values.method,
@@ -95,8 +136,6 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
       toast.error("Payment failed");
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
@@ -115,7 +154,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
             {...register("amount", { valueAsNumber: true })}
           />
 
-          {/* 💳 Method */}
+          {/* 💳 Payment Method */}
           <Controller
             name="method"
             control={control}
@@ -136,7 +175,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
             )}
           />
 
-          {/* 🏦 Account */}
+          {/* 🏦 Payment Account */}
           {selectedMethod && (
             <Controller
               name="payment_account_code"

@@ -72,7 +72,7 @@ export default function SaleList() {
       <PageHeader
         title="Sale Management"
         icon={<Plus size={16} />}
-        addLabel="Add Sale"
+        addLabel="Add"
         onAdd={() => navigate("/sales/create")}
         permission="sale.create"
       />
