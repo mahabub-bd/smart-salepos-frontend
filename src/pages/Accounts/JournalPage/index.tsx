@@ -33,48 +33,13 @@ export default function JournalPage() {
           <Table className="w-full text-sm">
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Transaction ID
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Reference
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Date
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Account
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Debit
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Credit
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                  Narration
-                </TableCell>
+                <TableCell isHeader>Transaction ID</TableCell>
+                <TableCell isHeader>Reference</TableCell>
+                <TableCell isHeader>Date</TableCell>
+                <TableCell isHeader>Account</TableCell>
+                <TableCell isHeader>Debit</TableCell>
+                <TableCell isHeader>Credit</TableCell>
+                <TableCell isHeader>Narration</TableCell>
               </TableRow>
             </TableHeader>
 

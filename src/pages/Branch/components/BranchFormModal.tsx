@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
 import { Modal } from "../../../components/ui/modal";
@@ -170,18 +171,13 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
 
         {/* Status Toggle */}
         <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="is_active"
+          <Checkbox
+            label="Active"
             checked={formData.is_active}
-            onChange={(e) =>
-              setFormData({ ...formData, is_active: e.target.checked })
+            onChange={(checked) =>
+              setFormData({ ...formData, is_active: checked })
             }
-            className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
           />
-          <Label htmlFor="is_active" className="text-sm font-medium">
-            Active Branch
-          </Label>
         </div>
 
         {/* Submit */}

@@ -131,6 +131,8 @@ export interface Product {
   supplier?: Supplier;
   tags?: Tag[];
   images?: Attachment[];
+  purchase_value?: number;
+  sale_value?: number;
   created_at: string;
   updated_at: string;
 }
@@ -300,8 +302,6 @@ export interface Customer {
   updated_at: string;
 }
 
-
-
 // Pagination Meta (for when pagination is included)
 export interface PaginationMeta {
   total: number;
@@ -383,14 +383,109 @@ export interface Sale {
   total: string;
   paid_amount: string;
   payments: SalePayment[];
-  status: "held" | "completed" | "refunded" | "partial_refund" | "draft" | "pending" | "cancelled";
+  status:
+    | "held"
+    | "completed"
+    | "refunded"
+    | "partial_refund"
+    | "draft"
+    | "pending"
+    | "cancelled";
   created_at: string;
   updated_at: string;
+  sale_type: string;
+  served_by: User;
   customer: Customer;
+}
+export interface CustomerGroup {
+  id: number;
+  name: string;
+  description?: string;
+  discount_percentage?: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface UpdateExpensePayload extends Partial<CreateExpensePayload> {
   id: number;
 }
+export interface WarehouseInventory {
+  warehouse: Warehouse;
+  purchased_quantity: number;
+  sold_quantity: number;
+  remaining_quantity: number;
+  batch_no: string;
+  purchase_value: number;
+  sale_value: number;
+}
+
+export interface ProductWiseInventoryItem {
+  product_id: number;
+  product: Product;
+  total_stock: number;
+  total_sold_quantity: number;
+  remaining_stock: number;
+  purchase_value: number;
+  sale_value: number;
+  warehouses: WarehouseInventory[];
+}
+
+export interface ProductBatchWise {
+  id: number;
+  product_id: number;
+  product: Product;
+  warehouse_id: number;
+  warehouse: Warehouse;
+
+  batch_no: string;
+  quantity: number;
+  sold_quantity: number;
+  expiry_date: string | null;
+  purchase_price: string;
+  supplier: string;
+  purchase_item_id: number;
+  created_at: string;
+  updated_at: string;
+  remaining_quantity: number;
+  purchase_value: number;
+  sale_value: number;
+  potential_profit: number;
+}
+// 📌 types.ts
+
+export interface TransactionEntry {
+  id: number;
+  account_code: string;
+  account_name: string;
+  debit: number;
+  credit: number;
+  narration: string;
+}
+
+export interface JournalTransaction {
+  id: number;
+  reference_type: string;
+  reference_id: number;
+  created_at: string;
+  entries: TransactionEntry[];
+}
+
+export interface SaleDetail {
+  sale_id: number;
+  invoice_no: string;
+  total: number;
+  created_at: string;
+  customer?: { id: number; name: string; phone: string };
+  served_by?: { id: number; full_name: string };
+  transactions: JournalTransaction[];
+}
+
+export interface SaleTransactionsResponse {
+  statusCode: number;
+  message: string;
+  data: SaleDetail[];
+}
+
 export type Inventory = InventoryItem[];
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";

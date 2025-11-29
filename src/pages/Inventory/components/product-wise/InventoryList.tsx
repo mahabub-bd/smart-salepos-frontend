@@ -1,13 +1,21 @@
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../../../components/common/Loading";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
 import { useGetProductWiseReportQuery } from "../../../../features/inventory/inventoryApi";
+import { ProductWiseInventoryItem } from "../../../../types";
 
 export default function InventoryListProductWise() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useGetProductWiseReportQuery();
 
-  const inventory = data?.data || [];
+  const inventory: ProductWiseInventoryItem[] = data?.data || [];
 
   if (isLoading) return <Loading message="Loading Inventory..." />;
   if (isError)
@@ -17,80 +25,94 @@ export default function InventoryListProductWise() {
     <div>
       <div className="rounded-xl border bg-white mt-5">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b bg-gray-50">
-              <tr>
-                <th className="table-header">Product</th>
-                <th className="table-header">SKU</th>
-                <th className="table-header">Purchased</th>
-                <th className="table-header">Sold</th>
-                <th className="table-header">Remaining</th>
-                <th className="table-header">Warehouses</th>
-                <th className="table-header text-right">Actions</th>
-              </tr>
-            </thead>
+          <Table className="w-full text-sm">
+            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+              <TableRow>
+                <TableCell className="table-header">Product</TableCell>
+                <TableCell className="table-header">SKU</TableCell>
+                <TableCell className="table-header">Purchased</TableCell>
+                <TableCell className="table-header">Sold</TableCell>
+                <TableCell className="table-header">Remaining</TableCell>
+                <TableCell className="table-header">Purchase Value</TableCell>
+                <TableCell className="table-header">Sale Value</TableCell>
+                <TableCell className="table-header">Warehouses</TableCell>
+                <TableCell className="table-header text-right">
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHeader>
 
-            <tbody>
-              {inventory.length ? (
-                inventory.map((item: any) => (
-                  <tr key={item.product_id} className="border-b">
+            <TableBody>
+              {inventory ? (
+                inventory.map((item) => (
+                  <TableRow key={item.product_id} className="border-b">
                     {/* Product Name */}
-                    <td className="table-body font-semibold">
+                    <TableCell className="table-body font-semibold">
                       {item.product.name}
-                    </td>
+                    </TableCell>
 
                     {/* SKU */}
-                    <td className="table-body text-gray-600">
+                    <TableCell className="table-body text-gray-600">
                       {item.product.sku}
-                    </td>
+                    </TableCell>
 
                     {/* Purchased (Total Stock) */}
-                    <td className="table-body font-medium">
+                    <TableCell className="table-body font-medium">
                       {item.total_stock}
-                    </td>
+                    </TableCell>
 
                     {/* Sold */}
-                    <td className="table-body font-medium text-red-500">
+                    <TableCell className="table-body font-medium text-red-500">
                       {item.total_sold_quantity}
-                    </td>
+                    </TableCell>
 
                     {/* Remaining */}
-                    <td className="table-body font-medium text-green-600">
+                    <TableCell className="table-body font-medium text-green-600">
                       {item.remaining_stock}
-                    </td>
+                    </TableCell>
+
+                    {/* Purchase Value */}
+                    <TableCell className="table-body font-medium text-blue-600">
+                      ৳{item.purchase_value.toLocaleString()}
+                    </TableCell>
+
+                    {/* Sale Value */}
+                    <TableCell className="table-body font-medium text-purple-600">
+                      ৳{item.sale_value.toLocaleString()}
+                    </TableCell>
 
                     {/* Warehouse Details */}
-                    <td className="table-body">
-                      {item.warehouses.map((w: any, index: number) => (
+                    <TableCell className="table-body">
+                      {item.warehouses.map((warehouse, index) => (
                         <div key={index} className="text-sm mb-2">
                           <span className="font-medium">
-                            {w.warehouse.name}
+                            {warehouse.warehouse.name}
                           </span>{" "}
                           —
                           <span className="text-blue-500">
                             {" "}
-                            {w.purchased_quantity} purchased
+                            {warehouse.purchased_quantity} purchased
                           </span>
                           ,
                           <span className="text-red-500">
                             {" "}
-                            {w.sold_quantity} sold
+                            {warehouse.sold_quantity} sold
                           </span>
                           ,
                           <span className="text-green-600">
                             {" "}
-                            {w.remaining_quantity} left
+                            {warehouse.remaining_quantity} left
                           </span>
                           <br />
                           <span className="text-xs text-gray-500">
-                            Batch: {w.batch_no}
+                            Batch: {warehouse.batch_no}
                           </span>
                         </div>
                       ))}
-                    </td>
+                    </TableCell>
 
                     {/* Action */}
-                    <td className="table-body text-right">
+                    <TableCell className="table-body text-right">
                       <button
                         className="p-2 rounded hover:bg-gray-100"
                         onClick={() =>
@@ -99,18 +121,21 @@ export default function InventoryListProductWise() {
                       >
                         <Eye size={18} />
                       </button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={7} className="py-6 text-center text-gray-500">
+                <TableRow>
+                  <TableCell
+                    colSpan={9}
+                    className="py-6 text-center text-gray-500"
+                  >
                     No inventory records found
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

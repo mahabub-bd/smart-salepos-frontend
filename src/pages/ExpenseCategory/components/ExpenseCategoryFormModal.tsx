@@ -4,8 +4,12 @@ import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
 import { Modal } from "../../../components/ui/modal";
 
+import Checkbox from "../../../components/form/input/Checkbox";
+import {
+  useCreateExpenseCategoryMutation,
+  useUpdateExpenseCategoryMutation,
+} from "../../../features/expense-category/expenseCategoryApi";
 import { ExpenseCategory } from "../../../types";
-import { useCreateExpenseCategoryMutation, useUpdateExpenseCategoryMutation } from "../../../features/expense-category/expenseCategoryApi";
 
 interface Props {
   isOpen: boolean;
@@ -110,18 +114,13 @@ export default function ExpenseCategoryFormModal({
 
         {/* Status Toggle */}
         <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="is_active"
+          <Checkbox
+            label="Active"
             checked={formData.is_active}
-            onChange={(e) =>
-              setFormData({ ...formData, is_active: e.target.checked })
+            onChange={(checked) =>
+              setFormData({ ...formData, is_active: checked })
             }
-            className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
           />
-          <Label htmlFor="is_active" className="text-sm font-medium">
-            Active Category
-          </Label>
         </div>
 
         {/* Submit */}

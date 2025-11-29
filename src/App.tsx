@@ -37,26 +37,30 @@ import PaymentsPage from "./pages/Accounts/payments";
 import BranchPage from "./pages/Branch";
 import CustomerPage from "./pages/Customer";
 import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
+import CustomerGroupPage from "./pages/CustomerGroup";
 import ExpenseCategoryPage from "./pages/ExpenseCategory";
 import ExpensesPage from "./pages/Expenses";
 import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
 import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
-import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
-import PublicRoute from "./route/public-route";
-import ProtectedRoute from "./route/protected";
-import UsersPage from "./pages/UserPage";
 import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
+import PosSalesSummaryPage from "./pages/POS/PosSalesSummaryPage";
+import PosTransactionHistoryPage from "./pages/POS/PosTransactionHistoryPage";
 import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
 import PurchaseDetailPage from "./pages/Purchase/components/PurchaseDetailPage";
 import PurchaseEdit from "./pages/Purchase/components/PurchaseEdit";
 import RolesPage from "./pages/Role";
 import SalesPage from "./pages/Sales";
+import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
 import SaleFormPage from "./pages/Sales/components/SaleFormPage";
 import SuppliersPage from "./pages/Supplier";
 import SupplierDetailPage from "./pages/Supplier/components/SupplierDetailPage";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
+import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
+import ProtectedRoute from "./route/protected";
+import PublicRoute from "./route/public-route";
+
 export default function App() {
   return (
     <Router>
@@ -142,14 +146,20 @@ export default function App() {
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
           <Route path="/branches" element={<BranchPage />} />
-          <Route path="customers" element={<CustomerPage />} />
-          <Route path="customers/:id" element={<CustomerDetailPage />} />
-          expenses/category
+          <Route path="/customers" element={<CustomerPage />} />
+          <Route path="/customers/:id" element={<CustomerDetailPage />} />
+          <Route path="customers-groups" element={<CustomerGroupPage />} />
           <Route path="/expenses/category" element={<ExpenseCategoryPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/sales" element={<SalesPage />} />
           <Route path="/sales/create" element={<SaleFormPage />} />
           <Route path="/sales/:id" element={<SaleDetailPage />} />
+          {/* POS Routes */}
+          <Route path="/pos/sales-summary" element={<PosSalesSummaryPage />} />
+          <Route
+            path="/pos/transactions"
+            element={<PosTransactionHistoryPage />}
+          />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

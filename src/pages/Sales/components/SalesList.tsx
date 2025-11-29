@@ -22,7 +22,6 @@ import SalePaymentModal from "./SalePaymentModal";
 
 // Import the Payment Modal
 
-
 export default function SaleList() {
   const canView = useHasPermission("sale.view");
   const navigate = useNavigate();
@@ -88,6 +87,7 @@ export default function SaleList() {
                 <TableCell isHeader>Total</TableCell>
                 <TableCell isHeader>Paid</TableCell>
                 <TableCell isHeader>Due</TableCell>
+                <TableCell isHeader>Sale Type</TableCell>
                 <TableCell isHeader>Status</TableCell>
                 <TableCell isHeader>Date</TableCell>
                 <TableCell isHeader className="text-right">
@@ -99,15 +99,20 @@ export default function SaleList() {
             <TableBody>
               {sales.length > 0 ? (
                 sales.map((sale: Sale) => {
-                  const dueAmount = Number(sale.total) - Number(sale.paid_amount);
+                  const dueAmount =
+                    Number(sale.total) - Number(sale.paid_amount);
 
                   return (
                     <TableRow key={sale.id}>
                       <TableCell>{sale.invoice_no}</TableCell>
                       <TableCell>{sale.customer?.name || "N/A"}</TableCell>
 
-                      <TableCell>{formatCurrencyEnglish(Number(sale.total))}</TableCell>
-                      <TableCell>{formatCurrencyEnglish(Number(sale.paid_amount))}</TableCell>
+                      <TableCell>
+                        {formatCurrencyEnglish(Number(sale.total))}
+                      </TableCell>
+                      <TableCell>
+                        {formatCurrencyEnglish(Number(sale.paid_amount))}
+                      </TableCell>
 
                       <TableCell
                         className={
@@ -118,7 +123,9 @@ export default function SaleList() {
                       >
                         {formatCurrencyEnglish(dueAmount)}
                       </TableCell>
-
+                      <TableCell className="capitalize">
+                        {sale.sale_type}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           size="sm"
@@ -183,12 +190,12 @@ export default function SaleList() {
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
           {/* Showing count */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {((page - 1) * limit) + 1} - {Math.min(page * limit, total)} of {total}
+            {(page - 1) * limit + 1} - {Math.min(page * limit, total)} of{" "}
+            {total}
           </div>
 
           {/* Pagination Controls */}
           <div className="flex items-center gap-3">
-
             {/* Prev Button */}
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -222,7 +229,6 @@ export default function SaleList() {
           </div>
         </div>
       )}
-
 
       {/* Sale Due Payment Modal */}
       {paymentModalOpen && selectedSale && (

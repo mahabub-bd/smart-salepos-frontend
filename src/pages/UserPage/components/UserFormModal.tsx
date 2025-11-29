@@ -11,11 +11,11 @@ import {
   useUpdateUserMutation,
 } from "../../../features/user/userApi";
 
-
 import { Role } from "../../../types/role";
 
 // UI
 import { toast } from "react-toastify";
+import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
@@ -209,34 +209,26 @@ export default function UserFormModal({
         />
 
         {/* Roles */}
+        {/* Roles */}
         <Controller
           name="roles"
           control={control}
           render={({ field }) => (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 capitalize">
               {roles.map((r: Role) => (
-                <label
-                  key={r.id}
-                  className={`cursor-pointer px-3 py-1 capitalize rounded-lg border ${
-                    field.value.includes(r.name)
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "border-gray-300 dark:border-gray-700"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    className="hidden"
+                <div key={r.id}>
+                  <Checkbox
+                    label={r.name}
                     checked={field.value.includes(r.name)}
-                    onChange={() =>
+                    onChange={(checked) =>
                       field.onChange(
-                        field.value.includes(r.name)
-                          ? field.value.filter((role) => role !== r.name)
-                          : [...field.value, r.name]
+                        checked
+                          ? [...field.value, r.name] // Add role
+                          : field.value.filter((role) => role !== r.name) // Remove role
                       )
                     }
                   />
-                  {r.name}
-                </label>
+                </div>
               ))}
             </div>
           )}

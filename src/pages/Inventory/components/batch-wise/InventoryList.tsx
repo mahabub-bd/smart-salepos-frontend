@@ -2,6 +2,12 @@ import { Eye } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import Loading from "../../../../components/common/Loading";
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
 import { useGetInventoryQuery } from "../../../../features/inventory/inventoryApi";
 
 export default function InventoryListBatchWise() {
@@ -18,69 +24,110 @@ export default function InventoryListBatchWise() {
     <div>
       <div className="rounded-xl border bg-white mt-5">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b bg-gray-50">
-              <tr>
-                <th className="table-header">Product</th>
-                <th className="table-header">Batch No</th>
-                <th className="table-header">Warehouse</th>
-                <th className="table-header">Qty</th>
-                <th className="table-header">Sold</th>
-                <th className="table-header">Remaining</th>
-                <th className="table-header">Supplier</th>
-                <th className="table-header text-right">Actions</th>
-              </tr>
-            </thead>
+          <Table className="w-full text-sm">
+            <TableHeader className="border-b bg-gray-50">
+              <TableRow>
+                <TableCell isHeader className="table-header">
+                  Product
+                </TableCell>
+                <TableCell isHeader className="table-header">
+                  Batch No
+                </TableCell>
+                <TableCell isHeader className="table-header">
+                  Warehouse
+                </TableCell>
+                <TableCell isHeader className="table-header">
+                  Qty
+                </TableCell>
+                <TableCell isHeader className="table-header">
+                  Sold
+                </TableCell>
+                <TableCell isHeader className="table-header">
+                  Remaining
+                </TableCell>
+                <TableCell className="table-header">Purchase Value</TableCell>
+                <TableCell className="table-header">Sale Value</TableCell>
+                <TableCell className="table-header">Potential Profit</TableCell>
+                <TableCell isHeader className="table-header">
+                  Supplier
+                </TableCell>
+                <TableCell isHeader className="table-header text-right">
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHeader>
 
             <tbody>
-              {inventory.length ? (
+              {inventory ? (
                 inventory.map((item: any) => (
-                  <tr key={item.id} className="border-b">
-                    <td className="table-body">
+                  <TableRow key={item.id} className="border-b">
+                    <TableCell className="table-body">
                       <div>
                         <p className="font-medium">{item.product.name}</p>
                         <p className="text-xs text-gray-500">
                           SKU: {item.product.sku}
                         </p>
                       </div>
-                    </td>
+                    </TableCell>
 
-                    <td className="table-body">{item.batch_no}</td>
+                    <TableCell className="table-body">
+                      {item.batch_no}
+                    </TableCell>
 
-                    <td className="table-body">{item.warehouse.name}</td>
+                    <TableCell className="table-body">
+                      {item.warehouse.name}
+                    </TableCell>
 
-                    <td className="table-body">{item.quantity}</td>
+                    <TableCell className="table-body">
+                      {item.quantity}
+                    </TableCell>
 
-                    <td className="table-body">{item.sold_quantity}</td>
+                    <TableCell className="table-body">
+                      {item.sold_quantity}
+                    </TableCell>
 
-                    <td className="table-body font-semibold">
+                    <TableCell className="table-body font-semibold">
                       {item.quantity - item.sold_quantity}
-                    </td>
+                    </TableCell>
 
-                    <td className="table-body">{item.supplier}</td>
+                    <TableCell className="table-body">
+                      {item.purchase_value?.toLocaleString() || "0"}
+                    </TableCell>
 
-                    <td className="table-body text-right">
+                    <TableCell className="table-body">
+                      {item.sale_value?.toLocaleString() || "0"}
+                    </TableCell>
+
+                    <TableCell className="table-body font-semibold text-green-600">
+                      {item.potential_profit?.toLocaleString() || "0"}
+                    </TableCell>
+
+                    <TableCell className="table-body">
+                      {item.supplier}
+                    </TableCell>
+
+                    <TableCell className="table-body text-right">
                       <button
                         className="p-2 rounded hover:bg-gray-100"
                         onClick={() => navigate(`/inventory/${item.id}`)}
                       >
                         <Eye size={18} />
                       </button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
-                <tr>
-                  <td
-                    colSpan={8}
+                <TableRow>
+                  <TableCell
+                    colSpan={10}
                     className="py-6 text-center text-gray-500 dark:text-gray-300"
                   >
                     No inventory records found
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
             </tbody>
-          </table>
+          </Table>
         </div>
       </div>
     </div>
