@@ -297,6 +297,9 @@ export interface Customer {
   status: boolean;
   account: Account;
   account_id: number;
+  group_id?: number;
+  group?: CustomerGroup;
+  reward_points?: number;
   sales: Sale[];
   created_at: string;
   updated_at: string;

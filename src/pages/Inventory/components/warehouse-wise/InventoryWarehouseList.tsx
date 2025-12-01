@@ -12,7 +12,7 @@ import { useGetWarehouseWiseReportQuery } from "../../../../features/inventory/i
 
 export default function InventoryWarehouseList() {
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useGetWarehouseWiseReportQuery();
+  const { data, isLoading, isError } = useGetWarehouseWiseReportQuery({});
 
   const warehouses = data?.data || [];
 

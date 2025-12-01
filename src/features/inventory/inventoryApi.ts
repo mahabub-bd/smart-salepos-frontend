@@ -17,7 +17,10 @@ export interface TransferPayload {
     quantity: number;
   }[];
 }
-
+interface WarehouseReportParams {
+  warehouse_id?: number;
+  search?: string;
+}
 export const inventoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 Get All Inventory
@@ -89,10 +92,17 @@ export const inventoryApi = apiSlice.injectEndpoints({
     }),
 
     // 🔹 WAREHOUSE-WISE REPORT
-    getWarehouseWiseReport: builder.query<ApiResponse<any>, void>({
-      query: () => ({
+    getWarehouseWiseReport: builder.query<
+      ApiResponse<any>,
+      WarehouseReportParams
+    >({
+      query: ({ warehouse_id, search }) => ({
         url: "/inventory/report/warehouse-wise",
         method: "GET",
+        params: {
+          warehouse_id,
+          search,
+        },
       }),
       providesTags: ["Inventory"],
     }),

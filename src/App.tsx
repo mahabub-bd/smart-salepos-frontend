@@ -43,6 +43,7 @@ import ExpensesPage from "./pages/Expenses";
 import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
 import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
 import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
+import POSPage from "./pages/POS/POSPage";
 import PosSalesSummaryPage from "./pages/POS/PosSalesSummaryPage";
 import PosTransactionHistoryPage from "./pages/POS/PosTransactionHistoryPage";
 import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
@@ -155,6 +156,7 @@ export default function App() {
           <Route path="/sales/create" element={<SaleFormPage />} />
           <Route path="/sales/:id" element={<SaleDetailPage />} />
           {/* POS Routes */}
+          <Route path="/pos" element={<POSPage />} />
           <Route path="/pos/sales-summary" element={<PosSalesSummaryPage />} />
           <Route
             path="/pos/transactions"

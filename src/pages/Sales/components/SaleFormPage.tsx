@@ -65,10 +65,6 @@ export default function SaleFormPage() {
     const customers = customerData?.data || [];
     const accounts = accountsData?.data || [];
 
-    const invoiceNo = `INV-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(
-        Math.random() * 1000
-    )}`;
-
     const {
         register,
         control,
@@ -155,7 +151,7 @@ export default function SaleFormPage() {
     }, [watch, setValue]);
     const onSubmit = async (data: SaleFormValues) => {
         try {
-            await createSale({ ...data, customer_id: Number(data.customer_id), invoice_no: invoiceNo }).unwrap();
+            await createSale({ ...data, customer_id: Number(data.customer_id) }).unwrap();
             toast.success("Sale created successfully!");
             navigate("/sales");
         } catch (error: any) {
@@ -173,17 +169,6 @@ export default function SaleFormPage() {
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col gap-5 p-5 border bg-white dark:bg-gray-800 rounded-xl shadow-sm"
             >
-                {/* Invoice Number */}
-                <div className="w-full">
-                    <Label htmlFor="invoice_no">Invoice Number</Label>
-                    <Input
-                        id="invoice_no"
-                        disabled
-                        value={invoiceNo}
-                        className="bg-gray-50 dark:bg-gray-700"
-                    />
-                </div>
-
                 {/* Customer */}
                 <div className="w-full">
                     <Label htmlFor="customer_id">Customer</Label>
