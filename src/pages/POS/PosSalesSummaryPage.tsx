@@ -9,7 +9,7 @@ import {
 import { JSX, useState } from "react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
-import { StatCard } from "../../components/common/stat-card";
+import StatCard from "../../components/common/stat-card";
 import { useGetPosSalesSummaryQuery } from "../../features/pos/posApi";
 
 export default function PosSalesSummaryPage() {

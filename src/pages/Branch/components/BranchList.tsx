@@ -83,24 +83,12 @@ export default function BranchList() {
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/5">
               <TableRow>
-                <TableCell isHeader className="table-header">
-                  Code
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Branch Name
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Address
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Phone
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Email
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Status
-                </TableCell>
+                <TableCell isHeader>Code</TableCell>
+                <TableCell isHeader>Branch Name</TableCell>
+                <TableCell isHeader>Address</TableCell>
+                <TableCell isHeader>Phone</TableCell>
+                <TableCell isHeader>Email</TableCell>
+                <TableCell isHeader>Status</TableCell>
                 <TableCell isHeader className="table-header text-right">
                   Actions
                 </TableCell>
@@ -111,25 +99,17 @@ export default function BranchList() {
               {branches.length > 0 ? (
                 branches.map((branch) => (
                   <TableRow key={branch.id}>
-                    <TableCell className="table-body font-medium">
-                      {branch.code}
-                    </TableCell>
+                    <TableCell>{branch.code}</TableCell>
 
-                    <TableCell className="table-body font-medium">
-                      {branch.name}
-                    </TableCell>
+                    <TableCell>{branch.name}</TableCell>
 
                     <TableCell className="table-body">
                       {branch.address}
                     </TableCell>
 
-                    <TableCell className="table-body">
-                      {branch.phone}
-                    </TableCell>
+                    <TableCell className="table-body">{branch.phone}</TableCell>
 
-                    <TableCell className="table-body">
-                      {branch.email}
-                    </TableCell>
+                    <TableCell className="table-body">{branch.email}</TableCell>
 
                     <TableCell className="table-body">
                       <Badge
@@ -141,7 +121,7 @@ export default function BranchList() {
                     </TableCell>
 
                     <TableCell className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-start gap-2">
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import Loading from "../../../../components/common/Loading";
 import PageBreadcrumb from "../../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../../components/common/PageMeta";
+import Button from "../../../../components/ui/button/Button";
 import { useGetPaymentByIdQuery } from "../../../../features/payment/paymentApi";
 
 export default function PaymentDetailsPage() {
@@ -26,11 +27,10 @@ export default function PaymentDetailsPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-xl font-semibold">Payment #{payment.id}</h1>
-          <Link
-            to="/accounts/payment"
-            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-          >
-            <ArrowLeft size={16} /> Back to payments
+          <Link to="/accounts/payment">
+            <Button size="sm">
+              <ArrowLeft size={16} /> Back to payments
+            </Button>
           </Link>
         </div>
 

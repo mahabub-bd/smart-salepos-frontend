@@ -49,7 +49,7 @@ interface StatCardProps {
   className?: string;
 }
 
-export function StatCard({
+export default function StatCard({
   icon: Icon,
   title,
   value,

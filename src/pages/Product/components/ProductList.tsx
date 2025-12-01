@@ -1,11 +1,10 @@
 import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
-import { Fragment, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
-import Badge from "../../../components/ui/badge/Badge";
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import {
   Table,
@@ -20,7 +19,7 @@ import {
   useGetProductsQuery,
 } from "../../../features/product/productApi";
 
-import Button from "../../../components/ui/button/Button";
+import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Product } from "../../../types";
 
@@ -33,7 +32,6 @@ export default function ProductList() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
-  const canCreate = useHasPermission("product.create");
   const canUpdate = useHasPermission("product.update");
   const canDelete = useHasPermission("product.delete");
 
@@ -90,28 +88,19 @@ export default function ProductList() {
     return <p className="p-6 text-red-500">Failed to fetch products.</p>;
 
   return (
-    <Fragment>
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/3 sm:px-6">
-        {/* Header Section */}
-        <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Product Management
-            </h3>
-          </div>
+    <>
+      {/* Header Section */}
 
-          <div className="flex items-center gap-3">
-            {canCreate && (
-              <Button size="sm" onClick={openCreatePage}>
-                <Plus size={16} />
-                Add
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Table Section */}
-        <div className="max-w-full overflow-x-auto mx-auto">
+      <PageHeader
+        title="Product Management"
+        icon={<Plus size={16} />}
+        addLabel="Add"
+        onAdd={openCreatePage}
+        permission="product.create"
+      />
+      {/* Table Section */}
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
+        <div className="max-w-full overflow-x-auto">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
@@ -119,26 +108,27 @@ export default function ProductList() {
                 <TableCell isHeader>Image</TableCell>
                 <TableCell isHeader>Product Name</TableCell>
 
-                <TableCell isHeader>Category</TableCell>
-
                 <TableCell isHeader>Subcategory</TableCell>
                 <TableCell isHeader>Brand</TableCell>
                 <TableCell isHeader>Supplier</TableCell>
                 <TableCell isHeader>Purchase Price</TableCell>
                 <TableCell isHeader>Selling Price</TableCell>
                 <TableCell isHeader>Stock</TableCell>
-                <TableCell isHeader>Status</TableCell>
+                <TableCell isHeader>SKU</TableCell>
                 <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
             {/* Table Body */}
-            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800 mx-auto">
+            <TableBody>
               {products.length > 0 ? (
                 products.map((product) => (
-                  <TableRow key={product.id} className="">
-                    {/* Product Image */}
-                    <TableCell className="py-3">
+                  <TableRow
+                    key={product.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  >
+                    {/* Product Image - Hidden on mobile */}
+                    <TableCell className="py-3 hidden sm:table-cell">
                       {product.images?.[0]?.url ? (
                         <ResponsiveImage
                           src={product.images[0].url}
@@ -156,62 +146,69 @@ export default function ProductList() {
 
                     {/* Product Name */}
                     <TableCell className="py-3">
-                      <div className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                        {product.name}
+                      <div className="flex flex-col gap-1">
+                        <div>{product.name}</div>
+                        {/* Mobile-only additional info */}
+                        <div>
+                          {product.category?.name && (
+                            <span>{product.category.name}</span>
+                          )}
+                          {product.category?.name && product.status && (
+                            <span> • </span>
+                          )}
+                          {product.status && (
+                            <span
+                              className={
+                                product.status
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }
+                            >
+                              {product.status ? "Active" : "Inactive"}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
 
-                    {/* Category */}
-                    <TableCell className="hidden xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                      {product.category?.name || (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </TableCell>
-
                     {/* Subcategory */}
-                    <TableCell className="hidden 2xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <TableCell>
                       {product.subcategory?.name || (
                         <span className="text-gray-400">-</span>
                       )}
                     </TableCell>
 
                     {/* Brand */}
-                    <TableCell className="hidden xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <TableCell>
                       {product.brand?.name || (
                         <span className="text-gray-400">-</span>
                       )}
                     </TableCell>
 
                     {/* Supplier */}
-                    <TableCell className="hidden 2xl:table-cell py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <TableCell>
                       {product.supplier?.name || (
                         <span className="text-gray-400">-</span>
                       )}
                     </TableCell>
-
-                    {/* Purchase Price */}
-                    <TableCell className="hidden lg:table-cell py-3 text-gray-800 text-theme-sm font-medium text-right dark:text-white/90">
+                    <TableCell>
                       ৳{Number(product.purchase_price).toLocaleString()}
                     </TableCell>
-
                     {/* Selling Price */}
-                    <TableCell className="py-3 text-green-600 text-theme-sm font-medium text-right dark:text-green-400">
+                    <TableCell>
                       ৳{Number(product.selling_price).toLocaleString()}
                     </TableCell>
-                    <TableCell>{product.available_stock}</TableCell>
-                    {/* Status */}
-                    <TableCell className="py-3 text-center">
-                      <Badge
-                        size="sm"
-                        color={product.status ? "success" : "error"}
-                      >
-                        {product.status ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
 
+                    {/* Stock */}
+                    <TableCell>
+                      <span>{product.available_stock}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span>{product.sku}</span>
+                    </TableCell>
                     {/* Actions */}
                     <TableCell className="py-3">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-start gap-1 sm:gap-2">
                         {canView && (
                           <IconButton
                             icon={Eye}
@@ -219,6 +216,7 @@ export default function ProductList() {
                             onClick={() => openViewPage(product)}
                             color="blue"
                             title="View Product"
+                            size={16}
                           />
                         )}
                         {canUpdate && (
@@ -228,6 +226,7 @@ export default function ProductList() {
                             onClick={() => openEditPage(product)}
                             color="blue"
                             title="Edit Product"
+                            size={16}
                           />
                         )}
                         {canDelete && (
@@ -236,6 +235,7 @@ export default function ProductList() {
                             onClick={() => openDeleteDialog(product)}
                             color="red"
                             title="Delete Product"
+                            size={16}
                           />
                         )}
                       </div>
@@ -244,7 +244,10 @@ export default function ProductList() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell className="py-12 text-center text-gray-500 dark:text-gray-400">
+                  <TableCell
+                    colSpan={10}
+                    className="py-12 text-center text-gray-500 dark:text-gray-400"
+                  >
                     <div className="flex flex-col items-center gap-2 w-full justify-center">
                       <p className="text-lg font-medium">No products found</p>
                       <p className="text-sm">
@@ -271,6 +274,6 @@ export default function ProductList() {
           onCancel={closeDeleteModal}
         />
       )}
-    </Fragment>
+    </>
   );
 }

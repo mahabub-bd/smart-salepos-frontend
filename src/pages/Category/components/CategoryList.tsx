@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
-import Button from "../../../components/ui/button/Button";
+import PageHeader from "../../../components/common/PageHeader";
 import { CategoryWithChildren } from "../../../types";
 import CategoryFormModal from "./CategoryFormModal";
 
@@ -141,64 +141,27 @@ export default function CategoryList() {
 
   return (
     <>
-      <div className="flex flex-col gap-5 rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/5">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Category Management
-          </h3>
+      <PageHeader
+        title="Category Management"
+        icon={<Plus size={16} />}
+        addLabel="Add"
+        onAdd={openCreateCategoryModal}
+        permission="category.create"
+      />
 
-          <div className="flex items-center gap-3">
-            {canCreate && (
-              <Button size="sm" onClick={openCreateCategoryModal}>
-                <Plus size={16} />
-                Add
-              </Button>
-            )}
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
+        <div className="max-w-full overflow-x-auto">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Logo
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Name
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Type
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Parent
-                </TableCell>
+                <TableCell isHeader>Logo</TableCell>
+                <TableCell isHeader>Name</TableCell>
+                <TableCell isHeader>Type</TableCell>
+                <TableCell isHeader>Parent</TableCell>
 
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
-                >
-                  Actions
-                </TableCell>
+                <TableCell isHeader>Status</TableCell>
+                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -249,7 +212,7 @@ export default function CategoryList() {
                     </TableCell>
 
                     {/* Parent */}
-                    <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <TableCell>
                       {cat.parent ? (
                         <span className="font-medium text-gray-700 dark:text-gray-300">
                           {cat.parent.name}
@@ -268,7 +231,7 @@ export default function CategoryList() {
 
                     {/* Actions */}
                     <TableCell className="py-3">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-start gap-2">
                         {/* Add Subcategory - Only for main categories */}
                         {!cat.parent && canCreate && (
                           <IconButton
@@ -308,6 +271,7 @@ export default function CategoryList() {
           </Table>
         </div>
       </div>
+
       {/* Category / SubCategory Form Modal */}
       <CategoryFormModal
         isOpen={isModalOpen}

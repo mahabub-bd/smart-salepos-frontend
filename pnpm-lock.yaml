@@ -50,6 +50,9 @@ importers:
       flatpickr:
         specifier: ^4.6.13
         version: 4.6.13
+      jsbarcode:
+        specifier: ^3.12.1
+        version: 3.12.1
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -80,6 +83,9 @@ importers:
       react-hook-form:
         specifier: ^7.66.1
         version: 7.66.1(react@19.2.0)
+      react-qr-code:
+        specifier: ^2.0.18
+        version: 2.0.18(react@19.2.0)
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@19.2.5)(react@19.2.0)(redux@5.0.1)
@@ -111,6 +117,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.1.17
         version: 4.1.17
+      '@types/jsbarcode':
+        specifier: ^3.11.4
+        version: 3.11.4
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -940,6 +949,9 @@ packages:
     peerDependencies:
       '@types/react': '*'
 
+  '@types/jsbarcode@3.11.4':
+    resolution: {integrity: sha512-VBcpTAnEMH0Gbh8JpV14CgOtJjCYjsvR2FoDRyoYPE0gUxtApf8N4c+HKEOyz/iiIZkMzqrzBA3XX7+KgKxxsA==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -1455,6 +1467,9 @@ packages:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
+  jsbarcode@3.12.1:
+    resolution: {integrity: sha512-QZQSqIknC2Rr/YOUyOkCBqsoiBAOTYK+7yNN3JsqfoUtJtkazxNw1dmPpxuv7VVvqW13kA3/mKiLq+s/e3o9hQ==}
+
   jsesc@3.1.0:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
@@ -1704,6 +1719,9 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  qr.js@0.0.0:
+    resolution: {integrity: sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==}
+
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
@@ -1761,6 +1779,11 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+
+  react-qr-code@2.0.18:
+    resolution: {integrity: sha512-v1Jqz7urLMhkO6jkgJuBYhnqvXagzceg3qJUWayuCK/c6LTIonpWbwxR1f1APGd4xrW/QcQEovNrAojbUz65Tg==}
+    peerDependencies:
+      react: '*'
 
   react-redux@9.2.0:
     resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
@@ -2788,6 +2811,10 @@ snapshots:
       '@types/react': 19.2.5
       hoist-non-react-statics: 3.3.2
 
+  '@types/jsbarcode@3.11.4':
+    dependencies:
+      '@types/node': 24.10.1
+
   '@types/json-schema@7.0.15': {}
 
   '@types/node@24.10.1':
@@ -3361,6 +3388,8 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
+  jsbarcode@3.12.1: {}
+
   jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
@@ -3568,6 +3597,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  qr.js@0.0.0: {}
+
   queue-microtask@1.2.3: {}
 
   queue@6.0.2:
@@ -3623,6 +3654,12 @@ snapshots:
       react: 19.2.0
 
   react-is@16.13.1: {}
+
+  react-qr-code@2.0.18(react@19.2.0):
+    dependencies:
+      prop-types: 15.8.1
+      qr.js: 0.0.0
+      react: 19.2.0
 
   react-redux@9.2.0(@types/react@19.2.5)(react@19.2.0)(redux@5.0.1):
     dependencies:

@@ -8,7 +8,8 @@ import {
   DollarLineIcon,
   TaskIcon,
 } from "../../icons";
-import { StatCard } from "../common/stat-card";
+import StatCard from "../common/stat-card";
+
 
 export default function EcommerceMetrics() {
   return (

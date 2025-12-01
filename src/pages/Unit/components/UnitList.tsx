@@ -85,18 +85,10 @@ export default function UnitList() {
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/5">
               <TableRow>
-                <TableCell isHeader className="table-header">
-                  Name
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Code
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Description
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Status
-                </TableCell>
+                <TableCell isHeader>Name</TableCell>
+                <TableCell isHeader>Code</TableCell>
+                <TableCell isHeader>Description</TableCell>
+                <TableCell isHeader>Status</TableCell>
                 <TableCell isHeader className="table-header text-right">
                   Actions
                 </TableCell>
@@ -124,7 +116,7 @@ export default function UnitList() {
                     </TableCell>
 
                     <TableCell className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-start gap-2">
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}

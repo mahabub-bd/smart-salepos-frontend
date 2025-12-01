@@ -2,7 +2,7 @@ import AccountBadge from "../../../components/common/AccountBadge";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import { StatCard } from "../../../components/common/stat-card";
+import  StatCard  from "../../../components/common/stat-card";
 
 import {
   Table,

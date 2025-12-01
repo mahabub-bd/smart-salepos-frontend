@@ -27,6 +27,7 @@ import CategoryPage from "./pages/Category";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import ProductPage from "./pages/Product";
 import ProductFormPage from "./pages/Product/components/ProductFormPage";
+import ProductDetailPage from "./pages/Product/components/ProductDetailPage";
 import PurchasePage from "./pages/Purchase";
 
 import AccountBalancePage from "./pages/Accounts/AccountBalance";
@@ -34,6 +35,7 @@ import AccountListPage from "./pages/Accounts/AccountList";
 import CashandBank from "./pages/Accounts/CashandBank";
 import JournalPage from "./pages/Accounts/JournalPage";
 import PaymentsPage from "./pages/Accounts/payments";
+import TrialBalancePage from "./pages/Accounts/TrialBalance";
 import PaymentDetailsPage from "./pages/Accounts/payments/components/PaymentDetails";
 import BranchPage from "./pages/Branch";
 import CustomerPage from "./pages/Customer";
@@ -120,6 +122,8 @@ export default function App() {
           <Route path="/products" element={<ProductPage />} />
           // For creating a product
           <Route path="/products/create" element={<ProductFormPage />} />
+          // For viewing a product
+          <Route path="/products/view/:id" element={<ProductDetailPage />} />
           // For editing a product
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
@@ -148,6 +152,7 @@ export default function App() {
           <Route path="/payments/:id" element={<PaymentDetailsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
+          <Route path="/accounts/trial-balance" element={<TrialBalancePage />} />
           <Route path="/branches" element={<BranchPage />} />
           <Route path="/customers" element={<CustomerPage />} />
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
