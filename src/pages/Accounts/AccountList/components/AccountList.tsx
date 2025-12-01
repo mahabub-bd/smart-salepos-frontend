@@ -114,7 +114,7 @@ export default function AccountListPage({
                   </TableCell>
 
                   {/* Action Buttons */}
-                  <TableCell className="px-4 py-2 flex justify-center gap-2">
+                  <TableCell className="px-4 py-2 flex justify-start gap-2">
                     {acc.isCash && (
                       <>
                         <IconButton
@@ -155,7 +155,7 @@ export default function AccountListPage({
                   </TableCell>
 
                   {/* Account Type Badge */}
-                  <TableCell className="px-4 py-2 text-center">
+                  <TableCell className="px-4 py-2 ">
                     <AccountBadge
                       color={
                         acc.type === "asset"

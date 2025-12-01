@@ -21,7 +21,7 @@ import {
   Scale,
   TrendingDown,
   TrendingUp,
-  Wallet
+  Wallet,
 } from "lucide-react";
 
 export default function AccountBalancePage() {
@@ -174,7 +174,7 @@ export default function AccountBalancePage() {
                   {/* Type – center */}
                   <TableCell
                     isHeader
-                    className="px-4 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                   >
                     Type
                   </TableCell>
@@ -207,7 +207,10 @@ export default function AccountBalancePage() {
 
               <TableBody className="divide-y divide-gray-100 dark:divide-gray-800 mx-auto">
                 {balances.map((item: Account) => (
-                  <TableRow key={item.code} className="border-b last:border-none">
+                  <TableRow
+                    key={item.code}
+                    className="border-b last:border-none"
+                  >
                     {/* Code – left */}
                     <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
                       {item.account_number}
@@ -222,18 +225,18 @@ export default function AccountBalancePage() {
                     </TableCell>
 
                     {/* Type – center */}
-                    <TableCell className="px-4 py-3 text-sm text-center capitalize">
+                    <TableCell className="px-4 py-3 text-sm  capitalize">
                       <AccountBadge
                         color={
                           item.type === "asset"
                             ? "blue"
                             : item.type === "liability"
-                              ? "orange"
-                              : item.type === "equity"
-                                ? "purple"
-                                : item.type === "income"
-                                  ? "green"
-                                  : "red"
+                            ? "orange"
+                            : item.type === "equity"
+                            ? "purple"
+                            : item.type === "income"
+                            ? "green"
+                            : "red"
                         }
                       >
                         {item.type}
@@ -252,8 +255,11 @@ export default function AccountBalancePage() {
 
                     {/* Balance – right, colored */}
                     <TableCell
-                      className={`px-4 py-3 text-sm text-right font-medium ${(item.balance ?? 0) < 0 ? "text-red-500" : "text-green-600"
-                        }`}
+                      className={`px-4 py-3 text-sm text-right font-medium ${
+                        (item.balance ?? 0) < 0
+                          ? "text-red-500"
+                          : "text-green-600"
+                      }`}
                     >
                       {Number(item.balance ?? 0).toFixed(2)}
                     </TableCell>

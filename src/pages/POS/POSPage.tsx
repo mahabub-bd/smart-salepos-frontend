@@ -344,7 +344,7 @@ export default function POSPage() {
               <Select
                 value={String(selectedWarehouse)}
                 onChange={(value) => setSelectedWarehouse(Number(value))}
-                placeholder="All Warehouses"
+                placeholder="Select Warehouses"
                 options={[
                   { value: "0", label: "All Warehouses" },
                   ...warehouses.map((w) => ({
@@ -404,7 +404,7 @@ export default function POSPage() {
         </div>
 
         {/* Right Side - Cart & Checkout */}
-        <div className="flex flex-col gap-4 overflow-y-scroll">
+        <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
           {/* Customer Selection */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <Select
@@ -602,13 +602,14 @@ export default function POSPage() {
                   }}
                   options={[
                     { value: "cash", label: "Cash" },
-                    { value: "bank", label: "Bank" },
-                    { value: "bkash", label: "Bkash" },
+                    { value: "bank", label: "Bank & MFS" },
                   ]}
                 />
               </div>
 
-              {(paymentMethod === "cash" || paymentMethod === "bank") && (
+              {(paymentMethod === "cash" ||
+                paymentMethod === "bank" ||
+                paymentMethod === "bkash") && (
                 <div>
                   <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
                     Account
@@ -644,48 +645,55 @@ export default function POSPage() {
           </div>
 
           {/* Summary & Checkout */}
-          <div className="bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                <span>Subtotal:</span>
+          <div
+            className="bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 
+                p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-sm"
+          >
+            <div className="space-y-1.5 mb-3">
+              <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <span>Subtotal</span>
                 <span>৳{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-sm text-red-600 dark:text-red-400">
-                <span>Discount:</span>
+              <div className="flex justify-between text-red-600 dark:text-red-400">
+                <span>Discount</span>
                 <span>-৳{discount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                <span>Tax:</span>
+              <div className="flex justify-between text-green-600 dark:text-green-400">
+                <span>Tax</span>
                 <span>+৳{tax.toFixed(2)}</span>
               </div>
+
               <div className="border-t border-gray-300 dark:border-gray-600 pt-2">
-                <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white">
-                  <span>Total:</span>
+                <div className="flex justify-between text-base font-bold text-gray-900 dark:text-white">
+                  <span>Total</span>
                   <span>৳{total.toFixed(2)}</span>
                 </div>
               </div>
-              <div className="flex justify-between text-base font-semibold text-orange-600 dark:text-orange-400">
-                <span>Due:</span>
+
+              <div className="flex justify-between text-sm font-semibold text-orange-600 dark:text-orange-400">
+                <span>Due</span>
                 <span>৳{due.toFixed(2)}</span>
               </div>
             </div>
-
-            <button
-              onClick={handleCheckout}
-              disabled={isCreating || !selectedCustomer || cart.length === 0}
-              className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isCreating ? "Processing..." : "Complete Sale"}
-            </button>
-
-            {cart.length > 0 && (
+            <div className="grid grid-cols-2 gap-4">
+              {cart.length > 0 && (
+                <button
+                  onClick={clearCart}
+                  className="w-full  py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 
+                 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm transition-all"
+                >
+                  Clear Cart
+                </button>
+              )}
               <button
-                onClick={clearCart}
-                className="w-full mt-2 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors"
+                onClick={handleCheckout}
+                disabled={isCreating || !selectedCustomer || cart.length === 0}
+                className="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md 
+               shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Clear Cart
+                {isCreating ? "Processing..." : "Complete Sale"}
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>

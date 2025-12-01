@@ -1,4 +1,4 @@
-import { ChevronLeft, Plus } from "lucide-react";
+import { ChevronLeft, FileDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router";
 
@@ -16,11 +16,13 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Link } from "react-router-dom";
 import Info from "../../../components/common/Info";
 import Button from "../../../components/ui/button/Button";
 import { useGetSaleByIdQuery } from "../../../features/sale/saleApi";
 import { SaleItem, SalePayment } from "../../../types";
+import SingleSalePDF from "./pdf/SingleSalePDF";
 import SalePaymentModal from "./SalePaymentModal";
 
 export default function SaleDetailPage() {
@@ -47,13 +49,24 @@ export default function SaleDetailPage() {
       <PageBreadcrumb pageTitle={`Sale Details (${sale.invoice_no})`} />
 
       <div className="flex flex-col gap-5 min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/5">
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-5">
           <Link to="/sales">
             <Button variant="primary" size="sm">
               <ChevronLeft size={16} />
               Back to Sales
             </Button>
           </Link>
+          <PDFDownloadLink
+            document={<SingleSalePDF sale={sale} />}
+            fileName={`sale-${sale.invoice_no}.pdf`}
+          >
+            {({ loading }) => (
+              <Button variant="outline" size="sm">
+                <FileDown size={16} />
+                {loading ? "Generating PDF..." : "Download PDF"}
+              </Button>
+            )}
+          </PDFDownloadLink>
         </div>
         {/* Sale Info */}
         <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">

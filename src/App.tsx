@@ -34,6 +34,7 @@ import AccountListPage from "./pages/Accounts/AccountList";
 import CashandBank from "./pages/Accounts/CashandBank";
 import JournalPage from "./pages/Accounts/JournalPage";
 import PaymentsPage from "./pages/Accounts/payments";
+import PaymentDetailsPage from "./pages/Accounts/payments/components/PaymentDetails";
 import BranchPage from "./pages/Branch";
 import CustomerPage from "./pages/Customer";
 import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
@@ -144,6 +145,7 @@ export default function App() {
           <Route path="/accounts/balances" element={<AccountBalancePage />} />
           <Route path="/accounts/journal" element={<JournalPage />} />
           <Route path="/accounts/payment" element={<PaymentsPage />} />
+          <Route path="/payments/:id" element={<PaymentDetailsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
           <Route path="/branches" element={<BranchPage />} />

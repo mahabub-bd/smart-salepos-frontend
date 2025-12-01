@@ -1,4 +1,13 @@
-import { ChevronLeft, ChevronRight, Eye, Plus, Wallet } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  Eye,
+  FileDown,
+  Plus,
+  ShoppingCart,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -14,10 +23,14 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import Button from "../../../components/ui/button/Button";
 import { useGetSalesQuery } from "../../../features/sale/saleApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Sale } from "../../../types";
 import { formatCurrencyEnglish, formatDate } from "../../../utlis";
+import SaleListPDF from "./pdf/SaleListPDF";
+import SingleSalePDF from "./pdf/SingleSalePDF";
 import SalePaymentModal from "./SalePaymentModal";
 
 // Import the Payment Modal
@@ -74,7 +87,21 @@ export default function SaleList() {
         addLabel="Add"
         onAdd={() => navigate("/sales/create")}
         permission="sale.create"
-      />
+      >
+        <PDFDownloadLink
+          document={<SaleListPDF sales={sales} />}
+          fileName={`sales-report-${
+            new Date().toISOString().split("T")[0]
+          }.pdf`}
+        >
+          {({ loading }) => (
+            <Button size="sm" variant="outline">
+              <FileDown size={14} />
+              {loading ? "Generating..." : "Download"}
+            </Button>
+          )}
+        </PDFDownloadLink>
+      </PageHeader>
 
       {/* Sales Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
@@ -123,9 +150,23 @@ export default function SaleList() {
                       >
                         {formatCurrencyEnglish(dueAmount)}
                       </TableCell>
-                      <TableCell className="capitalize">
-                        {sale.sale_type}
+                      <TableCell className="capitalize flex items-center gap-1">
+                        {sale.sale_type === "pos" ? (
+                          <>
+                            <CreditCard size={14} className="text-blue-600" />
+                            POS
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart
+                              size={14}
+                              className="text-green-600"
+                            />
+                            Regular
+                          </>
+                        )}
                       </TableCell>
+
                       <TableCell>
                         <Badge
                           size="sm"
@@ -165,6 +206,16 @@ export default function SaleList() {
                               }}
                             />
                           )}
+                          <PDFDownloadLink
+                            document={<SingleSalePDF sale={sale} />}
+                            fileName={`sale-${sale.invoice_no}.pdf`}
+                          >
+                            <IconButton
+                              icon={FileDown}
+                              tooltip="PDF"
+                              color="orange"
+                            />
+                          </PDFDownloadLink>
                         </div>
                       </TableCell>
                     </TableRow>

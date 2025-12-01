@@ -86,42 +86,65 @@ export default function PaymentsPage() {
 
             <TableBody>
               {payments.length > 0 ? (
-                payments.map((payment: any) => (
-                  <TableRow key={payment.id}>
-                    {/* LEFT     */}
-                    <TableCell className="px-4 py-3 text-sm text-left">
-                      {payment.supplier?.name || "-"}
-                    </TableCell>
-                    {/* LEFT     */}
-                    <TableCell className="px-4 py-3 text-sm text-left">
-                      {payment.purchase?.po_no || "-"}
-                    </TableCell>
-                    {/* RIGHT    */}
-                    <TableCell className="px-4 py-3 text-sm text-right">
-                      {Number(payment.amount).toFixed(2)}
-                    </TableCell>
-                    {/* CENTER   */}
-                    <TableCell className="px-4 py-3 text-sm  text-center">
-                      <span className={badgeColors[payment.method]}>
-                        {payment.method}
-                      </span>
-                    </TableCell>
-                    {/* CENTER   */}
-                    <TableCell className="px-4 py-3 text-sm text-center capitalize">
-                      {payment.type}
-                    </TableCell>
-                    {/* CENTER   */}
-                    <TableCell className="px-4 py-3 text-sm text-center">
-                      {new Date(payment.created_at).toLocaleDateString()}
-                    </TableCell>
-                    {/* RIGHT    */}
-                    <TableCell className="px-4 py-3 text-sm text-right capitalize">
-                      <Link to={`/payments/${payment.id}`}>
-                        <IconButton icon={Eye} color="blue" />
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))
+                payments.map((payment: any) => {
+                  const isSupplierPayment = payment.type === "supplier";
+                  const displayName = isSupplierPayment
+                    ? payment.supplier?.name
+                    : payment.customer?.name;
+
+                  const referenceNo = isSupplierPayment
+                    ? payment.purchase?.po_no
+                    : payment.sale?.invoice_no;
+
+                  return (
+                    <TableRow key={payment.id}>
+                      {/* Supplier / Customer */}
+                      <TableCell className="px-4 py-3 text-sm text-left">
+                        {displayName || "-"}
+                      </TableCell>
+
+                      {/* PO No or Invoice No */}
+                      <TableCell className="px-4 py-3 text-sm text-left">
+                        {referenceNo || "-"}
+                      </TableCell>
+
+                      {/* Amount */}
+                      <TableCell className="px-4 py-3 text-sm text-right">
+                        {Number(payment.amount).toFixed(2)}
+                      </TableCell>
+
+                      {/* Method Badge */}
+                      <TableCell className="px-4 py-3 text-sm ">
+                        <span
+                          className={
+                            badgeColors[payment.method] ||
+                            "bg-gray-50 text-gray-600 px-2 py-1 rounded-full text-xs"
+                          }
+                        >
+                          {payment.method.charAt(0).toUpperCase() +
+                            payment.method.slice(1)}
+                        </span>
+                      </TableCell>
+
+                      {/* Type */}
+                      <TableCell className="px-4 py-3 text-sm  capitalize">
+                        {payment.type}
+                      </TableCell>
+
+                      {/* Date */}
+                      <TableCell className="px-4 py-3 text-sm ">
+                        {new Date(payment.created_at).toLocaleDateString()}
+                      </TableCell>
+
+                      {/* Action */}
+                      <TableCell className="px-4 py-3 text-sm text-right">
+                        <Link to={`/payments/${payment.id}`}>
+                          <IconButton icon={Eye} color="blue" />
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell className="py-6 text-center text-gray-500 dark:text-gray-400">
