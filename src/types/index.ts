@@ -126,6 +126,7 @@ export interface Product {
   status: boolean;
   brand?: Brand;
   category?: Category;
+
   subcategory?: SubCategory;
   unit?: Unit;
   supplier?: Supplier;
@@ -134,6 +135,9 @@ export interface Product {
   purchase_value?: number;
   sale_value?: number;
   created_at: string;
+  total_stock: number;
+  total_sold: number;
+  available_stock: number;
   updated_at: string;
 }
 export interface ProductRequest {

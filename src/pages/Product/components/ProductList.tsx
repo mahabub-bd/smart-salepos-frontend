@@ -116,68 +116,19 @@ export default function ProductList() {
             {/* Table Header */}
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Image
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 min-w-[200px]"
-                >
-                  Product Name
-                </TableCell>
+                <TableCell isHeader>Image</TableCell>
+                <TableCell isHeader>Product Name</TableCell>
 
-                <TableCell
-                  isHeader
-                  className="hidden xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Category
-                </TableCell>
+                <TableCell isHeader>Category</TableCell>
 
-                <TableCell
-                  isHeader
-                  className="hidden 2xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Subcategory
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="hidden xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Brand
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="hidden 2xl:table-cell py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Supplier
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="hidden lg:table-cell py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
-                >
-                  Purchase Price
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
-                >
-                  Selling Price
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 font-medium text-gray-500 text-end text-theme-xs dark:text-gray-400"
-                >
-                  Actions
-                </TableCell>
+                <TableCell isHeader>Subcategory</TableCell>
+                <TableCell isHeader>Brand</TableCell>
+                <TableCell isHeader>Supplier</TableCell>
+                <TableCell isHeader>Purchase Price</TableCell>
+                <TableCell isHeader>Selling Price</TableCell>
+                <TableCell isHeader>Stock</TableCell>
+                <TableCell isHeader>Status</TableCell>
+                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -247,7 +198,7 @@ export default function ProductList() {
                     <TableCell className="py-3 text-green-600 text-theme-sm font-medium text-right dark:text-green-400">
                       ৳{Number(product.selling_price).toLocaleString()}
                     </TableCell>
-
+                    <TableCell>{product.available_stock}</TableCell>
                     {/* Status */}
                     <TableCell className="py-3 text-center">
                       <Badge
