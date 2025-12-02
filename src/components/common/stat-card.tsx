@@ -85,33 +85,33 @@ export default function StatCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-4 md:p-4",
+        "relative overflow-hidden rounded-xl border p-3",
         bgColorClasses[bgColor],
         className
       )}
     >
       {/* Background Icon */}
-      <div className="absolute -top-4 -right-4 opacity-5 dark:opacity-10">
-        <Icon className="text-8xl text-gray-800 dark:text-white" />
+      <div className="absolute -top-3 -right-3 opacity-5 dark:opacity-10">
+        <Icon className="text-6xl text-gray-800 dark:text-white" />
       </div>
 
       {/* Main Icon */}
       <div
         className={cn(
-          "relative z-10 flex items-center justify-center w-12 h-12 rounded-xl",
+          "relative z-10 flex items-center justify-center w-9 h-9 rounded-lg",
           iconBgClasses[bgColor]
         )}
       >
-        <Icon className="text-gray-800 text-2xl dark:text-white/90" />
+        <Icon className="text-gray-800 text-lg dark:text-white/90" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex items-end justify-between mt-5">
+      <div className="relative z-10 flex items-end justify-between mt-3">
         <div>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-xs text-gray-600 dark:text-gray-400">
             {title}
           </span>
-          <h4 className="mt-2 font-bold text-gray-800 text-xl dark:text-white/90">
+          <h4 className="mt-1 font-bold text-gray-800 text-lg dark:text-white/90">
             {value}
           </h4>
         </div>
