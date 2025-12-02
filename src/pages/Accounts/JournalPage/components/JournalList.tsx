@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Loading from "../../../../components/common/Loading";
 import {
   Table,
@@ -6,17 +7,38 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../components/ui/table";
-import { useGetAccountJournalQuery } from "../../../../features/accounts/accountsApi";
+import { useGetAccountJournalQuery, useGetAccountsQuery } from "../../../../features/accounts/accountsApi";
 
 export default function JournalList() {
-  const { data, isLoading, isError } = useGetAccountJournalQuery();
+  const [selectedAccountCode, setSelectedAccountCode] = useState<string>("");
+  const { data, isLoading, isError } = useGetAccountJournalQuery(selectedAccountCode || undefined);
+  const { data: accountsData } = useGetAccountsQuery();
   const journal = data?.data || [];
+  const accounts = accountsData?.data || [];
 
   if (isLoading) return <Loading message="Loading journal entries..." />;
   if (isError)
     return <p className="text-red-500 p-4">Failed to load journal entries.</p>;
   return (
     <>
+      <div className="mb-4 flex items-center gap-3">
+        <label htmlFor="accountFilter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Filter by Account:
+        </label>
+        <select
+          id="accountFilter"
+          value={selectedAccountCode}
+          onChange={(e) => setSelectedAccountCode(e.target.value)}
+          className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        >
+          <option value="">All Accounts</option>
+          {accounts.map((account: any) => (
+            <option key={account.code} value={account.code}>
+              {account.name} ({account.code})
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
           <Table>

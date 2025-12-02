@@ -150,7 +150,7 @@ const navItems: NavItem[] = [
       { name: "Account List", path: "/accounts/list" },
       { name: "Balance Sheet", path: "/accounts/balances" },
       { name: "Trial Balance", path: "/accounts/trial-balance" },
-      { name: "Owner Capital", path: "/accounts/EQUITY.CAPITAL" },
+      
     ],
   },
 

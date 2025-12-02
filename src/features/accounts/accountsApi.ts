@@ -97,8 +97,8 @@ export const accountsApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Accounts"],
     }),
     // 🔹 Get account journal
-    getAccountJournal: builder.query<ApiResponse<JournalEntry[]>, void>({
-      query: () => `/accounts/reports/journal`,
+    getAccountJournal: builder.query<ApiResponse<JournalEntry[]>, string | void>({
+      query: (accountCode) => `/accounts/reports/journal${accountCode ? `?accountCode=${accountCode}` : ""}`,
       providesTags: ["Accounts"],
     }),
     getTrialBalance: builder.query<ApiResponse<any>, string | void>({

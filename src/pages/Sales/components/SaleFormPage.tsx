@@ -99,17 +99,20 @@ export default function SaleFormPage() {
         0
     );
 
-    // Calculate discount
+    // Step 1: Calculate VAT FIRST (on subtotal)
+    const tax = (subtotal * formValues.tax_percentage) / 100;
+
+    // Step 2: Calculate amount with VAT
+    const amountWithVAT = subtotal + tax;
+
+    // Step 3: Calculate discount (on amount with VAT)
     let discount =
         formValues.discount_type === "fixed"
             ? formValues.discount_value
-            : (subtotal * formValues.discount_value) / 100;
+            : (amountWithVAT * formValues.discount_value) / 100;
 
-    // Calculate tax
-    const tax = (subtotal * formValues.tax_percentage) / 100;
-
-    // Calculate total
-    const total = subtotal - discount + tax;
+    // Step 4: Calculate final total (amount with VAT - discount)
+    const total = amountWithVAT - discount;
 
     // Calculate due amount
     const due = total - formValues.paid_amount;

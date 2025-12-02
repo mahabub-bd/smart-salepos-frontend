@@ -3,8 +3,16 @@ import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
 
-import { Building, CreditCard, TrendingUp, DollarSign, Wallet, Calendar } from "lucide-react";
+import {
+  Building,
+  Calendar,
+  CreditCard,
+  DollarSign,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
+import StatCard from "../../../components/common/stat-card";
 import {
   Table,
   TableBody,
@@ -13,7 +21,6 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetTrialBalanceQuery } from "../../../features/accounts/accountsApi";
-import StatCard from "../../../components/common/stat-card";
 
 interface NormalBalance {
   side: "debit" | "credit";
@@ -22,6 +29,7 @@ interface NormalBalance {
 
 interface TrialBalanceItem {
   code: string;
+  account_number: number;
   name: string;
   type: string;
   debit: number;
@@ -62,7 +70,8 @@ export default function TrialBalancePage() {
     items.forEach((item) => {
       const type = item.type.toLowerCase();
       if (type in grouped) {
-        grouped[type as keyof typeof grouped].amount += item.normalBalance.amount;
+        grouped[type as keyof typeof grouped].amount +=
+          item.normalBalance.amount;
         grouped[type as keyof typeof grouped].count += 1;
       }
     });
@@ -179,36 +188,12 @@ export default function TrialBalancePage() {
             <Table>
               <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
                 <TableRow>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Account Code
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Account Name
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Type
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Debit
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Credit
-                  </TableCell>
+                  <TableCell isHeader>Account Number</TableCell>
+                  <TableCell isHeader>Account Code</TableCell>
+                  <TableCell isHeader>Account Name</TableCell>
+                  <TableCell isHeader>Type</TableCell>
+                  <TableCell isHeader>Debit</TableCell>
+                  <TableCell isHeader>Credit</TableCell>
                 </TableRow>
               </TableHeader>
 
@@ -218,12 +203,9 @@ export default function TrialBalancePage() {
                     key={item.code}
                     className="border-b last:border-none"
                   >
-                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
-                      {item.code}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
-                      {item.name}
-                    </TableCell>
+                    <TableCell>{item.account_number}</TableCell>
+                    <TableCell>{item.code}</TableCell>
+                    <TableCell>{item.name}</TableCell>
                     <TableCell className="px-4 py-3 text-sm capitalize">
                       <AccountBadge
                         color={
@@ -241,13 +223,15 @@ export default function TrialBalancePage() {
                         {item.type}
                       </AccountBadge>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                      {item.normalBalance.side === "debit" && item.normalBalance.amount > 0
+                    <TableCell>
+                      {item.normalBalance.side === "debit" &&
+                      item.normalBalance.amount > 0
                         ? `৳${item.normalBalance.amount.toFixed(2)}`
                         : "-"}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                      {item.normalBalance.side === "credit" && item.normalBalance.amount > 0
+                    <TableCell>
+                      {item.normalBalance.side === "credit" &&
+                      item.normalBalance.amount > 0
                         ? `৳${item.normalBalance.amount.toFixed(2)}`
                         : "-"}
                     </TableCell>
@@ -260,15 +244,15 @@ export default function TrialBalancePage() {
                 <TableBody>
                   <TableRow className="bg-gray-50 dark:bg-gray-800/50 font-semibold">
                     <TableCell
-                      colSpan={3}
+                      colSpan={4}
                       className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100"
                     >
                       Totals:
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
+                    <TableCell>
                       ৳{trialBalance.totals.totalDebit.toFixed(2)}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
+                    <TableCell>
                       ৳{trialBalance.totals.totalCredit.toFixed(2)}
                     </TableCell>
                   </TableRow>

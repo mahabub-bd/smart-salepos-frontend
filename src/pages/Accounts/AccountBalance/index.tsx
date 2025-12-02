@@ -2,7 +2,7 @@ import AccountBadge from "../../../components/common/AccountBadge";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import  StatCard  from "../../../components/common/stat-card";
+import StatCard from "../../../components/common/stat-card";
 
 import {
   Table,
@@ -149,59 +149,24 @@ export default function AccountBalancePage() {
               <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
                 <TableRow>
                   {/* Code – left */}
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Code
-                  </TableCell>
+                  <TableCell isHeader>Account Number</TableCell>
 
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Account Number
-                  </TableCell>
+                  <TableCell isHeader>Code</TableCell>
 
                   {/* Name – left */}
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Name
-                  </TableCell>
+                  <TableCell isHeader>Name</TableCell>
 
                   {/* Type – center */}
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Type
-                  </TableCell>
+                  <TableCell isHeader>Type</TableCell>
 
                   {/* Debit – right */}
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Debit
-                  </TableCell>
+                  <TableCell isHeader>Debit</TableCell>
 
                   {/* Credit – right */}
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Credit
-                  </TableCell>
+                  <TableCell isHeader>Credit</TableCell>
 
                   {/* Balance – right */}
-                  <TableCell
-                    isHeader
-                    className="px-4 py-3 text-right text-theme-xs font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Balance
-                  </TableCell>
+                  <TableCell isHeader>Balance</TableCell>
                 </TableRow>
               </TableHeader>
 
@@ -212,17 +177,11 @@ export default function AccountBalancePage() {
                     className="border-b last:border-none"
                   >
                     {/* Code – left */}
-                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
-                      {item.account_number}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
-                      {item.code}
-                    </TableCell>
+                    <TableCell>{item.account_number}</TableCell>
+                    <TableCell>{item.code}</TableCell>
 
                     {/* Name – left */}
-                    <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
-                      {item.name}
-                    </TableCell>
+                    <TableCell>{item.name}</TableCell>
 
                     {/* Type – center */}
                     <TableCell className="px-4 py-3 text-sm  capitalize">
@@ -244,14 +203,10 @@ export default function AccountBalancePage() {
                     </TableCell>
 
                     {/* Debit – right */}
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                      {Number(item.debit ?? 0).toFixed(2)}
-                    </TableCell>
+                    <TableCell>{Number(item.debit ?? 0).toFixed(2)}</TableCell>
 
                     {/* Credit – right */}
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                      {Number(item.credit ?? 0).toFixed(2)}
-                    </TableCell>
+                    <TableCell>{Number(item.credit ?? 0).toFixed(2)}</TableCell>
 
                     {/* Balance – right, colored */}
                     <TableCell
