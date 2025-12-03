@@ -1,8 +1,8 @@
 import PageMeta from "../../components/common/PageMeta";
 import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
-import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
+import Last30DaysSalesChart from "../../components/ecommerce/Last30DaysSalesChart";
 import RecentOrders from "../../components/ecommerce/RecentOrders";
-import StatisticsChart from "../../components/ecommerce/StatisticsChart";
+import YearlyMonthWiseSalesChart from "../../components/ecommerce/YearlyMonthWiseSalesChart";
 
 export default function Home() {
   return (
@@ -17,11 +17,13 @@ export default function Home() {
           <EcommerceMetrics />
         </div>
 
+        {/* New Analytics Charts */}
         <div className="col-span-12">
-          <StatisticsChart />
+          <Last30DaysSalesChart />
         </div>
+
         <div className="col-span-12">
-          <MonthlySalesChart />
+          <YearlyMonthWiseSalesChart />
         </div>
 
         <div className="col-span-12">

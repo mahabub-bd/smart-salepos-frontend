@@ -23,6 +23,7 @@ import BranchFormModal from "./BranchFormModal";
 
 export default function BranchList() {
   const { data, isLoading, isError } = useGetBranchesQuery();
+
   const [deleteBranch] = useDeleteBranchMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,6 +89,7 @@ export default function BranchList() {
                 <TableCell isHeader>Address</TableCell>
                 <TableCell isHeader>Phone</TableCell>
                 <TableCell isHeader>Email</TableCell>
+                <TableCell isHeader>Warehouse</TableCell>
                 <TableCell isHeader>Status</TableCell>
                 <TableCell isHeader className="table-header text-right">
                   Actions
@@ -110,6 +112,18 @@ export default function BranchList() {
                     <TableCell className="table-body">{branch.phone}</TableCell>
 
                     <TableCell className="table-body">{branch.email}</TableCell>
+
+                    <TableCell className="table-body">
+                      {branch.default_warehouse ? (
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {branch.default_warehouse.name}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">
+                          No warehouse
+                        </span>
+                      )}
+                    </TableCell>
 
                     <TableCell className="table-body">
                       <Badge
@@ -145,7 +159,7 @@ export default function BranchList() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="py-6 text-center text-gray-500 dark:text-gray-400"
                   >
                     No branches found

@@ -29,6 +29,7 @@ export interface User {
   full_name: string;
   phone: string;
   roles: Role[];
+  branches?: Branch[];
   status: string;
   last_login_at: string | null;
   created_at: string;
@@ -289,6 +290,7 @@ export interface Branch {
   is_active: boolean;
   default_warehouse_id: number | null;
   created_at: string;
+  default_warehouse: Warehouse;
   updated_at: string;
 }
 export interface Customer {

@@ -1,14 +1,22 @@
-import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
+import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
+
 import {
   useCreateBranchMutation,
   useUpdateBranchMutation,
 } from "../../../features/branch/branchApi";
+import { useGetWarehousesQuery } from "../../../features/warehouse/warehouseApi";
+
 import { Branch } from "../../../types";
+import { BranchFormType, branchSchema } from "./branch.schema";
 
 interface Props {
   isOpen: boolean;
@@ -17,35 +25,51 @@ interface Props {
 }
 
 export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
+  const { data: warehousesData, isLoading: isLoadingWarehouses } =
+    useGetWarehousesQuery();
+
+  const warehouses = warehousesData?.data || [];
+  const isEdit = !!branch;
+
   const [createBranch] = useCreateBranchMutation();
   const [updateBranch] = useUpdateBranchMutation();
 
-  const isEdit = !!branch;
-
-  const [formData, setFormData] = useState({
-    code: branch?.code || "",
-    name: branch?.name || "",
-    address: branch?.address || "",
-    phone: branch?.phone || "",
-    email: branch?.email || "",
-    is_active: branch?.is_active ?? true,
-    default_warehouse_id: branch?.default_warehouse_id || "",
+  // React Hook Form Initialization
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<BranchFormType>({
+    resolver: zodResolver(branchSchema),
+    defaultValues: {
+      code: "",
+      name: "",
+      address: "",
+      phone: "",
+      email: "",
+      is_active: true,
+      default_warehouse_id: "",
+    },
   });
 
-  // Reset form when modal opens/closes
+  // Reset form when modal opens
   useEffect(() => {
     if (isEdit && branch) {
-      setFormData({
+      reset({
         code: branch.code,
         name: branch.name,
         address: branch.address,
         phone: branch.phone,
         email: branch.email,
         is_active: branch.is_active,
-        default_warehouse_id: branch.default_warehouse_id || "",
+        default_warehouse_id:
+          branch.default_warehouse_id?.toString() ||
+          branch.default_warehouse?.id?.toString() ||
+          "",
       });
     } else {
-      setFormData({
+      reset({
         code: "",
         name: "",
         address: "",
@@ -55,19 +79,15 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
         default_warehouse_id: "",
       });
     }
-  }, [isEdit, branch]);
+  }, [isEdit, branch, reset, isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (values: BranchFormType) => {
     const payload = {
-      ...formData,
-      default_warehouse_id: formData.default_warehouse_id
-        ? Number(formData.default_warehouse_id)
+      ...values,
+      default_warehouse_id: values.default_warehouse_id
+        ? Number(values.default_warehouse_id)
         : null,
     };
-
-    console.log("Submitting payload:", payload);
 
     try {
       if (isEdit && branch) {
@@ -79,7 +99,6 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
       }
       onClose();
     } catch (err: any) {
-      console.error("Error submitting branch:", err);
       toast.error(err?.data?.message || "Something went wrong!");
     }
   };
@@ -90,100 +109,129 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
         {isEdit ? "Update Branch" : "Create New Branch"}
       </h2>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Branch Code */}
         <div>
-          <Label className="text-sm font-medium mb-1 block">Branch Code</Label>
-          <Input
-            value={formData.code}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-            placeholder="BR-001"
-            required
+          <Label>Branch Code</Label>
+          <Controller
+            name="code"
+            control={control}
+            render={({ field }) => <Input {...field} placeholder="BR-001" />}
           />
+          {errors.code && (
+            <p className="text-red-500 text-sm">{errors.code.message}</p>
+          )}
         </div>
 
         {/* Branch Name */}
         <div>
-          <Label className="text-sm font-medium mb-1 block">Branch Name</Label>
-          <Input
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Main Branch"
-            required
+          <Label>Branch Name</Label>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} placeholder="Main Branch" />
+            )}
           />
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
         </div>
 
         {/* Address */}
         <div>
-          <Label className="text-sm font-medium mb-1 block">Address</Label>
-          <Input
-            value={formData.address}
-            onChange={(e) =>
-              setFormData({ ...formData, address: e.target.value })
-            }
-            placeholder="123 Street, City"
-            required
+          <Label>Address</Label>
+          <Controller
+            name="address"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} placeholder="123 Street, City" />
+            )}
           />
+          {errors.address && (
+            <p className="text-red-500 text-sm">{errors.address.message}</p>
+          )}
         </div>
 
-        {/* Phone & Email - Side by Side */}
+        {/* Phone + Email */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="text-sm font-medium mb-1 block">Phone</Label>
-            <Input
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              placeholder="+8801712345678"
-              required
+            <Label>Phone</Label>
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="+8801712345678" />
+              )}
             />
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone.message}</p>
+            )}
           </div>
 
           <div>
-            <Label className="text-sm font-medium mb-1 block">Email</Label>
-            <Input
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              placeholder="branch@example.com"
-              required
+            <Label>Email</Label>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="email"
+                  placeholder="branch@example.com"
+                />
+              )}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
         </div>
 
-        {/* Default Warehouse ID */}
+        {/* Default Warehouse */}
         <div>
-          <Label className="text-sm font-medium mb-1 block">
-            Default Warehouse ID (Optional)
-          </Label>
-          <Input
-            type="number"
-            value={formData.default_warehouse_id}
-            onChange={(e) =>
-              setFormData({ ...formData, default_warehouse_id: e.target.value })
-            }
-            placeholder="1"
-          />
+          <Label>Default Warehouse (Optional)</Label>
+          {isLoadingWarehouses ? (
+            <p className="text-sm text-gray-500">Loading warehouses...</p>
+          ) : (
+            <Controller
+              name="default_warehouse_id"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value?.toString()}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "", label: "Select a warehouse" },
+                    ...warehouses.map((w) => ({
+                      value: w.id.toString(),
+                      label: `${w.name}${w.location ? ` - ${w.location}` : ""}`,
+                    })),
+                  ]}
+                />
+              )}
+            />
+          )}
         </div>
 
-        {/* Status Toggle */}
+        {/* Active Status */}
         <div className="flex items-center gap-2">
-          <Checkbox
-            label="Active"
-            checked={formData.is_active}
-            onChange={(checked) =>
-              setFormData({ ...formData, is_active: checked })
-            }
+          <Controller
+            name="is_active"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                label="Active"
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50"
+          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
         >
           {isEdit ? "Update Branch" : "Create Branch"}
         </button>

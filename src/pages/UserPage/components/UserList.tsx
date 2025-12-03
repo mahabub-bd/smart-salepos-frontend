@@ -100,6 +100,9 @@ export default function UserList() {
                 Role
               </TableCell>
               <TableCell isHeader>
+                Branches
+              </TableCell>
+              <TableCell isHeader>
                 Status
               </TableCell>
               <TableCell
@@ -149,6 +152,25 @@ export default function UserList() {
                   <Badge size="sm" color="primary">
                     {user.roles?.[0]?.name?.toUpperCase()}
                   </Badge>
+                </TableCell>
+
+                <TableCell >
+                  {user.branches && user.branches.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {user.branches.slice(0, 2).map((branch) => (
+                        <Badge key={branch.id} size="sm" color="secondary">
+                          {branch.name}
+                        </Badge>
+                      ))}
+                      {user.branches.length > 2 && (
+                        <Badge size="sm" color="secondary">
+                          +{user.branches.length - 2}
+                        </Badge>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 text-sm">No branches</span>
+                  )}
                 </TableCell>
 
                 <TableCell >
@@ -221,7 +243,7 @@ export default function UserList() {
                   {user.phone}
                 </div>
 
-                <div className="mt-2 flex justify-between">
+                <div className="mt-2 flex flex-wrap gap-1 justify-between">
                   <Badge size="sm" color="primary">
                     {user.roles?.[0]?.name?.toUpperCase()}
                   </Badge>
@@ -233,6 +255,21 @@ export default function UserList() {
                     {user.status.toUpperCase()}
                   </Badge>
                 </div>
+
+                {user.branches && user.branches.length > 0 && (
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      Branches:
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {user.branches.map((branch) => (
+                        <Badge key={branch.id} size="sm" color="secondary">
+                          {branch.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-3 flex gap-2">
                   <button

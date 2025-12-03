@@ -1,6 +1,7 @@
 
 import { ApiResponse, User } from "../../types";
 import { apiSlice } from "../apiSlice";
+import { updateUser as updateAuthUser } from "../auth/authSlice";
 
 export interface CreateUserPayload {
   username: string;
@@ -9,6 +10,7 @@ export interface CreateUserPayload {
   phone: string;
   password: string;
   roles: string[];
+  branch_ids?: number[];
 }
 
 export interface UpdateUserDto {
@@ -18,6 +20,7 @@ export interface UpdateUserDto {
   phone?: string;
   password?: string;
   roles?: string[];
+  branch_ids?: number[];
 }
 
 export interface UpdateUserPayload {
@@ -62,6 +65,23 @@ export const usersApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
+      async onQueryStarted({ id }, { dispatch, queryFulfilled, getState }) {
+        try {
+          const { data } = await queryFulfilled;
+          const updatedUser = data.data;
+
+          // Get current auth state
+          const state = getState() as any;
+          const currentUser = state.auth.user;
+
+          // If the updated user is the current logged-in user, update auth state
+          if (currentUser && currentUser.id === updatedUser.id) {
+            dispatch(updateAuthUser(updatedUser));
+          }
+        } catch (error) {
+          console.error("Failed to sync user update with auth state:", error);
+        }
+      },
       invalidatesTags: (_result, _error, { id }) => [
         "Users",
         { type: "Users", id },

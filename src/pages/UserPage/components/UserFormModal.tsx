@@ -5,6 +5,7 @@ import { z } from "zod";
 
 // API hooks
 import { useGetRolesQuery } from "../../../features/role/roleApi";
+import { useGetBranchesQuery } from "../../../features/branch/branchApi";
 import {
   useCreateUserMutation,
   useGetUserByIdQuery,
@@ -12,6 +13,7 @@ import {
 } from "../../../features/user/userApi";
 
 import { Role } from "../../../types/role";
+import { Branch } from "../../../types";
 
 // UI
 import { toast } from "react-toastify";
@@ -34,6 +36,7 @@ const BaseUserSchema = z.object({
   full_name: z.string().min(3, "Full name is required"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   roles: z.array(z.string()).min(1, "Select at least one role"),
+  branch_ids: z.array(z.number()).optional(),
   status: z.enum(["pending", "active", "suspend", "deactive"]),
 });
 
@@ -73,6 +76,7 @@ export default function UserFormModal({
       phone: "",
       password: "",
       roles: [],
+      branch_ids: [],
       status: "active",
     } as FormState,
   });
@@ -86,7 +90,9 @@ export default function UserFormModal({
   );
 
   const { data: rolesData } = useGetRolesQuery();
+  const { data: branchesData } = useGetBranchesQuery();
   const roles: Role[] = rolesData?.data || [];
+  const branches: Branch[] = branchesData?.data || [];
   const singleUser = singleUserRes?.data;
 
   useEffect(() => {
@@ -98,6 +104,7 @@ export default function UserFormModal({
         phone: singleUser.phone,
         password: "",
         roles: singleUser.roles?.map((r: Role) => r.name) || [],
+        branch_ids: singleUser.branches?.map((b: Branch) => b.id) || [],
         status: singleUser.status,
       } as FormState);
     } else {
@@ -209,33 +216,66 @@ export default function UserFormModal({
         />
 
         {/* Roles */}
-        {/* Roles */}
-        <Controller
-          name="roles"
-          control={control}
-          render={({ field }) => (
-            <div className="flex flex-wrap gap-2 capitalize">
-              {roles.map((r: Role) => (
-                <div key={r.id}>
-                  <Checkbox
-                    label={r.name}
-                    checked={field.value.includes(r.name)}
-                    onChange={(checked) =>
-                      field.onChange(
-                        checked
-                          ? [...field.value, r.name] // Add role
-                          : field.value.filter((role) => role !== r.name) // Remove role
-                      )
-                    }
-                  />
-                </div>
-              ))}
-            </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Roles *</label>
+          <Controller
+            name="roles"
+            control={control}
+            render={({ field }) => (
+              <div className="flex flex-wrap gap-2 capitalize">
+                {roles.map((r: Role) => (
+                  <div key={r.id}>
+                    <Checkbox
+                      label={r.name}
+                      checked={field.value.includes(r.name)}
+                      onChange={(checked) =>
+                        field.onChange(
+                          checked
+                            ? [...field.value, r.name] // Add role
+                            : field.value.filter((role) => role !== r.name) // Remove role
+                        )
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          />
+          {errors.roles && (
+            <p className="text-red-500 text-sm">{errors.roles.message}</p>
           )}
-        />
-        {errors.roles && (
-          <p className="text-red-500 text-sm">{errors.roles.message}</p>
-        )}
+        </div>
+
+        {/* Branches */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Branches</label>
+          <Controller
+            name="branch_ids"
+            control={control}
+            render={({ field }) => (
+              <div className="flex flex-wrap gap-2">
+                {branches.map((branch: Branch) => (
+                  <div key={branch.id}>
+                    <Checkbox
+                      label={branch.name}
+                      checked={field.value?.includes(branch.id) || false}
+                      onChange={(checked) =>
+                        field.onChange(
+                          checked
+                            ? [...(field.value || []), branch.id] // Add branch
+                            : (field.value || []).filter((id) => id !== branch.id) // Remove branch
+                        )
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          />
+          {errors.branch_ids && (
+            <p className="text-red-500 text-sm">{errors.branch_ids.message}</p>
+          )}
+        </div>
 
         {/* Submit button */}
         <button

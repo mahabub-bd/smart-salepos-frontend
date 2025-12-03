@@ -792,3 +792,23 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+
+/* Make tooltip appear above everything */
+.apexcharts-tooltip {
+  z-index: 999999 !important;
+}
+
+/* Light theme fix */
+.apexcharts-tooltip.apexcharts-theme-light {
+  background: #ffffff !important;
+  color: #111827 !important; /* Tailwind gray-900 */
+  border: 1px solid #e5e7eb !important; /* gray-200 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Title section */
+.apexcharts-tooltip-title {
+  background: #f3f4f6 !important; /* gray-100 */
+  color: #111827 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
