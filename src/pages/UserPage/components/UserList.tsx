@@ -158,12 +158,12 @@ export default function UserList() {
                   {user.branches && user.branches.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {user.branches.slice(0, 2).map((branch) => (
-                        <Badge key={branch.id} size="sm" color="secondary">
+                        <Badge key={branch.id} size="sm" color="primary">
                           {branch.name}
                         </Badge>
                       ))}
                       {user.branches.length > 2 && (
-                        <Badge size="sm" color="secondary">
+                        <Badge size="sm" color="primary">
                           +{user.branches.length - 2}
                         </Badge>
                       )}
@@ -263,7 +263,7 @@ export default function UserList() {
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {user.branches.map((branch) => (
-                        <Badge key={branch.id} size="sm" color="secondary">
+                        <Badge key={branch.id} size="sm" color="primary">
                           {branch.name}
                         </Badge>
                       ))}

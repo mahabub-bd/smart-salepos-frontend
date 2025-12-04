@@ -65,7 +65,7 @@ export const usersApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      async onQueryStarted({ id }, { dispatch, queryFulfilled, getState }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled, getState }) {
         try {
           const { data } = await queryFulfilled;
           const updatedUser = data.data;
