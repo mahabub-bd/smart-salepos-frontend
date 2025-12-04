@@ -93,6 +93,14 @@ export default function SaleFormPage() {
     const formValues = watch();
     const selectedPaymentMethod = watch("payment_method");
 
+    // Get selected customer's group discount
+    const selectedCustomerData = customers.find(
+        (c) => String(c.id) === formValues.customer_id
+    );
+    const groupDiscountPercentage = selectedCustomerData?.group?.discount_percentage
+        ? Number(selectedCustomerData.group.discount_percentage)
+        : 0;
+
     // Calculate subtotal
     const subtotal = formValues.items.reduce(
         (sum, item) => sum + item.quantity * Number(item.unit_price),
@@ -105,14 +113,20 @@ export default function SaleFormPage() {
     // Step 2: Calculate amount with VAT
     const amountWithVAT = subtotal + tax;
 
-    // Step 3: Calculate discount (on amount with VAT)
-    let discount =
+    // Step 3: Calculate group discount (percentage-based on amountWithVAT)
+    const groupDiscount = (amountWithVAT * groupDiscountPercentage) / 100;
+
+    // Step 4: Calculate manual discount (also on amountWithVAT)
+    const manualDiscount =
         formValues.discount_type === "fixed"
             ? formValues.discount_value
             : (amountWithVAT * formValues.discount_value) / 100;
 
-    // Step 4: Calculate final total (amount with VAT - discount)
-    const total = amountWithVAT - discount;
+    // Step 5: Total discount is sum of both
+    const totalDiscount = groupDiscount + manualDiscount;
+
+    // Step 6: Calculate final total (amount with VAT - total discount)
+    const total = amountWithVAT - totalDiscount;
 
     // Calculate due amount
     const due = total - formValues.paid_amount;
@@ -480,12 +494,7 @@ export default function SaleFormPage() {
                         </span>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                        <Label className="mb-0 text-gray-600 dark:text-gray-300">Discount:</Label>
-                        <span className="font-medium text-red-600">
-                            -৳{discount.toFixed(2)}
-                        </span>
-                    </div>
+
 
                     <div className="flex justify-between items-center">
                         <Label className="mb-0 text-gray-600 dark:text-gray-300">Tax:</Label>
@@ -493,6 +502,40 @@ export default function SaleFormPage() {
                             +৳{tax.toFixed(2)}
                         </span>
                     </div>
+
+                    {/* Group Discount */}
+                    {groupDiscount > 0 && (
+                        <div className="flex justify-between items-center">
+                            <Label className="mb-0 text-blue-600 dark:text-blue-400 text-sm">
+                                Group Discount ({selectedCustomerData?.group?.name} - {groupDiscountPercentage}%):
+                            </Label>
+                            <span className="font-medium text-blue-600 dark:text-blue-400">
+                                -৳{groupDiscount.toFixed(2)}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Manual Discount */}
+                    {manualDiscount > 0 && (
+                        <div className="flex justify-between items-center">
+                            <Label className="mb-0 text-red-600 dark:text-red-400 text-sm">
+                                Discount {formValues.discount_type === "percentage" && `(${formValues.discount_value}%)`}:
+                            </Label>
+                            <span className="font-medium text-red-600">
+                                -৳{manualDiscount.toFixed(2)}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Total Discount */}
+                    {totalDiscount > 0 && (
+                        <div className="flex justify-between items-center">
+                            <Label className="mb-0 text-red-700 dark:text-red-500 font-semibold">Total Discount:</Label>
+                            <span className="font-semibold text-red-700 dark:text-red-500">
+                                -৳{totalDiscount.toFixed(2)}
+                            </span>
+                        </div>
+                    )}
 
                     <div className="flex justify-between items-center border-t border-gray-300 dark:border-gray-600 pt-3 mt-3">
                         <Label className="mb-0 text-lg font-bold text-gray-800 dark:text-white">

@@ -16,8 +16,7 @@ export default function PermissionCard({
     <div
       onClick={onToggle}
       className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer
-        ${
-          isSelected ? "border-blue-600 bg-blue-50" : "border-gray-300 bg-white"
+        ${isSelected ? "border-blue-300 bg-blue-50" : "border-gray-300 bg-white"
         }
       `}
     >
@@ -25,10 +24,6 @@ export default function PermissionCard({
 
       <div>
         <h4 className="text-sm font-semibold">{permission.key}</h4>
-
-        {permission.description && (
-          <p className="text-xs text-gray-600">{permission.description}</p>
-        )}
       </div>
     </div>
   );

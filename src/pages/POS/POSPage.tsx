@@ -140,6 +140,14 @@ export default function POSPage() {
         : false
   );
 
+  // Get selected customer's group discount
+  const selectedCustomerData = customers.find(
+    (c) => String(c.id) === selectedCustomer
+  );
+  const groupDiscountPercentage = selectedCustomerData?.group?.discount_percentage
+    ? Number(selectedCustomerData.group.discount_percentage)
+    : 0;
+
   // Calculate totals
   const subtotal = cart.reduce(
     (sum, item) => sum + item.quantity * item.unit_price,
@@ -147,11 +155,20 @@ export default function POSPage() {
   );
   const tax = (subtotal * taxPercentage) / 100;
   const amountWithVAT = subtotal + tax;
-  const discount =
+
+  // Calculate group discount (always percentage-based on amountWithVAT)
+  const groupDiscount = (amountWithVAT * groupDiscountPercentage) / 100;
+
+  // Calculate manual discount (also on amountWithVAT, not after group discount)
+  const manualDiscount =
     discountType === "fixed"
       ? discountValue
       : (amountWithVAT * discountValue) / 100;
-  const total = amountWithVAT - discount;
+
+  // Total discount is sum of both
+  const totalDiscount = groupDiscount + manualDiscount;
+
+  const total = amountWithVAT - totalDiscount;
   const due = total - paidAmount;
 
   const addToCart = (productData: ExtendedProduct) => {
@@ -268,7 +285,7 @@ export default function POSPage() {
         customer_id: Number(selectedCustomer),
         branch_id: 1,
         discount_type: discountType,
-        discount_value: discountValue,
+        discount: discountValue,
         tax_percentage: taxPercentage,
         paid_amount: paidAmount,
         payment_method: paidAmount > 0 ? paymentMethod : undefined,
@@ -657,14 +674,38 @@ export default function POSPage() {
                 <span>Subtotal</span>
                 <span>৳{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-red-600 dark:text-red-400">
-                <span>Discount</span>
-                <span>-৳{discount.toFixed(2)}</span>
-              </div>
               <div className="flex justify-between text-green-600 dark:text-green-400">
                 <span>Tax</span>
                 <span>+৳{tax.toFixed(2)}</span>
               </div>
+
+              {/* Group Discount */}
+              {groupDiscount > 0 && (
+                <div className="flex justify-between text-blue-600 dark:text-blue-400 text-xs">
+                  <span>
+                    Group Discount ({selectedCustomerData?.group?.name} - {groupDiscountPercentage}%)
+                  </span>
+                  <span>-৳{groupDiscount.toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* Manual Discount */}
+              {manualDiscount > 0 && (
+                <div className="flex justify-between text-red-600 dark:text-red-400 text-xs">
+                  <span>
+                    Discount {discountType === "percentage" && `(${discountValue}%)`}
+                  </span>
+                  <span>-৳{manualDiscount.toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* Total Discount */}
+              {totalDiscount > 0 && (
+                <div className="flex justify-between text-red-600 dark:text-red-400 font-semibold">
+                  <span>Total Discount</span>
+                  <span>-৳{totalDiscount.toFixed(2)}</span>
+                </div>
+              )}
 
               <div className="border-t border-gray-300 dark:border-gray-600 pt-2">
                 <div className="flex justify-between text-base font-bold text-gray-900 dark:text-white">

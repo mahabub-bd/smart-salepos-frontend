@@ -1,5 +1,5 @@
-import { apiSlice } from "../apiSlice";
 import { ApiResponse } from "../../types";
+import { apiSlice } from "../apiSlice";
 
 // Analytics Interfaces
 export interface DailySale {
@@ -33,9 +33,17 @@ export const salesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 GET ALL SALES
     getSales: builder.query({
-      query: ({ page = 1, limit = 10 }) =>
-        `/sales/list?page=${page}&limit=${limit}`,
-      providesTags: ["Sales"], // Added here
+      query: ({ page = 1, limit = 10 }) => ({
+        url: `/sales/list`,
+        params: { page, limit },
+      }),
+      providesTags: (result) =>
+        result?.data
+          ? [
+            ...result.data.map(({ id }: any) => ({ type: 'Sales' as const, id })),
+            { type: 'Sales', id: 'LIST' },
+          ]
+          : [{ type: 'Sales', id: 'LIST' }],
     }),
 
     // 🔹 GET SALE BY ID

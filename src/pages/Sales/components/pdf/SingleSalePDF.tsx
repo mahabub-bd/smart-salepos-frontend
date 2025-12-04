@@ -55,23 +55,42 @@ export default function SingleSalePDF({ sale }: { sale: any }) {
         {/* Totals */}
         <View style={styles.section}>
           <Text>
-            <Text style={styles.bold}>Subtotal:</Text> ৳{sale.subtotal}
+            <Text style={styles.bold}>Subtotal:</Text> ৳{sale.subtotal || '0.00'}
           </Text>
           <Text>
-            <Text style={styles.bold}>Discount:</Text> ৳{sale.discount}
+            <Text style={styles.bold}>Tax:</Text> ৳{sale.tax || '0.00'}
+          </Text>
+
+          {/* Group Discount - only show if exists */}
+          {sale.group_discount && Number(sale.group_discount) > 0 && (
+            <Text>
+              <Text style={styles.bold}>Group Discount:</Text> ৳{sale.group_discount}
+            </Text>
+          )}
+
+          {/* Manual Discount - only show if exists */}
+          {sale.manual_discount && Number(sale.manual_discount) > 0 && (
+            <Text>
+              <Text style={styles.bold}>Manual Discount:</Text> ৳{sale.manual_discount}
+            </Text>
+          )}
+
+          {/* Total Discount */}
+          {sale.discount && Number(sale.discount) > 0 && (
+            <Text>
+              <Text style={styles.bold}>Total Discount:</Text> ৳{sale.discount}
+            </Text>
+          )}
+
+          <Text>
+            <Text style={styles.bold}>Total:</Text> ৳{sale.total || '0.00'}
           </Text>
           <Text>
-            <Text style={styles.bold}>Tax:</Text> ৳{sale.tax}
-          </Text>
-          <Text>
-            <Text style={styles.bold}>Total:</Text> ৳{sale.total}
-          </Text>
-          <Text>
-            <Text style={styles.bold}>Paid:</Text> ৳{sale.paid_amount}
+            <Text style={styles.bold}>Paid:</Text> ৳{sale.paid_amount || '0.00'}
           </Text>
           <Text>
             <Text style={styles.bold}>Due:</Text> ৳
-            {Number(sale.total) - Number(sale.paid_amount)}
+            {(Number(sale.total || 0) - Number(sale.paid_amount || 0)).toFixed(2)}
           </Text>
         </View>
 

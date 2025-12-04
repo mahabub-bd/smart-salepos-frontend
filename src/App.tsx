@@ -26,8 +26,8 @@ import BrandsPage from "./pages/Brand";
 import CategoryPage from "./pages/Category";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import ProductPage from "./pages/Product";
-import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import ProductDetailPage from "./pages/Product/components/ProductDetailPage";
+import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import PurchasePage from "./pages/Purchase";
 
 import AccountBalancePage from "./pages/Accounts/AccountBalance";
@@ -35,8 +35,8 @@ import AccountListPage from "./pages/Accounts/AccountList";
 import CashandBank from "./pages/Accounts/CashandBank";
 import JournalPage from "./pages/Accounts/JournalPage";
 import PaymentsPage from "./pages/Accounts/payments";
-import TrialBalancePage from "./pages/Accounts/TrialBalance";
 import PaymentDetailsPage from "./pages/Accounts/payments/components/PaymentDetails";
+import TrialBalancePage from "./pages/Accounts/TrialBalance";
 import BranchPage from "./pages/Branch";
 import CustomerPage from "./pages/Customer";
 import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
@@ -162,6 +162,14 @@ export default function App() {
           <Route path="/sales" element={<SalesPage />} />
           <Route path="/sales/create" element={<SaleFormPage />} />
           <Route path="/sales/:id" element={<SaleDetailPage />} />
+          <Route
+            path="/sales-return"
+            element={<div>Sales Return - Coming Soon</div>}
+          />
+          <Route
+            path="/purchase-return"
+            element={<div>Purchase Return - Coming Soon</div>}
+          />
           {/* POS Routes */}
           <Route path="/pos" element={<POSPage />} />
           <Route path="/pos/sales-summary" element={<PosSalesSummaryPage />} />

@@ -24,12 +24,10 @@ import {
 } from "../../../components/ui/table";
 
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import Button from "../../../components/ui/button/Button";
 import { useGetSalesQuery } from "../../../features/sale/saleApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Sale } from "../../../types";
 import { formatCurrencyEnglish, formatDate } from "../../../utlis";
-import SaleListPDF from "./pdf/SaleListPDF";
 import SingleSalePDF from "./pdf/SingleSalePDF";
 import SalePaymentModal from "./SalePaymentModal";
 
@@ -46,7 +44,7 @@ export default function SaleList() {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
 
-  const { data, isLoading, isError, refetch } = useGetSalesQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useGetSalesQuery({
     page,
     limit,
   });
@@ -55,8 +53,8 @@ export default function SaleList() {
   const total = data?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
-  // Loading state
-  if (isLoading) return <Loading message="Loading Sales..." />;
+  // Only show full loading screen on initial load, not on pagination
+  if (isLoading && !data) return <Loading message="Loading Sales..." />;
 
   // Error state
   if (isError)
@@ -87,24 +85,16 @@ export default function SaleList() {
         addLabel="Add"
         onAdd={() => navigate("/sales/create")}
         permission="sale.create"
-      >
-        <PDFDownloadLink
-          document={<SaleListPDF sales={sales} />}
-          fileName={`sales-report-${
-            new Date().toISOString().split("T")[0]
-          }.pdf`}
-        >
-          {({ loading }) => (
-            <Button size="sm" variant="outline">
-              <FileDown size={14} />
-              {loading ? "Generating..." : "Download"}
-            </Button>
-          )}
-        </PDFDownloadLink>
-      </PageHeader>
+      />
 
       {/* Sales Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e] relative">
+        {/* Loading overlay during pagination */}
+        {isFetching && data && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10">
+            <div className="text-sm text-gray-600 dark:text-gray-400">Loading...</div>
+          </div>
+        )}
         <div className="max-w-full overflow-x-auto">
           <Table>
             <TableHeader>

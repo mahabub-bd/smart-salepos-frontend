@@ -31,9 +31,9 @@ export default function CustomerGroupList() {
     null
   );
 
-  const canCreate = useHasPermission("customer.group.create");
-  const canUpdate = useHasPermission("customer.group.update");
-  const canDelete = useHasPermission("customer.group.delete");
+  const canCreate = useHasPermission("customergroup.create");
+  const canUpdate = useHasPermission("customergroup.update");
+  const canDelete = useHasPermission("customergroup.delete");
 
   const { data, isLoading, isError } = useGetCustomerGroupsQuery({});
 
@@ -66,7 +66,7 @@ export default function CustomerGroupList() {
           setEditGroup(null);
           setIsModalOpen(true);
         }}
-        permission="customer.group.create"
+        permission="customergroup.create"
       />
 
       <div className="border rounded-xl">

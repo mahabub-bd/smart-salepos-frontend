@@ -87,8 +87,33 @@ export default function SaleDetailPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <Info label="Invoice No" value={sale.invoice_no} />
             <Info label="Subtotal" value={`${sale.subtotal} ৳`} />
-            <Info label="Discount" value={`${sale.discount} ৳`} />
             <Info label="Tax" value={`${sale.tax} ৳`} />
+
+            {/* Group Discount - only show if exists */}
+            {sale.group_discount && Number(sale.group_discount) > 0 && (
+              <Info
+                label="Group Discount"
+                value={`${sale.group_discount} ৳`}
+                className="text-blue-600 dark:text-blue-400"
+              />
+            )}
+
+            {/* Manual Discount - only show if exists */}
+            {sale.manual_discount && Number(sale.manual_discount) > 0 && (
+              <Info
+                label="Manual Discount"
+                value={`${sale.manual_discount} ৳`}
+                className="text-red-600 dark:text-red-400"
+              />
+            )}
+
+            {/* Total Discount */}
+            <Info
+              label="Total Discount"
+              value={`${sale.discount} ৳`}
+              className="font-semibold"
+            />
+
             <Info label="Total Amount" value={`${sale.total} ৳`} />
             <Info label="Paid Amount" value={`${sale.paid_amount} ৳`} />
             <Info label="Due Amount" value={`${dueAmount} ৳`} />
@@ -100,8 +125,8 @@ export default function SaleDetailPage() {
                   sale.status === "completed"
                     ? "success"
                     : sale.status === "pending"
-                    ? "warning"
-                    : "error"
+                      ? "warning"
+                      : "error"
                 }
               >
                 {sale.status}
