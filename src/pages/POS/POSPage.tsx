@@ -136,8 +136,8 @@ export default function POSPage() {
     paymentMethod === "cash"
       ? acc.isCash
       : paymentMethod === "bank"
-      ? acc.isBank
-      : false
+        ? acc.isBank
+        : false
   );
 
   // Calculate totals
@@ -145,10 +145,13 @@ export default function POSPage() {
     (sum, item) => sum + item.quantity * item.unit_price,
     0
   );
-  const discount =
-    discountType === "fixed" ? discountValue : (subtotal * discountValue) / 100;
   const tax = (subtotal * taxPercentage) / 100;
-  const total = subtotal - discount + tax;
+  const amountWithVAT = subtotal + tax;
+  const discount =
+    discountType === "fixed"
+      ? discountValue
+      : (amountWithVAT * discountValue) / 100;
+  const total = amountWithVAT - discount;
   const due = total - paidAmount;
 
   const addToCart = (productData: ExtendedProduct) => {
@@ -279,12 +282,12 @@ export default function POSPage() {
         payments:
           paidAmount > 0
             ? [
-                {
-                  method: paymentMethod,
-                  amount: paidAmount,
-                  account_code: paymentAccountCode,
-                },
-              ]
+              {
+                method: paymentMethod,
+                amount: paidAmount,
+                account_code: paymentAccountCode,
+              },
+            ]
             : [],
       }).unwrap();
 
@@ -610,22 +613,22 @@ export default function POSPage() {
               {(paymentMethod === "cash" ||
                 paymentMethod === "bank" ||
                 paymentMethod === "bkash") && (
-                <div>
-                  <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                    Account
-                  </label>
-                  <Select
-                    className="h-8"
-                    value={paymentAccountCode}
-                    onChange={setPaymentAccountCode}
-                    placeholder="Select Account"
-                    options={filteredAccounts.map((acc) => ({
-                      value: acc.code,
-                      label: `${acc.name} - ${acc.code}`,
-                    }))}
-                  />
-                </div>
-              )}
+                  <div>
+                    <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
+                      Account
+                    </label>
+                    <Select
+                      className="h-8"
+                      value={paymentAccountCode}
+                      onChange={setPaymentAccountCode}
+                      placeholder="Select Account"
+                      options={filteredAccounts.map((acc) => ({
+                        value: acc.code,
+                        label: `${acc.name} - ${acc.code}`,
+                      }))}
+                    />
+                  </div>
+                )}
             </div>
 
             <div>
