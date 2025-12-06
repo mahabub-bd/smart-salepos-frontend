@@ -45,11 +45,13 @@ export default function PurchaseReceiveModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto">
-      <h2 className="text-lg font-semibold mb-4">
-        Receive Items – {purchase.po_no}
-      </h2>
-      <p>Product Received </p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Purchase Receive Items"
+      description="Review and enter the received quantities for this purchase order."
+      className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto"
+    >
       <div className="space-y-4">
         {purchase.items.map((item, idx) => (
           <div key={item.id} className="flex justify-between items-center">

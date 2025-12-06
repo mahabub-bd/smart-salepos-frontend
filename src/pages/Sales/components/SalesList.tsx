@@ -92,7 +92,9 @@ export default function SaleList() {
         {/* Loading overlay during pagination */}
         {isFetching && data && (
           <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Loading...</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Loading...
+            </div>
           </div>
         )}
         <div className="max-w-full overflow-x-auto">
@@ -121,7 +123,14 @@ export default function SaleList() {
 
                   return (
                     <TableRow key={sale.id}>
-                      <TableCell>{sale.invoice_no}</TableCell>
+                      <TableCell>
+                        <Link
+                          to={`/sales/${sale.id}`}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          {sale.invoice_no}
+                        </Link>
+                      </TableCell>
                       <TableCell>{sale.customer?.name || "N/A"}</TableCell>
 
                       <TableCell>

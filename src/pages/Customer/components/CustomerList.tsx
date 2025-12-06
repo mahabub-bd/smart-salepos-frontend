@@ -8,7 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
@@ -28,22 +28,19 @@ import {
 } from "../../../features/customer/customerApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Customer } from "../../../types";
-import CustomerFormModal from "./CustomerFormModal";
 
 export default function CustomerList() {
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
     null
   );
 
-  const canCreate = useHasPermission("customer.create");
   const canUpdate = useHasPermission("customer.update");
   const canDelete = useHasPermission("customer.delete");
   const canView = useHasPermission("customer.view");
@@ -70,16 +67,6 @@ export default function CustomerList() {
   const totalPages = data?.meta?.totalPages || 1;
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + customers.length;
-
-  const openCreateModal = () => {
-    setEditCustomer(null);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (customer: Customer) => {
-    setEditCustomer(customer);
-    setIsModalOpen(true);
-  };
 
   const openDeleteDialog = (customer: Customer) => {
     setCustomerToDelete(customer);
@@ -108,7 +95,7 @@ export default function CustomerList() {
         title="Customer Management"
         icon={<Plus size={16} />}
         addLabel="Add Customer"
-        onAdd={openCreateModal}
+        onAdd={() => navigate("/customers/new")}
         permission="customer.create"
       />
 
@@ -138,7 +125,7 @@ export default function CustomerList() {
                 <TableCell isHeader>Customer Code</TableCell>
                 <TableCell isHeader>Customer Name</TableCell>
                 <TableCell isHeader>Contact</TableCell>
-                <TableCell isHeader>Address</TableCell>
+                {/* <TableCell isHeader>Address</TableCell> */}
                 <TableCell isHeader>Customer Group</TableCell>
                 <TableCell isHeader>Account</TableCell>
                 <TableCell isHeader>Status</TableCell>
@@ -155,7 +142,7 @@ export default function CustomerList() {
                     <TableCell>{customer.customer_code}</TableCell>
                     <TableCell>{customer.name}</TableCell>
                     <TableCell>{customer.phone}</TableCell>
-                    <TableCell>{customer.address}</TableCell>
+                    {/* <TableCell>{customer.address}</TableCell> */}
                     <TableCell>
                       {customer.group ? (
                         <span>{customer.group.name}</span>
@@ -191,12 +178,13 @@ export default function CustomerList() {
                         </Link>
                       )}
                       {canUpdate && (
-                        <IconButton
-                          icon={Pencil}
-                          tooltip="Edit"
-                          onClick={() => openEditModal(customer)}
-                          color="blue"
-                        />
+                        <Link to={`/customers/${customer.id}/edit`}>
+                          <IconButton
+                            icon={Pencil}
+                            tooltip="Edit"
+                            color="blue"
+                          />
+                        </Link>
                       )}
                       {canDelete && (
                         <IconButton
@@ -290,14 +278,6 @@ export default function CustomerList() {
           </div>
         )}
       </div>
-
-      {(canCreate || canUpdate) && (
-        <CustomerFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          customer={editCustomer}
-        />
-      )}
 
       {canDelete && (
         <ConfirmDialog

@@ -1,5 +1,14 @@
+import { Link } from "react-router";
 import Loading from "../../../components/common/Loading";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import { useGetCustomerByIdQuery } from "../../../features/customer/customerApi";
+import { Sale } from "../../../types";
 
 interface Props {
   customerId: string;
@@ -38,7 +47,7 @@ export default function CustomerDetail({ customerId }: Props) {
           <Info label="Name" value={customer.name} />
           <Info label="Phone" value={customer.phone || "-"} />
           <Info label="Email" value={customer.email || "-"} />
-          <Info label="Address" value={customer.address || "-"} />
+
           <Info label="Customer Group" value={customer.group?.name || "-"} />
           <Info label="Reward Points" value={customer.reward_points || 0} />
           <Info
@@ -58,6 +67,46 @@ export default function CustomerDetail({ customerId }: Props) {
           <Info
             label="Created At"
             value={new Date(customer.created_at).toLocaleDateString()}
+          />
+        </div>
+      </DetailCard>
+
+      {/* Billing Address */}
+      <DetailCard title="Billing Address">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <Info
+            label="Contact Name"
+            value={customer.billing_address?.contact_name || "-"}
+          />
+          <Info label="Phone" value={customer.billing_address?.phone || "-"} />
+          <Info
+            label="Street"
+            value={customer.billing_address?.street || "-"}
+          />
+          <Info label="City" value={customer.billing_address?.city || "-"} />
+          <Info
+            label="Country"
+            value={customer.billing_address?.country || "-"}
+          />
+        </div>
+      </DetailCard>
+
+      {/* Shipping Address */}
+      <DetailCard title="Shipping Address">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <Info
+            label="Contact Name"
+            value={customer.shipping_address?.contact_name || "-"}
+          />
+          <Info label="Phone" value={customer.shipping_address?.phone || "-"} />
+          <Info
+            label="Street"
+            value={customer.shipping_address?.street || "-"}
+          />
+          <Info label="City" value={customer.shipping_address?.city || "-"} />
+          <Info
+            label="Country"
+            value={customer.shipping_address?.country || "-"}
           />
         </div>
       </DetailCard>
@@ -136,36 +185,50 @@ const Metric = ({ label, value, color }: any) => (
 /* ---------------- Sales History Table ---------------- */
 
 const SalesTable = ({ sales }: any) => (
-  <table className="w-full text-sm">
-    <thead className="border-b bg-gray-50">
-      <tr>
-        <th className="table-header">Invoice</th>
-        <th className="table-header">Date</th>
-        <th className="table-header">Items</th>
-        <th className="table-header">Total</th>
-        <th className="table-header">Paid</th>
-        <th className="table-header">Due</th>
-        <th className="table-header">Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {sales.map((s: any) => (
-        <tr key={s.id} className="border-b">
-          <td className="table-body">{s.invoice_no}</td>
-          <td className="table-body">
-            {new Date(s.created_at).toLocaleDateString()}
-          </td>
-          <td className="table-body">{s.items?.length || 0}</td>
-          <td className="table-body">{Number(s.total).toLocaleString()}</td>
-          <td className="table-body text-green-600 font-medium">
-            {Number(s.paid_amount).toLocaleString()}
-          </td>
-          <td className="table-body text-red-500 font-medium">
-            {(Number(s.total) - Number(s.paid_amount)).toLocaleString()}
-          </td>
-          <td className="table-body capitalize">{s.status}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+  <div className="max-w-full overflow-x-auto">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableCell isHeader>Invoice</TableCell>
+          <TableCell isHeader>Date</TableCell>
+          <TableCell isHeader>Items</TableCell>
+          <TableCell isHeader>Total</TableCell>
+          <TableCell isHeader>Paid</TableCell>
+          <TableCell isHeader>Due</TableCell>
+          <TableCell isHeader>Sale Type</TableCell>
+          <TableCell isHeader>Status</TableCell>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {sales.map((s: Sale) => (
+          <TableRow key={s.id} className="border-b">
+            <TableCell className="table-body">
+              <Link
+                to={`/sales/${s.id}`}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                {s.invoice_no}
+              </Link>
+            </TableCell>
+
+            <TableCell className="table-body">
+              {new Date(s.created_at).toLocaleDateString()}
+            </TableCell>
+            <TableCell className="table-body">{s.items?.length || 0}</TableCell>
+            <td className="table-body">{Number(s.total).toLocaleString()}</td>
+            <TableCell className="table-body text-green-600 font-medium">
+              {Number(s.paid_amount).toLocaleString()}
+            </TableCell>
+            <TableCell className="table-body text-red-500 font-medium">
+              {(Number(s.total) - Number(s.paid_amount)).toLocaleString()}
+            </TableCell>
+            <TableCell className="capitalize flex items-center gap-1">
+              {s.sale_type === "pos" ? "POS" : "Regular"}
+            </TableCell>
+            <TableCell className="table-body capitalize">{s.status}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
 );

@@ -1,33 +1,8 @@
-import { ApiResponse } from "../../types";
+import { ApiResponse, Last30DaysAnalytics, MonthWiseAnalytics } from "../../types";
 import { apiSlice } from "../apiSlice";
 
-// Analytics Interfaces
-export interface DailySale {
-  date: string;
-  total: number;
-  orders: number;
-}
 
-export interface Last30DaysAnalytics {
-  totalSales: number;
-  totalOrders: number;
-  averageOrderValue: number;
-  dailySales: DailySale[];
-}
 
-export interface MonthlySale {
-  month: number; // 1, 2, 3, etc.
-  monthName: string; // "January", "February", etc.
-  total: number;
-  orders: number;
-}
-
-export interface MonthWiseAnalytics {
-  year: number;
-  monthlySales: MonthlySale[];
-  totalYearlySales: number;
-  totalYearlyOrders: number;
-}
 
 export const salesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

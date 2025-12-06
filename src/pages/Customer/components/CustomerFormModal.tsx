@@ -26,9 +26,27 @@ const customerSchema = z.object({
   name: z.string().min(1, "Customer name is required"),
   email: z.string().email("Invalid email"),
   phone: z.string().min(11, "Phone must be at least 11 digits"),
-  address: z.string().optional(),
+
   group_id: z.string().optional(),
   status: z.boolean(),
+  billing_address: z
+    .object({
+      contact_name: z.string().optional(),
+      phone: z.string().optional(),
+      street: z.string().optional(),
+      city: z.string().optional(),
+      country: z.string().optional(),
+    })
+    .optional(),
+  shipping_address: z
+    .object({
+      contact_name: z.string().optional(),
+      phone: z.string().optional(),
+      street: z.string().optional(),
+      city: z.string().optional(),
+      country: z.string().optional(),
+    })
+    .optional(),
 });
 
 type CustomerFormData = z.infer<typeof customerSchema>;
@@ -61,9 +79,23 @@ export default function CustomerFormModal({
       name: "",
       email: "",
       phone: "",
-      address: "",
+
       group_id: "",
       status: true,
+      billing_address: {
+        contact_name: "",
+        phone: "",
+        street: "",
+        city: "",
+        country: "",
+      },
+      shipping_address: {
+        contact_name: "",
+        phone: "",
+        street: "",
+        city: "",
+        country: "",
+      },
     },
   });
 
@@ -74,9 +106,22 @@ export default function CustomerFormModal({
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
-        address: customer.address || "",
         group_id: customer.group_id?.toString() || "",
         status: customer.status,
+        billing_address: {
+          contact_name: customer.billing_address?.contact_name || "",
+          phone: customer.billing_address?.phone || "",
+          street: customer.billing_address?.street || "",
+          city: customer.billing_address?.city || "",
+          country: customer.billing_address?.country || "",
+        },
+        shipping_address: {
+          contact_name: customer.shipping_address?.contact_name || "",
+          phone: customer.shipping_address?.phone || "",
+          street: customer.shipping_address?.street || "",
+          city: customer.shipping_address?.city || "",
+          country: customer.shipping_address?.country || "",
+        },
       });
     } else {
       reset();
@@ -88,9 +133,7 @@ export default function CustomerFormModal({
     try {
       const payload = {
         ...data,
-        group_id: data.group_id
-          ? Number(data.group_id)
-          : undefined,
+        group_id: data.group_id ? Number(data.group_id) : undefined,
       };
 
       if (isEdit && customer) {
@@ -107,12 +150,13 @@ export default function CustomerFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-6">
-      <h2 className="text-lg font-semibold mb-4">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-3xl p-6 max-h-[90vh] flex flex-col">
+      <h2 className="text-lg font-semibold mb-4 shrink-0">
         {isEdit ? "Update Customer" : "Create New Customer"}
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <div className="overflow-y-auto flex-1 px-1">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Customer Name */}
         <div>
           <Label>
@@ -151,15 +195,92 @@ export default function CustomerFormModal({
           </div>
         </div>
 
-        {/* Address */}
-        <div>
-          <Label>Address</Label>
-          <textarea
-            rows={3}
-            {...register("address")}
-            placeholder="Dhaka, Bangladesh"
-            className="w-full px-3 py-2 border rounded-lg"
-          />
+        {/* Billing Address */}
+        <div className="border rounded-lg p-4 bg-gray-50">
+          <h3 className="text-md font-medium mb-3">Billing Address</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Contact Name</Label>
+              <Input
+                placeholder="John Doe"
+                {...register("billing_address.contact_name")}
+              />
+            </div>
+            <div>
+              <Label>Phone</Label>
+              <Input
+                placeholder="01700000000"
+                {...register("billing_address.phone")}
+              />
+            </div>
+          </div>
+          <div className="mt-3">
+            <Label>Street</Label>
+            <Input
+              placeholder="123 Main Street"
+              {...register("billing_address.street")}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-3">
+            <div>
+              <Label>City</Label>
+              <Input
+                placeholder="Dhaka"
+                {...register("billing_address.city")}
+              />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Input
+                placeholder="Bangladesh"
+                {...register("billing_address.country")}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Shipping Address */}
+        <div className="border rounded-lg p-4 bg-gray-50">
+          <h3 className="text-md font-medium mb-3">Shipping Address</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Contact Name</Label>
+              <Input
+                placeholder="John Doe"
+                {...register("shipping_address.contact_name")}
+              />
+            </div>
+            <div>
+              <Label>Phone</Label>
+              <Input
+                placeholder="01700000000"
+                {...register("shipping_address.phone")}
+              />
+            </div>
+          </div>
+          <div className="mt-3">
+            <Label>Street</Label>
+            <Input
+              placeholder="456 Shipping Lane"
+              {...register("shipping_address.street")}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-3">
+            <div>
+              <Label>City</Label>
+              <Input
+                placeholder="Chattogram"
+                {...register("shipping_address.city")}
+              />
+            </div>
+            <div>
+              <Label>Country</Label>
+              <Input
+                placeholder="Bangladesh"
+                {...register("shipping_address.country")}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Customer Group */}
@@ -187,9 +308,11 @@ export default function CustomerFormModal({
             onChange={(checked) => setValue("status", checked)}
           />
         </div>
+        </form>
+      </div>
 
         {/* Submit Buttons */}
-        <div className="flex justify-end gap-3 mt-4">
+        <div className="flex justify-end gap-3 mt-4 shrink-0">
           <button
             type="button"
             onClick={onClose}
@@ -201,6 +324,7 @@ export default function CustomerFormModal({
             type="submit"
             disabled={isLoading}
             className="px-4 py-2 bg-brand-600 text-white rounded-lg"
+            onClick={handleSubmit(onSubmit)}
           >
             {isLoading
               ? isEdit
@@ -211,7 +335,6 @@ export default function CustomerFormModal({
               : "Create Customer"}
           </button>
         </div>
-      </form>
     </Modal>
   );
 }

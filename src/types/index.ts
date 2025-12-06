@@ -293,13 +293,24 @@ export interface Branch {
   default_warehouse: Warehouse;
   updated_at: string;
 }
+
+export interface Address {
+  contact_name?: string;
+  phone?: string;
+  street?: string;
+  city?: string;
+  country?: string;
+}
+
 export interface Customer {
   id: number;
   name: string;
   customer_code: string;
   email: string;
   phone: string;
-  address: string;
+
+  billing_address?: Address;
+  shipping_address?: Address;
   status: boolean;
   account: Account;
   account_id: number;
@@ -498,3 +509,232 @@ export interface SaleTransactionsResponse {
 
 export type Inventory = InventoryItem[];
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
+// Type definitions for settings
+export interface SettingsData {
+  id: number;
+  business_name: string | null;
+  tagline: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  country: string;
+  website: string | null;
+  currency: string;
+  currency_symbol: string;
+  tax_registration: string | null;
+  company_registration: string | null;
+  default_tax_percentage: string;
+  low_stock_threshold: string;
+  logo_attachment_id: number | null;
+  logo_attachment?: Attachment;
+  footer_text: string | null;
+  receipt_header: string | null;
+  include_barcode: boolean;
+  include_customer_details: boolean;
+  enable_auto_backup: boolean;
+  backup_retention_days: number;
+  default_invoice_layout: string;
+  show_product_images: boolean;
+  show_product_skus: boolean;
+  show_item_tax_details: boolean;
+  show_payment_breakdown: boolean;
+  invoice_paper_size: string;
+  print_duplicate_copy: boolean;
+  invoice_footer_message: string | null;
+  use_thermal_printer: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SettingsUpdateRequest {
+  business_name?: string;
+  tagline?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  country?: string;
+  website?: string;
+  currency?: string;
+  currency_symbol?: string;
+  tax_registration?: string;
+  company_registration?: string;
+  default_tax_percentage?: number;
+  low_stock_threshold?: number;
+  footer_text?: string;
+  receipt_header?: string;
+  include_barcode?: boolean;
+  include_customer_details?: boolean;
+  enable_auto_backup?: boolean;
+  backup_retention_days?: number;
+  default_invoice_layout?: string;
+  show_product_images?: boolean;
+  show_product_skus?: boolean;
+  show_item_tax_details?: boolean;
+  show_payment_breakdown?: boolean;
+  invoice_paper_size?: string;
+  print_duplicate_copy?: boolean;
+  invoice_footer_message?: string;
+  use_thermal_printer?: boolean;
+}
+
+export interface ReceiptPreviewData {
+  business_name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  website: string | null;
+  currency: string;
+  currency_symbol: string;
+  tax_registration: string | null;
+  company_registration: string | null;
+  footer_text: string | null;
+  receipt_header: string | null;
+  include_barcode: boolean;
+  include_customer_details: boolean;
+  logo_url: string;
+  default_invoice_layout: string;
+  show_product_images: boolean;
+  show_product_skus: boolean;
+  show_item_tax_details: boolean;
+  show_payment_breakdown: boolean;
+  invoice_paper_size: string;
+  print_duplicate_copy: boolean;
+  invoice_footer_message: string | null;
+  use_thermal_printer: boolean;
+}
+export interface DailySale {
+  date: string;
+  total: number;
+  orders: number;
+}
+
+export interface Last30DaysAnalytics {
+  totalSales: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  dailySales: DailySale[];
+}
+
+export interface MonthlySale {
+  month: number; // 1, 2, 3, etc.
+  monthName: string; // "January", "February", etc.
+  total: number;
+  orders: number;
+}
+
+export interface MonthWiseAnalytics {
+  year: number;
+  monthlySales: MonthlySale[];
+  totalYearlySales: number;
+  totalYearlyOrders: number;
+}
+
+// Enhanced Sale Data Types based on API response
+export interface SaleItem {
+  product: Product;
+  quantity: number;
+  unit_price: string;
+  discount: string;
+  tax: string;
+  line_total: string;
+}
+
+export interface SaleCustomer {
+  id: number;
+  customer_code: string;
+  name: string;
+  phone: string;
+  email: string;
+  billing_address?: Address;
+  shipping_address?: Address;
+  status: boolean;
+  reward_points: string;
+  account_id: number;
+  group_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SalePayment {
+  method: string;
+  amount: string;
+  account_code: string;
+  reference?: string;
+  created_at: string;
+}
+
+export interface SaleBranch {
+  id: number;
+  code: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaleUser {
+  id: number;
+  username: string;
+  email: string;
+  full_name: string;
+  phone: string;
+  roles: Array<{
+    id: number;
+    name: string;
+    description: string;
+  }>;
+  status: string;
+  last_login_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaleData {
+  invoice_no: string;
+  items: SaleItem[];
+  subtotal: string;
+  discount: string;
+  manual_discount: string;
+  group_discount: string;
+  tax: string;
+  total: string;
+  paid_amount: string;
+  payments: SalePayment[];
+  customer: SaleCustomer;
+  created_by: SaleUser;
+  branch: SaleBranch;
+  served_by: SaleUser;
+  created_at: string;
+  updated_at: string;
+}
+
+// API Response Types for Sales
+export interface SaleResponse {
+  id: number;
+  invoice_no: string;
+  items: SaleItem[];
+  subtotal: string;
+  discount: string;
+  manual_discount: string;
+  group_discount: string;
+  tax: string;
+  total: string;
+  paid_amount: string;
+  payments: SalePayment[];
+  customer: SaleCustomer;
+  created_by: SaleUser;
+  branch: SaleBranch;
+  served_by: SaleUser;
+  status: string;
+  sale_type: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaleListResponse {
+  data: SaleResponse[];
+  meta?: PaginationMeta;
+}

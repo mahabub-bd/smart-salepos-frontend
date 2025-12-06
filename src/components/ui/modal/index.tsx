@@ -1,12 +1,16 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   className?: string;
   children: React.ReactNode;
-  showCloseButton?: boolean; // New prop to control close button visibility
-  isFullscreen?: boolean; // Default to false for backwards compatibility
+  showCloseButton?: boolean;
+  isFullscreen?: boolean;
+
+  // New optional props
+  title?: string;
+  description?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -14,8 +18,10 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   className,
-  showCloseButton = true, // Default to true for backwards compatibility
+  showCloseButton = true,
   isFullscreen = false,
+  title,
+  description,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +57,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-full rounded-3xl bg-white  dark:bg-gray-900";
+    : "relative w-full rounded-3xl bg-white dark:bg-gray-900";
 
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
@@ -61,9 +67,10 @@ export const Modal: React.FC<ModalProps> = ({
           onClick={onClose}
         ></div>
       )}
+
       <div
         ref={modalRef}
-        className={`${contentClasses}  ${className}`}
+        className={`${contentClasses} ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {showCloseButton && (
@@ -87,7 +94,25 @@ export const Modal: React.FC<ModalProps> = ({
             </svg>
           </button>
         )}
-        <div>{children}</div>
+
+        {/* Title + Description Section */}
+        {(title || description) && (
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            {title && (
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                {title}
+              </h2>
+            )}
+            {description && (
+              <p className="mt-1 text-gray-600 dark:text-gray-300 text-sm">
+                {description}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Modal Content */}
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );

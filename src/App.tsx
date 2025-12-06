@@ -40,6 +40,7 @@ import TrialBalancePage from "./pages/Accounts/TrialBalance";
 import BranchPage from "./pages/Branch";
 import CustomerPage from "./pages/Customer";
 import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
+import CustomerFormPage from "./pages/Customer/components/CustomerFormPage";
 import CustomerGroupPage from "./pages/CustomerGroup";
 import ExpenseCategoryPage from "./pages/ExpenseCategory";
 import ExpensesPage from "./pages/Expenses";
@@ -56,6 +57,11 @@ import RolesPage from "./pages/Role";
 import SalesPage from "./pages/Sales";
 import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
 import SaleFormPage from "./pages/Sales/components/SaleFormPage";
+
+import PurchaseReturnPage from "./pages/Purchase-Return";
+import PurchaseReturnDetailPage from "./pages/Purchase-Return/components/PurchaseReturnDetailPage";
+import ReceiptSettingsPage from "./pages/Settings";
+import BusinessSettingsPage from "./pages/Settings/Business";
 import SuppliersPage from "./pages/Supplier";
 import SupplierDetailPage from "./pages/Supplier/components/SupplierDetailPage";
 import TagPage from "./pages/Tag";
@@ -108,6 +114,8 @@ export default function App() {
           <Route path="/form-elements" element={<FormElements />} />
           <Route path="/basic-tables" element={<BasicTables />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/settings/business" element={<BusinessSettingsPage />} />
+          <Route path="/settings/receipt" element={<ReceiptSettingsPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/units" element={<UnitPage />} />
           <Route path="/permissions" element={<PermissionsPage />} />
@@ -152,10 +160,15 @@ export default function App() {
           <Route path="/payments/:id" element={<PaymentDetailsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
-          <Route path="/accounts/trial-balance" element={<TrialBalancePage />} />
+          <Route
+            path="/accounts/trial-balance"
+            element={<TrialBalancePage />}
+          />
           <Route path="/branches" element={<BranchPage />} />
           <Route path="/customers" element={<CustomerPage />} />
+          <Route path="/customers/new" element={<CustomerFormPage />} />
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
+          <Route path="/customers/:id/edit" element={<CustomerFormPage />} />
           <Route path="customers-groups" element={<CustomerGroupPage />} />
           <Route path="/expenses/category" element={<ExpenseCategoryPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
@@ -166,9 +179,10 @@ export default function App() {
             path="/sales-return"
             element={<div>Sales Return - Coming Soon</div>}
           />
+          <Route path="/purchase-returns" element={<PurchaseReturnPage />} />
           <Route
-            path="/purchase-return"
-            element={<div>Purchase Return - Coming Soon</div>}
+            path="/purchase-returns/:id"
+            element={<PurchaseReturnDetailPage />}
           />
           {/* POS Routes */}
           <Route path="/pos" element={<POSPage />} />

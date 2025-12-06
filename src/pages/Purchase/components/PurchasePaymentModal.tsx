@@ -6,15 +6,15 @@ import { z } from "zod";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select"; // 👈 use your Select
 import Button from "../../../components/ui/button/Button";
+
+import { Modal } from "../../../components/ui/modal";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useCreatePaymentMutation } from "../../../features/payment/paymentApi";
 
 const paymentSchema = z.object({
   amount: z.number().positive("Amount must be > 0"),
   method: z.enum(["cash", "bank", "bkash"]),
-  payment_account_code: z.string({
-    error: "Payment account is required",
-  }),
+  payment_account_code: z.string().min(1, "Payment account is required"),
   note: z.string().optional(),
 });
 
@@ -51,7 +51,7 @@ export default function PurchasePaymentModal({
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchemaWithLimit(dueAmount)),
     defaultValues: {
-      method: undefined as any,
+      method: "cash",
       payment_account_code: "",
       note: "",
     },
@@ -77,8 +77,8 @@ export default function PurchasePaymentModal({
     selectedMethod === "cash"
       ? acc.isCash
       : selectedMethod === "bank"
-        ? acc.isBank
-        : false
+      ? acc.isBank
+      : false
   );
 
   const onSubmit = async (values: PaymentFormValues) => {
@@ -95,29 +95,32 @@ export default function PurchasePaymentModal({
 
       toast.success("Payment successful");
       onClose();
-    } catch {
-      toast.error("Payment failed");
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast.error(error.data?.message || "Payment failed");
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay">
-      <div className="modal-box max-w-md p-6 bg-white rounded-xl shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Make Payment</h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Purchase Payment"
+      description="Provide the payment details to complete this purchase."
+      className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        {/* 💰 Amount */}
+        <Input
+          type="number"
+          placeholder={`Due: ${dueAmount}`}
+          error={!!errors.amount}
+          hint={errors.amount?.message}
+          {...register("amount", { valueAsNumber: true })}
+        />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {/* 💰 Amount */}
-          <Input
-            type="number"
-            placeholder={`Due: ${dueAmount}`}
-            error={!!errors.amount}
-            hint={errors.amount?.message}
-            {...register("amount", { valueAsNumber: true })}
-          />
-
-          {/* 💳 Payment Method */}
+        {/* 💳 Payment Method */}
+        <div>
           <Controller
             name="method"
             control={control}
@@ -125,18 +128,22 @@ export default function PurchasePaymentModal({
               <Select
                 options={[
                   { value: "cash", label: "Cash" },
-                  { value: "bank", label: "Bank" },
-                  { value: "bkash", label: "Bkash" },
+                  { value: "bank", label: "Bank & MFS" },
                 ]}
                 placeholder="Select Method"
-                defaultValue={field.value}
+                value={field.value}
                 onChange={(value) => field.onChange(value)}
               />
             )}
           />
+          {errors.method && (
+            <p className="mt-1 text-sm text-red-600">{errors.method.message}</p>
+          )}
+        </div>
 
-          {/* 🏦 Payment Account */}
-          {selectedMethod && (
+        {/* 🏦 Payment Account */}
+        {selectedMethod && (
+          <div>
             <Controller
               name="payment_account_code"
               control={control}
@@ -144,36 +151,47 @@ export default function PurchasePaymentModal({
                 <Select
                   options={filteredAccounts.map((acc: any) => ({
                     value: acc.code,
-                    label: `${acc.name} - ${acc.code} - ${acc.account_number}`,
+                    label: `${acc.name} - ${acc.account_number}`,
                   }))}
                   placeholder="Select Account"
-                  defaultValue={field.value}
+                  value={field.value}
                   onChange={(value) => field.onChange(value)}
                 />
               )}
             />
-          )}
-
-          {/* 📝 Note */}
-          <Input
-            type="text"
-            placeholder="Note"
-            error={!!errors.note}
-            hint={errors.note?.message}
-            {...register("note")}
-          />
-
-          {/* 🔘 Buttons */}
-          <div className="flex justify-end gap-2">
-            <Button size="sm" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button size="sm" disabled={isLoading}>
-              {isLoading ? "Processing..." : "Pay"}
-            </Button>
+            {errors.payment_account_code && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.payment_account_code.message}
+              </p>
+            )}
           </div>
-        </form>
+        )}
+
+        {/* 📝 Note */}
+        <Input
+          type="text"
+          placeholder="Note"
+          error={!!errors.note}
+          hint={errors.note?.message}
+          {...register("note")}
+        />
+      </form>
+
+      <div className="flex justify-end gap-2 mt-4">
+        <Button size="sm" variant="outline" type="button" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          size="sm"
+          type="submit"
+          disabled={
+            isLoading || !selectedMethod || !watch("payment_account_code")
+          }
+          onClick={handleSubmit(onSubmit)}
+        >
+          {isLoading ? "Processing..." : "Pay"}
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 }

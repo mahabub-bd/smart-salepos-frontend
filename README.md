@@ -1,192 +1,157 @@
-# TailAdmin React - Free React Tailwind Admin Dashboard Template
-
-TailAdmin is a free and open-source admin dashboard template built on **React and Tailwind CSS**, providing developers
-with everything they need to create a comprehensive, data-driven back-end,
-dashboard, or admin panel solution for upcoming web projects.
-
-With TailAdmin, you get access to all the necessary dashboard UI components, elements, and pages required to build a
-feature-rich and complete dashboard or admin panel. Whether you're building dashboard or admin panel for a complex web
-application or a simple website, TailAdmin is the perfect solution to help you get up and running quickly.
-
-![TailAdmin React.js Dashboard Preview](./banner.png)
+# Purchase Return Process Flow
 
 ## Overview
+The purchase return system follows a structured workflow with proper status tracking and validation. Each stage has specific requirements and transitions.
 
-TailAdmin provides essential UI components and layouts for building feature-rich, data-driven admin dashboards and
-control panels. It's built on:
+## Process Flow States
 
-- React 19
-- TypeScript
-- Tailwind CSS
+### 1. Draft (DRAFT)
+- **Description**: Initial state when creating a purchase return
+- **Allowed Actions**: Update, Approve, Cancel
+- **Requirements**:
+  - Valid purchase ID (must be received)
+  - Valid supplier ID
+  - Valid warehouse ID
+  - Return items with quantities
+  - Cannot exceed original purchase quantities
 
-### Quick Links
+### 2. Approved (APPROVED)
+- **Description**: Purchase return has been approved for processing
+- **Allowed Actions**: Process, Cancel
+- **Requirements**:
+  - Must be approved by authorized user
+  - Approval notes (optional)
+  - Supplier must have a valid chart of account
 
-- [✨ Visit Website](https://tailadmin.com)
-- [📄 Documentation](https://tailadmin.com/docs)
-- [⬇️ Download](https://tailadmin.com/download)
-- [🖌️ Figma Design File (Community Edition)](https://www.figma.com/community/file/1214477970819985778)
-- [⚡ Get PRO Version](https://tailadmin.com/pricing)
+### 3. Processed (PROCESSED)
+- **Description**: Purchase return has been fully processed
+- **Allowed Actions**: None (Final state)
+- **Requirements**:
+  - Inventory quantities adjusted
+  - Accounting entries posted
+  - Supplier payable reduced
 
-### Demos
+### 4. Cancelled (CANCELLED)
+- **Description**: Purchase return has been cancelled
+- **Allowed Actions**: None (Final state)
+- **Requirements**:
+  - Can only be cancelled from Draft or Approved states
 
-- [Free Version](https://free-react-demo.tailadmin.com/)
-- [Pro Version](https://react-demo.tailadmin.com)
+## API Endpoints
 
-### Other Versions
+### Create Purchase Return
+```
+POST /purchase-returns
+```
+- Creates a new purchase return in DRAFT status
+- Validates against original purchase quantities
+- Generates unique return number if not provided
 
-- [HTML Version](https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template)
-- [Next.js Version](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
-- [Vue.js Version](https://github.com/TailAdmin/vue-tailwind-admin-dashboard)
+### Get Purchase Returns
+```
+GET /purchase-returns
+GET /purchase-returns/:id
+```
+- Returns purchase returns with all relations
+- Includes status and timestamps for each stage
 
-## Installation
+### Update Purchase Return
+```
+PATCH /purchase-returns/:id
+```
+- Only allowed for DRAFT status returns
+- Can modify all fields except status
 
-### Prerequisites
+### Approve Purchase Return
+```
+PATCH /purchase-returns/:id/approve
+Body: {
+  "approval_notes": "Optional approval notes"
+}
+```
+- Transitions from DRAFT to APPROVED
+- Records approver ID and timestamp
+- Validates supplier has chart of account
 
-To get started with TailAdmin, ensure you have the following prerequisites installed and set up:
+### Process Purchase Return
+```
+PATCH /purchase-returns/:id/process
+Body: {
+  "processing_notes": "Optional processing notes"
+}
+```
+- Transitions from APPROVED to PROCESSED
+- Updates inventory quantities
+- Posts accounting entries
+- Records processor ID and timestamp
 
-- Node.js 18.x or later (recommended to use Node.js 20.x or later)
+### Cancel Purchase Return
+```
+PATCH /purchase-returns/:id/cancel
+```
+- Transitions from DRAFT or APPROVED to CANCELLED
+- Cannot cancel processed returns
 
-### Cloning the Repository
+## Status Transition Matrix
 
-Clone the repository using the following command:
+| From → To     | DRAFT | APPROVED | PROCESSED | CANCELLED |
+|---------------|-------|----------|-----------|-----------|
+| **DRAFT**     | -     | ✅       | ❌         | ✅         |
+| **APPROVED**  | ❌     | -        | ✅         | ✅         |
+| **PROCESSED** | ❌     | ❌       | -         | ❌         |
+| **CANCELLED** | ❌     | ❌       | ❌         | -         |
 
-```bash
-git clone https://github.com/TailAdmin/free-react-tailwind-admin-dashboard.git
+## Validation Rules
+
+### Quantity Validation
+- Cannot return more items than originally purchased
+- Checks against all previously processed returns for the same purchase
+
+### Inventory Validation
+- Sufficient inventory must exist before processing
+- Inventory is reduced by returned quantities
+
+### Accounting Validation
+- Supplier must have an assigned chart of account
+- Inventory account is created if not exists
+
+### Permission Validation
+- Each endpoint requires specific permissions
+- User ID is tracked for audit purposes
+
+## Database Schema Updates
+
+### New Fields Added
+- `approved_at`: Timestamp when return was approved
+- `approved_by`: User ID who approved the return
+- `processed_at`: Timestamp when return was processed
+- `processed_by`: User ID who processed the return
+- `approval_notes`: Optional notes about approval decision
+
+### Status Enum
+Replaced string status with proper enum:
+```typescript
+enum PurchaseReturnStatus {
+  DRAFT = 'draft',
+  APPROVED = 'approved',
+  PROCESSED = 'processed',
+  CANCELLED = 'cancelled',
+}
 ```
 
-> Windows Users: place the repository near the root of your drive if you face issues while cloning.
+## Error Handling
 
-1. Install dependencies:
+Common error scenarios:
+- **Invalid Status Transition**: Attempting to process without approval
+- **Insufficient Inventory**: Not enough items to return
+- **Missing Supplier Account**: Supplier lacks chart of account
+- **Exceeded Return Quantity**: Returning more than purchased
+- **Unauthorized Actions**: Insufficient permissions
 
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+## Audit Trail
 
-   > Use the `--legacy-peer-deps` flag, if you face issues while installing.
-
-2. Start the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-## Components
-
-TailAdmin is a pre-designed starting point for building a web-based dashboard using React.js and Tailwind CSS. The
-template includes:
-
-- Sophisticated and accessible sidebar
-- Data visualization components
-- Prebuilt profile management and 404 page
-- Tables and Charts(Line and Bar)
-- Authentication forms and input elements
-- Alerts, Dropdowns, Modals, Buttons and more
-- Can't forget Dark Mode 🕶️
-
-All components are built with React and styled using Tailwind CSS for easy customization.
-
-## Feature Comparison
-
-### Free Version
-
-- 1 Unique Dashboard
-- 30+ dashboard components
-- 50+ UI elements
-- Basic Figma design files
-- Community support
-
-### Pro Version
-
-- 7 Unique Dashboards: Analytics, Ecommerce, Marketing, CRM, SaaS, Stocks, Logistics (more coming soon)
-- 500+ dashboard components and UI elements
-- Complete Figma design file
-- Email support
-
-To learn more about pro version features and pricing, visit our [pricing page](https://tailadmin.com/pricing).
-
-## Changelog
-
-### Version 2.0.2 - [March 25, 2025]
-
-- Upgraded to React 19
-- Included overrides for packages to prevent peer dependency errors.
-- Migrated from react-flatpickr to flatpickr package for React 19 support
-
-### Version 2.0.1 - [February 27, 2025]
-
-#### Update Overview
-
-- Upgraded to Tailwind CSS v4 for better performance and efficiency.
-- Updated class usage to match the latest syntax and features.
-- Replaced deprecated class and optimized styles.
-
-#### Next Steps
-
-- Run npm install or yarn install to update dependencies.
-- Check for any style changes or compatibility issues.
-- Refer to the Tailwind CSS v4 [Migration Guide](https://tailwindcss.com/docs/upgrade-guide) on this release. if needed.
-- This update keeps the project up to date with the latest Tailwind improvements. 🚀
-
-### Version 2.0.0 - [February 2025]
-
-A major update with comprehensive redesign and modern React patterns implementation.
-
-#### Major Improvements
-
-- Complete UI redesign with modern React patterns
-- New features: collapsible sidebar, chat, and calendar
-- Improved performance and accessibility
-- Updated data visualization using ApexCharts
-
-#### Key Features
-
-- Redesigned dashboards (Ecommerce, Analytics, Marketing, CRM)
-- Enhanced navigation with React Router integration
-- Advanced tables with sorting and filtering
-- Calendar with drag-and-drop support
-- New UI components and improved existing ones
-
-#### Breaking Changes
-
-- Updated sidebar component API
-- Migrated charts to ApexCharts
-- Revised authentication system
-
-[Read more](https://tailadmin.com/docs/update-logs/react) on this release.
-
-### Version 1.3.7 - [June 20, 2024]
-
-#### Enhancements
-
-1. Remove Repetition of DefaultLayout in every Pages
-2. Add ClickOutside Component for reduce repeated functionality in Header Message, Notification and User Dropdowns.
-
-### Version 1.3.6 - [Jan 31, 2024]
-
-#### Enhancements
-
-1. Integrate flatpickr in [Date Picker/Form Elements]
-2. Change color after select an option [Select Element/Form Elements].
-3. Make it functional [Multiselect Dropdown/Form Elements].
-4. Make best value editable [Pricing Table One/Pricing Table].
-5. Rearrange Folder structure.
-
-### Version 1.2.0 - [Apr 28, 2023]
-
-- Add Typescript in TailAdmin React.
-
-### Version 1.0.0 - Initial Release - [Mar 13, 2023]
-
-- Initial release of TailAdmin React.
-
-## License
-
-TailAdmin React.js Free Version is released under the MIT License.
-
-## Support
-
-If you find this project helpful, please consider giving it a star on GitHub. Your support helps us continue developing
-and maintaining this template.
+The system tracks:
+- User ID for each status change
+- Timestamps for approval and processing
+- Optional notes for approval decisions
+- All changes are immutable after processing

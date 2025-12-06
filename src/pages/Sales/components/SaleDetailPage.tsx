@@ -1,4 +1,4 @@
-import { ChevronLeft, FileDown, Plus } from "lucide-react";
+import { ChevronLeft, FileDown, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router";
 
@@ -76,7 +76,7 @@ export default function SaleDetailPage() {
             {/* Show Pay Due button ONLY if there's a due */}
             {dueAmount > 0 && (
               <IconButton
-                icon={Plus}
+                icon={Wallet}
                 color="blue"
                 tooltip="Pay Due"
                 onClick={() => setPaymentModalOpen(true)}
@@ -125,8 +125,8 @@ export default function SaleDetailPage() {
                   sale.status === "completed"
                     ? "success"
                     : sale.status === "pending"
-                      ? "warning"
-                      : "error"
+                    ? "warning"
+                    : "error"
                 }
               >
                 {sale.status}

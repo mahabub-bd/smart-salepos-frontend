@@ -210,7 +210,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
             <Button size="sm" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button size="sm" disabled={isLoading}>
+            <Button size="sm" type="submit" disabled={isLoading}>
               {isLoading ? "Processing..." : "Make Payment"}
             </Button>
           </div>

@@ -1,0 +1,78 @@
+import {
+  ApiResponse,
+  ReceiptPreviewData,
+  SettingsData,
+  SettingsUpdateRequest,
+} from "../../types";
+import { apiSlice } from "../apiSlice";
+
+export const settingsApi = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    // Get all settings
+    getSettings: builder.query<ApiResponse<SettingsData>, void>({
+      query: () => ({
+        url: "/settings",
+        method: "GET",
+      }),
+      providesTags: ["Settings"],
+    }),
+
+    // Update settings
+    updateSettings: builder.mutation<
+      ApiResponse<SettingsData>,
+      SettingsUpdateRequest
+    >({
+      query: (data) => ({
+        url: "/settings",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
+
+    // Upload logo for settings
+    uploadSettingsLogo: builder.mutation<
+      ApiResponse<any>,
+      { id: number; logo: File }
+    >({
+      query: ({ id, logo }) => {
+        const formData = new FormData();
+        formData.append("logo", logo);
+
+        return {
+          url: `/settings/logo/${id}`,
+          method: "POST",
+          body: formData,
+          formData: true,
+        };
+      },
+      invalidatesTags: ["Settings"],
+    }),
+
+    // Get receipt preview settings
+    getReceiptPreview: builder.query<ApiResponse<ReceiptPreviewData>, void>({
+      query: () => ({
+        url: "/settings/receipt/preview",
+        method: "GET",
+      }),
+      providesTags: ["Settings"],
+    }),
+
+    // Reset all settings
+    resetSettings: builder.mutation<ApiResponse<any>, void>({
+      query: () => ({
+        url: "/settings/reset",
+        method: "POST",
+      }),
+      invalidatesTags: ["Settings"],
+    }),
+  }),
+});
+
+export const {
+  useGetSettingsQuery,
+  useUpdateSettingsMutation,
+  useUploadSettingsLogoMutation,
+  useGetReceiptPreviewQuery,
+  useResetSettingsMutation,
+} = settingsApi;

@@ -1,15 +1,19 @@
-import { Eye, FileCheck, Pencil, Plus, Wallet } from "lucide-react";
+import { Eye, FileCheck, Pencil, Plus, RotateCcw, Wallet } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { useGetPurchasesQuery } from "../../../features/purchases/purchasesApi";
+import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
 
 export default function PurchaseList() {
   const { data, isLoading, isError } = useGetPurchasesQuery();
   const navigate = useNavigate();
+  const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
   const purchases = data?.data || [];
 
@@ -54,6 +58,7 @@ export default function PurchaseList() {
                   const due = Number(p.due_amount || 0);
                   const isFullyPaid = due === 0;
                   const isReceived = p.status === "received";
+                  const canReturn = p.status === "received";
 
                   return (
                     <tr key={p.id} className="border-b hover:bg-gray-50">
@@ -127,6 +132,18 @@ export default function PurchaseList() {
                             }
                           />
 
+                          {/* Purchase Return */}
+                          <IconButton
+                            icon={RotateCcw}
+                            tooltip="Purchase Return"
+                            color="orange"
+                            disabled={!canReturn}
+                            onClick={() => {
+                              setSelectedPurchase(p);
+                              setIsReturnModalOpen(true);
+                            }}
+                          />
+
                           {/* Edit Purchase */}
                           <IconButton
                             icon={Pencil}
@@ -151,6 +168,16 @@ export default function PurchaseList() {
           </table>
         </div>
       </div>
+
+      {/* Purchase Return Modal */}
+      <PurchaseReturnModal
+        isOpen={isReturnModalOpen}
+        onClose={() => {
+          setIsReturnModalOpen(false);
+          setSelectedPurchase(null);
+        }}
+        purchase={selectedPurchase}
+      />
     </>
   );
 }
