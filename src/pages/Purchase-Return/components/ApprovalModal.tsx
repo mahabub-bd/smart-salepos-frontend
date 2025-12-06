@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-import Button from "../../../components/ui/button/Button";
-import { Modal } from "../../../components/ui/modal";
 import TextArea from "../../../components/form/input/TextArea";
 import Label from "../../../components/form/Label";
+import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 import { useApprovePurchaseReturnMutation } from "../../../features/purchase-return/purchaseReturnApi";
 
 interface ApprovalModalProps {
@@ -26,7 +26,8 @@ export default function ApprovalModal({
   onSuccess,
 }: ApprovalModalProps) {
   const [approvalNotes, setApprovalNotes] = useState("");
-  const [approvePurchaseReturn, { isLoading }] = useApprovePurchaseReturnMutation();
+  const [approvePurchaseReturn, { isLoading }] =
+    useApprovePurchaseReturnMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +42,9 @@ export default function ApprovalModal({
         },
       }).unwrap();
 
-      toast.success(`Purchase return ${purchaseReturn.return_no} approved successfully`);
+      toast.success(
+        `Purchase return ${purchaseReturn.return_no} approved successfully`
+      );
       setApprovalNotes("");
       onSuccess?.();
       onClose();
@@ -61,7 +64,7 @@ export default function ApprovalModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      className="max-w-md w-full"
+      className="max-w-xl w-full"
       title="Approve Purchase Return"
     >
       {purchaseReturn ? (
@@ -73,9 +76,19 @@ export default function ApprovalModal({
             </h3>
             <div className="space-y-1 text-sm text-gray-600">
               {purchaseReturn.supplier_name && (
-                <p>Supplier: <span className="font-medium text-gray-900">{purchaseReturn.supplier_name}</span></p>
+                <p>
+                  Supplier:{" "}
+                  <span className="font-medium text-gray-900">
+                    {purchaseReturn.supplier_name}
+                  </span>
+                </p>
               )}
-              <p>Amount: <span className="font-medium text-gray-900">{parseFloat(purchaseReturn.total).toLocaleString()}</span></p>
+              <p>
+                Amount:{" "}
+                <span className="font-medium text-gray-900">
+                  {parseFloat(purchaseReturn.total).toLocaleString()}
+                </span>
+              </p>
             </div>
           </div>
 
@@ -97,7 +110,8 @@ export default function ApprovalModal({
           {/* Confirmation Message */}
           <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              Are you sure you want to approve this purchase return? This action will mark the return as approved and allow it to be processed.
+              Are you sure you want to approve this purchase return? This action
+              will mark the return as approved and allow it to be processed.
             </p>
           </div>
 
@@ -121,7 +135,9 @@ export default function ApprovalModal({
           </div>
         </form>
       ) : (
-        <p className="text-center text-gray-500">Loading purchase return details...</p>
+        <p className="text-center text-gray-500">
+          Loading purchase return details...
+        </p>
       )}
     </Modal>
   );

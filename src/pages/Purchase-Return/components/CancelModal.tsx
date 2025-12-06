@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-import Button from "../../../components/ui/button/Button";
-import { Modal } from "../../../components/ui/modal";
 import TextArea from "../../../components/form/input/TextArea";
 import Label from "../../../components/form/Label";
+import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 import { useCancelPurchaseReturnMutation } from "../../../features/purchase-return/purchaseReturnApi";
 
 interface CancelModalProps {
@@ -26,7 +26,8 @@ export default function CancelModal({
   onSuccess,
 }: CancelModalProps) {
   const [cancelReason, setCancelReason] = useState("");
-  const [cancelPurchaseReturn, { isLoading }] = useCancelPurchaseReturnMutation();
+  const [cancelPurchaseReturn, { isLoading }] =
+    useCancelPurchaseReturnMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +36,9 @@ export default function CancelModal({
 
     try {
       await cancelPurchaseReturn(purchaseReturn.id).unwrap();
-      toast.success(`Purchase return ${purchaseReturn.return_no} cancelled successfully`);
+      toast.success(
+        `Purchase return ${purchaseReturn.return_no} cancelled successfully`
+      );
       setCancelReason("");
       onSuccess?.();
       onClose();
@@ -55,7 +58,7 @@ export default function CancelModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      className="max-w-lg w-full"
+      className="max-w-xl w-full"
       title="Cancel Purchase Return"
     >
       {purchaseReturn ? (
@@ -67,9 +70,19 @@ export default function CancelModal({
             </h3>
             <div className="space-y-1 text-sm text-gray-600">
               {purchaseReturn.supplier_name && (
-                <p>Supplier: <span className="font-medium text-gray-900">{purchaseReturn.supplier_name}</span></p>
+                <p>
+                  Supplier:{" "}
+                  <span className="font-medium text-gray-900">
+                    {purchaseReturn.supplier_name}
+                  </span>
+                </p>
               )}
-              <p>Amount: <span className="font-medium text-gray-900">{parseFloat(purchaseReturn.total).toLocaleString()}</span></p>
+              <p>
+                Amount:{" "}
+                <span className="font-medium text-gray-900">
+                  {parseFloat(purchaseReturn.total).toLocaleString()}
+                </span>
+              </p>
             </div>
           </div>
 
@@ -92,7 +105,8 @@ export default function CancelModal({
           <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-800 font-medium mb-1">Warning</p>
             <p className="text-sm text-red-700">
-              Are you sure you want to cancel this purchase return? This action cannot be undone and the return will be marked as cancelled.
+              Are you sure you want to cancel this purchase return? This action
+              cannot be undone and the return will be marked as cancelled.
             </p>
           </div>
 
@@ -117,7 +131,9 @@ export default function CancelModal({
           </div>
         </form>
       ) : (
-        <p className="text-center text-gray-500">Loading purchase return details...</p>
+        <p className="text-center text-gray-500">
+          Loading purchase return details...
+        </p>
       )}
     </Modal>
   );

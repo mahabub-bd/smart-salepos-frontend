@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import Input from "../../../../components/form/input/InputField";
+import Button from "../../../../components/ui/button/Button";
 import { Modal } from "../../../../components/ui/modal";
 import { useAddBankBalanceMutation } from "../../../../features/accounts/accountsApi";
 import AccountInfo from "./AccountInfo";
@@ -80,14 +81,16 @@ export default function AddBalanceModal({
         />
 
         <div className="flex justify-end gap-2 mt-4">
-          <button
+          <Button
+            size="sm"
             type="button"
             onClick={onClose}
             className="px-4 py-2 bg-gray-500 text-white rounded"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            size="sm"
             type="submit"
             disabled={isLoading}
             className={`px-4 py-2 bg-green-600 text-white rounded ${
@@ -95,7 +98,7 @@ export default function AddBalanceModal({
             }`}
           >
             {isLoading ? "Saving..." : "Add Balance"}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

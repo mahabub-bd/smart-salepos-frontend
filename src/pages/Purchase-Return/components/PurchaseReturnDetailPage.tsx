@@ -10,13 +10,12 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import Button from "../../../components/ui/button/Button";
-import {
-  useGetPurchaseReturnByIdQuery,
-} from "../../../features/purchase-return/purchaseReturnApi";
+import { useGetPurchaseReturnByIdQuery } from "../../../features/purchase-return/purchaseReturnApi";
 import ApprovalModal from "./ApprovalModal";
 import CancelModal from "./CancelModal";
 import ProcessingModal from "./ProcessingModal";
 import PurchaseReturnStatusBadge from "./PurchaseReturnStatusBadge";
+import RefundModal from "./RefundModal";
 
 import {
   Table,
@@ -40,6 +39,7 @@ export default function PurchaseReturnDetailPage() {
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
   const [isProcessingModalOpen, setIsProcessingModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
 
   const purchaseReturn = purchaseReturnData?.data;
 
@@ -53,6 +53,10 @@ export default function PurchaseReturnDetailPage() {
 
   const handleCancelClick = () => {
     setIsCancelModalOpen(true);
+  };
+
+  const handleRefundClick = () => {
+    setIsRefundModalOpen(true);
   };
 
   if (isLoading)
@@ -135,6 +139,15 @@ export default function PurchaseReturnDetailPage() {
                 </Button>
               </>
             )}
+            {purchaseReturn.status === "processed" && !purchaseReturn.refund_to_supplier && (
+              <Button
+                size="sm"
+                onClick={handleRefundClick}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Process Refund
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -180,6 +193,66 @@ export default function PurchaseReturnDetailPage() {
             </div>
           </div>
 
+          {/* Original Purchase Details */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Package size={18} />
+              Original Purchase Details
+            </h2>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Purchase Order #</p>
+                <p className="font-medium">{purchaseReturn.purchase?.po_no}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-600">Purchase Total</p>
+                <p className="font-medium">
+                  {parseFloat(
+                    purchaseReturn.purchase?.total || "0"
+                  ).toLocaleString()}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-600">Paid Amount</p>
+                <p className="font-medium">
+                  {parseFloat(
+                    purchaseReturn.purchase?.paid_amount || "0"
+                  ).toLocaleString()}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-600">Due Amount</p>
+                <p className="font-medium">
+                  {parseFloat(
+                    purchaseReturn.purchase?.due_amount || "0"
+                  ).toLocaleString()}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-600">Purchase Status</p>
+                <p className="font-medium capitalize">
+                  {purchaseReturn.purchase?.status}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-600">Created Date</p>
+                <p className="font-medium">
+                  {purchaseReturn.purchase?.created_at
+                    ? new Date(
+                        purchaseReturn.purchase.created_at
+                      ).toLocaleDateString()
+                    : "-"}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Approval Status */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -188,6 +261,7 @@ export default function PurchaseReturnDetailPage() {
             </h2>
 
             <div className="grid grid-cols-2 gap-4">
+              {/* Status */}
               <div>
                 <p className="text-sm text-gray-600">Status</p>
                 <div className="flex items-center gap-2 mt-1">
@@ -195,6 +269,7 @@ export default function PurchaseReturnDetailPage() {
                 </div>
               </div>
 
+              {/* Approved At */}
               <div>
                 <p className="text-sm text-gray-600">Approved At</p>
                 <p className="font-medium">
@@ -208,15 +283,23 @@ export default function PurchaseReturnDetailPage() {
                 </p>
               </div>
 
+              {/* Approved By */}
               <div>
                 <p className="text-sm text-gray-600">Approved By</p>
                 <p className="font-medium">
-                  {purchaseReturn.approved_by
-                    ? `User ID: ${purchaseReturn.approved_by}`
-                    : "-"}
+                  {purchaseReturn.approved_user?.full_name || "-"}
                 </p>
               </div>
 
+              {/* Processed By */}
+              <div>
+                <p className="text-sm text-gray-600">Processed By</p>
+                <p className="font-medium">
+                  {purchaseReturn.processed_user?.full_name || "-"}
+                </p>
+              </div>
+
+              {/* Processed At */}
               <div>
                 <p className="text-sm text-gray-600">Processed At</p>
                 <p className="font-medium">
@@ -230,6 +313,7 @@ export default function PurchaseReturnDetailPage() {
                 </p>
               </div>
 
+              {/* Approval Notes */}
               <div className="col-span-2">
                 <p className="text-sm text-gray-600">Approval Notes</p>
                 <p className="font-medium">
@@ -237,6 +321,7 @@ export default function PurchaseReturnDetailPage() {
                 </p>
               </div>
 
+              {/* Processing Notes */}
               {purchaseReturn.processing_notes && (
                 <div className="col-span-2">
                   <p className="text-sm text-gray-600">Processing Notes</p>
@@ -247,6 +332,160 @@ export default function PurchaseReturnDetailPage() {
               )}
             </div>
           </div>
+
+          {/* Refund Information */}
+          {purchaseReturn.refund_to_supplier && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <FileText size={18} />
+                Refund Information
+              </h2>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600">Refund to Supplier</p>
+                  <p className="font-medium capitalize">
+                    {purchaseReturn.refund_to_supplier ? "Yes" : "No"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Refund Amount</p>
+                  <p className="font-medium text-lg">
+                    {parseFloat(
+                      purchaseReturn.refund_amount || "0"
+                    ).toLocaleString()}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Payment Method</p>
+                  <p className="font-medium capitalize">
+                    {purchaseReturn.refund_payment_method || "-"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Refund Reference</p>
+                  <p className="font-medium">
+                    {purchaseReturn.refund_reference || "-"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Refunded At</p>
+                  <p className="font-medium">
+                    {purchaseReturn.refunded_at
+                      ? new Date(
+                          purchaseReturn.refunded_at
+                        ).toLocaleDateString() +
+                        " " +
+                        new Date(
+                          purchaseReturn.refunded_at
+                        ).toLocaleTimeString()
+                      : "-"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600">Debit Account Code</p>
+                  <p className="font-medium">
+                    {purchaseReturn.debit_account_code || "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Refund History */}
+          {purchaseReturn.refund_history && purchaseReturn.refund_history.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <FileText size={18} />
+                Refund Transaction History
+              </h2>
+
+              <div className="space-y-3">
+                {purchaseReturn.refund_history.map((history, index) => (
+                  <div key={history.id || index} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                          Amount
+                        </p>
+                        <p className="font-semibold text-lg text-green-600">
+                          {parseFloat(history.amount || "0").toLocaleString()}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                          Method
+                        </p>
+                        <p className="font-medium capitalize">
+                          {history.method || "-"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                          Date & Time
+                        </p>
+                        <p className="font-medium text-sm">
+                          {history.created_at
+                            ? new Date(history.created_at).toLocaleDateString() +
+                              " " +
+                              new Date(history.created_at).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "-"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                          Debit Account
+                        </p>
+                        <p className="font-mono text-sm">
+                          {history.debit_account_code || "-"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                          Credit Account
+                        </p>
+                        <p className="font-mono text-sm">
+                          {history.credit_account_code || "-"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                          Type
+                        </p>
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
+                          {history.type?.replace(/_/g, " ") || "-"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {history.note && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">
+                          Note
+                        </p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          {history.note}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Returned Items */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
@@ -262,6 +501,9 @@ export default function PurchaseReturnDetailPage() {
                     <TableCell isHeader>Product</TableCell>
                     <TableCell isHeader className="text-center">
                       SKU
+                    </TableCell>
+                    <TableCell isHeader className="text-center">
+                      Barcode
                     </TableCell>
                     <TableCell isHeader className="text-center">
                       Returned Qty
@@ -289,13 +531,18 @@ export default function PurchaseReturnDetailPage() {
                         {item.product?.sku}
                       </TableCell>
 
+                      <TableCell className="text-center font-mono text-sm">
+                        {item.product?.barcode}
+                      </TableCell>
+
                       <TableCell className="text-center">
                         {item.returned_quantity}
                       </TableCell>
 
                       <TableCell className="text-right">
-                        {parseFloat(
-                          item.price?.toString() || "0"
+                        {(typeof item.price === "string"
+                          ? parseFloat(item.price)
+                          : item.price
                         ).toLocaleString()}
                       </TableCell>
 
@@ -307,7 +554,7 @@ export default function PurchaseReturnDetailPage() {
 
                   {/* Footer total row */}
                   <TableRow>
-                    <TableCell colSpan={4} className="text-right font-semibold">
+                    <TableCell colSpan={5} className="text-right font-semibold">
                       Total Return Amount:
                     </TableCell>
                     <TableCell className="text-right text-lg font-bold text-orange-600">
@@ -448,6 +695,26 @@ export default function PurchaseReturnDetailPage() {
                 return_no: purchaseReturn.return_no,
                 supplier_name: purchaseReturn.supplier?.name,
                 total: purchaseReturn.total || "0",
+              }
+            : null
+        }
+        onSuccess={() => {
+          refetch();
+        }}
+      />
+
+      {/* Refund Modal */}
+      <RefundModal
+        isOpen={isRefundModalOpen}
+        onClose={() => setIsRefundModalOpen(false)}
+        purchaseReturn={
+          purchaseReturn
+            ? {
+                id: purchaseReturn.id,
+                return_no: purchaseReturn.return_no,
+                supplier_name: purchaseReturn.supplier?.name,
+                total: purchaseReturn.total || "0",
+                status: purchaseReturn.status,
               }
             : null
         }

@@ -629,7 +629,6 @@ export interface MonthWiseAnalytics {
   totalYearlyOrders: number;
 }
 
-// Enhanced Sale Data Types based on API response
 export interface SaleItem {
   product: Product;
   quantity: number;
@@ -681,11 +680,8 @@ export interface SaleUser {
   email: string;
   full_name: string;
   phone: string;
-  roles: Array<{
-    id: number;
-    name: string;
-    description: string;
-  }>;
+  roles: Role[];
+
   status: string;
   last_login_at: string;
   created_at: string;
@@ -737,4 +733,105 @@ export interface SaleResponse {
 export interface SaleListResponse {
   data: SaleResponse[];
   meta?: PaginationMeta;
+}
+
+export interface PurchaseReturnItemCreate {
+  product_id: number;
+  purchase_item_id: number;
+  returned_quantity: number;
+  price: number; // Create API expects number
+  line_total?: string; // Optional for create payload
+}
+
+export interface PurchaseReturnItem {
+  id: number;
+  purchase_return_id: number;
+  purchase_item_id: number;
+  purchase_item?: PurchaseItem;
+  product_id: number;
+  product?: Product;
+  returned_quantity: number;
+  price: string;
+  line_total: string;
+}
+
+export interface CreatePurchaseReturnPayload {
+  purchase_id: number;
+  supplier_id: number;
+  warehouse_id: number;
+  reason: string;
+  items: PurchaseReturnItemCreate[];
+}
+
+export interface UpdatePurchaseReturnPayload {
+  return_date?: string;
+  items?: PurchaseReturnItemCreate[];
+  reason?: string;
+  note?: string;
+}
+
+export interface ApprovePurchaseReturnPayload {
+  approval_notes?: string;
+}
+
+export interface ProcessPurchaseReturnPayload {
+  processing_notes?: string;
+  refund_to_supplier?: boolean;
+  refund_amount?: number;
+  refund_payment_method?: "cash" | "bank";
+  refund_reference?: string;
+  debit_account_code?: string;
+  refund_later?: boolean;
+}
+
+export interface RefundPurchaseReturnPayload {
+  refund_amount: number;
+  payment_method: "cash" | "bank_transfer" | "check";
+  refund_reference?: string;
+  debit_account_code: string;
+  refund_notes?: string;
+}
+
+export interface RefundHistory {
+  id: number;
+  type: string;
+  amount: string;
+  method: string;
+  note?: string;
+  purchase_return_id: number;
+  debit_account_code: string;
+  credit_account_code: string;
+  created_at: string;
+}
+
+export interface PurchaseReturn {
+  id: number;
+  return_no: string;
+  purchase_id: number;
+  purchase?: Purchase;
+  supplier_id: number;
+  supplier?: Supplier;
+  warehouse_id: number;
+  warehouse?: Warehouse;
+  items: PurchaseReturnItem[];
+  total: string;
+  reason: string;
+  status: "draft" | "approved" | "processed" | "cancelled";
+  approved_at?: string;
+  approved_by?: number;
+  approved_user?: User;
+  processed_at?: string;
+  processed_by?: number;
+  processed_user?: User;
+  approval_notes?: string;
+  processing_notes?: string;
+  created_at: string;
+  updated_at: string;
+  refund_to_supplier: boolean;
+  refund_reference: string;
+  refund_payment_method: "cash" | "bank";
+  refunded_at: string;
+  debit_account_code: string;
+  refund_amount: string;
+  refund_history?: RefundHistory[];
 }

@@ -151,7 +151,7 @@ export default function PurchasePaymentModal({
                 <Select
                   options={filteredAccounts.map((acc: any) => ({
                     value: acc.code,
-                    label: `${acc.name} - ${acc.account_number}`,
+                    label: `${acc.name} - ${acc.code}`,
                   }))}
                   placeholder="Select Account"
                   value={field.value}

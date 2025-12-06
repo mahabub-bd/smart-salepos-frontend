@@ -131,7 +131,8 @@ export default function PurchaseReturnModal({
           product_id: item.product_id,
           purchase_item_id: item.purchase_item_id,
           returned_quantity: item.returned_quantity,
-          price: item.price,
+          price: item.price, // Send as number for create API
+          line_total: (item.returned_quantity * item.price).toString(), // Calculate line_total as string
         })),
       }).unwrap();
 

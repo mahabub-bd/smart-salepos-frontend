@@ -93,7 +93,7 @@ export default function SignInForm() {
               type={showPassword ? "text" : "password"}
               placeholder="Enter password"
               {...register("password")}
-              className="pr-10" 
+              className="pr-10"
             />
             <button
               type="button"
@@ -126,7 +126,7 @@ export default function SignInForm() {
         </div>
 
         {/* Submit Button */}
-        <Button className="w-full" size="sm" disabled={isLoading}>
+        <Button type="submit" className="w-full" size="sm" disabled={isLoading}>
           {isLoading ? "Signing in..." : "Sign In"}
         </Button>
       </form>

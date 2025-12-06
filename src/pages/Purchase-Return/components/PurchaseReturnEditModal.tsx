@@ -14,14 +14,13 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import {
-  PurchaseReturn,
-  PurchaseReturnItem,
   useCancelPurchaseReturnMutation,
   useUpdatePurchaseReturnMutation,
 } from "../../../features/purchase-return/purchaseReturnApi";
-import PurchaseReturnStatusBadge from "./PurchaseReturnStatusBadge";
 import ApprovalModal from "./ApprovalModal";
 import ProcessingModal from "./ProcessingModal";
+import PurchaseReturnStatusBadge from "./PurchaseReturnStatusBadge";
+import { PurchaseReturn, PurchaseReturnItem } from "../../../types";
 
 interface PurchaseReturnEditModalProps {
   isOpen: boolean;
@@ -49,12 +48,7 @@ export default function PurchaseReturnEditModal({
   // Initialize form when purchaseReturn changes
   useEffect(() => {
     if (purchaseReturn && isOpen) {
-      setReturnItems(
-        purchaseReturn.items.map((item) => ({
-          ...item,
-          price: parseFloat(item.price?.toString() || "0"),
-        }))
-      );
+      setReturnItems(purchaseReturn.items);
       setReason(purchaseReturn.reason || "");
     }
   }, [purchaseReturn, isOpen]);
@@ -78,7 +72,12 @@ export default function PurchaseReturnEditModal({
 
   const getTotalReturnAmount = () => {
     return returnItems.reduce(
-      (total, item) => total + item.returned_quantity * item.price,
+      (total, item) =>
+        total +
+        item.returned_quantity *
+          (typeof item.price === "string"
+            ? parseFloat(item.price)
+            : item.price),
       0
     );
   };
@@ -93,8 +92,13 @@ export default function PurchaseReturnEditModal({
         id: purchaseReturn.id,
         body: {
           items: returnItems.map((item) => ({
-            ...item,
-            price: parseFloat(item.price?.toString() || "0"),
+            product_id: item.product_id,
+            purchase_item_id: item.purchase_item_id,
+            returned_quantity: item.returned_quantity,
+            price:
+              typeof item.price === "string"
+                ? parseFloat(item.price)
+                : item.price,
           })),
           reason: reason.trim(),
         },
@@ -170,27 +174,32 @@ export default function PurchaseReturnEditModal({
           {/* Approval Information (shown for approved returns) */}
           {isApproved && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-blue-800 mb-2">Approval Information</h4>
+              <h4 className="text-sm font-semibold text-blue-800 mb-2">
+                Approval Information
+              </h4>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <span className="text-gray-600">Approved At: </span>
                   <span className="font-medium">
                     {purchaseReturn.approved_at
                       ? new Date(purchaseReturn.approved_at).toLocaleString()
-                      : '-'
-                    }
+                      : "-"}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Approved By: </span>
                   <span className="font-medium">
-                    {purchaseReturn.approved_by ? `User ID: ${purchaseReturn.approved_by}` : '-'}
+                    {purchaseReturn.approved_by
+                      ? `User ID: ${purchaseReturn.approved_by}`
+                      : "-"}
                   </span>
                 </div>
                 {purchaseReturn.approval_notes && (
                   <div className="col-span-2">
                     <span className="text-gray-600">Approval Notes: </span>
-                    <p className="font-medium mt-1">{purchaseReturn.approval_notes}</p>
+                    <p className="font-medium mt-1">
+                      {purchaseReturn.approval_notes}
+                    </p>
                   </div>
                 )}
               </div>
@@ -270,11 +279,17 @@ export default function PurchaseReturnEditModal({
                             />
                           </TableCell>
                           <TableCell className="text-right">
-                            {item.price.toLocaleString()}
+                            {(typeof item.price === "string"
+                              ? parseFloat(item.price)
+                              : item.price
+                            ).toLocaleString()}
                           </TableCell>
                           <TableCell className="text-right font-medium">
                             {(
-                              item.returned_quantity * item.price
+                              item.returned_quantity *
+                              (typeof item.price === "string"
+                                ? parseFloat(item.price)
+                                : item.price)
                             ).toLocaleString()}
                           </TableCell>
                         </TableRow>
@@ -380,12 +395,16 @@ export default function PurchaseReturnEditModal({
       <ApprovalModal
         isOpen={isApprovalModalOpen}
         onClose={() => setIsApprovalModalOpen(false)}
-        purchaseReturn={purchaseReturn ? {
-          id: purchaseReturn.id,
-          return_no: purchaseReturn.return_no,
-          supplier_name: purchaseReturn.supplier?.name,
-          total: purchaseReturn.total || "0",
-        } : null}
+        purchaseReturn={
+          purchaseReturn
+            ? {
+                id: purchaseReturn.id,
+                return_no: purchaseReturn.return_no,
+                supplier_name: purchaseReturn.supplier?.name,
+                total: purchaseReturn.total || "0",
+              }
+            : null
+        }
         onSuccess={() => {
           onUpdated?.();
           onClose();
@@ -396,12 +415,16 @@ export default function PurchaseReturnEditModal({
       <ProcessingModal
         isOpen={isProcessingModalOpen}
         onClose={() => setIsProcessingModalOpen(false)}
-        purchaseReturn={purchaseReturn ? {
-          id: purchaseReturn.id,
-          return_no: purchaseReturn.return_no,
-          supplier_name: purchaseReturn.supplier?.name,
-          total: purchaseReturn.total || "0",
-        } : null}
+        purchaseReturn={
+          purchaseReturn
+            ? {
+                id: purchaseReturn.id,
+                return_no: purchaseReturn.return_no,
+                supplier_name: purchaseReturn.supplier?.name,
+                total: purchaseReturn.total || "0",
+              }
+            : null
+        }
         onSuccess={() => {
           onUpdated?.();
           onClose();
