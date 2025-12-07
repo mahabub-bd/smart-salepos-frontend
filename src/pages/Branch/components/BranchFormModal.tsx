@@ -63,10 +63,7 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
         phone: branch.phone,
         email: branch.email,
         is_active: branch.is_active,
-        default_warehouse_id:
-          branch.default_warehouse_id?.toString() ||
-          branch.default_warehouse?.id?.toString() ||
-          "",
+        default_warehouse_id: branch.default_warehouse_id?.toString() || "",
       });
     } else {
       reset({
@@ -104,11 +101,12 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Branch" : "Create New Branch"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-2xl p-6"
+      title={isEdit ? "Update Branch" : "Create New Branch"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Branch Code */}
         <div>

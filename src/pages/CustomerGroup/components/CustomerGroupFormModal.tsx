@@ -72,11 +72,12 @@ export default function CustomerGroupFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="p-6 max-w-lg">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Customer Group" : "Create Customer Group"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="p-6 max-w-lg"
+      title={isEdit ? "Update Customer Group" : "Create Customer Group"}
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Label>Group Name *</Label>
         <InputField

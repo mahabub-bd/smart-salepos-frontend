@@ -6,6 +6,7 @@ import Label from "../../../components/form/Label";
 import { Modal } from "../../../components/ui/modal";
 import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 
+import Button from "../../../components/ui/button/Button";
 import {
   useCreateBrandMutation,
   useUpdateBrandMutation,
@@ -123,11 +124,12 @@ export default function BrandFormModal({ isOpen, onClose, brand }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Brand" : "Create New Brand"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6"
+      title={isEdit ? "Update Brand" : "Create New Brand"}
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Brand Name */}
         <div>
@@ -175,13 +177,9 @@ export default function BrandFormModal({ isOpen, onClose, brand }: Props) {
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50"
-          disabled={isUploading || !attachmentId} // 🚀 Only enabled AFTER successful logo upload
-        >
+        <Button type="submit" disabled={isUploading || !attachmentId}>
           {isEdit ? "Update Brand" : "Create Brand"}
-        </button>
+        </Button>
       </form>
     </Modal>
   );

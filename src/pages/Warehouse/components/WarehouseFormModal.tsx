@@ -9,6 +9,7 @@ import Input from "../../../components/form/input/InputField";
 import Switch from "../../../components/form/switch/Switch";
 import { Modal } from "../../../components/ui/modal";
 
+import Button from "../../../components/ui/button/Button";
 import {
   useCreateWarehouseMutation,
   useUpdateWarehouseMutation,
@@ -60,8 +61,7 @@ export default function WarehouseFormModal({
     },
   });
 
-  const statusValue = watch("status"); // 👈 Best practice
-
+  const statusValue = watch("status");
   useEffect(() => {
     if (isEdit && warehouse) {
       reset({
@@ -91,11 +91,12 @@ export default function WarehouseFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Warehouse" : "Create New Warehouse"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6"
+      title={isEdit ? "Update Warehouse" : "Create New Warehouse"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div>
           <Label>Name</Label>
@@ -132,20 +133,16 @@ export default function WarehouseFormModal({
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
-          <button
+          <Button
             type="button"
             className="px-4 py-2 border rounded"
             onClick={onClose}
           >
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 bg-brand-600 text-white rounded"
-          >
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : isEdit ? "Update" : "Create"}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

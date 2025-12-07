@@ -4,16 +4,16 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 // API hooks
-import { useGetRolesQuery } from "../../../features/role/roleApi";
 import { useGetBranchesQuery } from "../../../features/branch/branchApi";
+import { useGetRolesQuery } from "../../../features/role/roleApi";
 import {
   useCreateUserMutation,
   useGetUserByIdQuery,
   useUpdateUserMutation,
 } from "../../../features/user/userApi";
 
-import { Role } from "../../../types/role";
 import { Branch } from "../../../types";
+import { Role } from "../../../types/role";
 
 // UI
 import { toast } from "react-toastify";
@@ -147,11 +147,12 @@ export default function UserFormModal({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
-      <h2 className="text-lg font-semibold mb-5">
-        {isEdit ? "Update User" : "Create New User"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6"
+      title={isEdit ? "Update User" : "Create New User"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {/* Username */}
         <Input
@@ -263,7 +264,9 @@ export default function UserFormModal({
                         field.onChange(
                           checked
                             ? [...(field.value || []), branch.id] // Add branch
-                            : (field.value || []).filter((id) => id !== branch.id) // Remove branch
+                            : (field.value || []).filter(
+                                (id) => id !== branch.id
+                              ) // Remove branch
                         )
                       }
                     />

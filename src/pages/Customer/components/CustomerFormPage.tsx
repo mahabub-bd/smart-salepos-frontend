@@ -15,6 +15,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Loading from "../../../components/common/Loading";
 
 // 🔹 Zod Validation Schema
 const customerSchema = z.object({
@@ -193,11 +194,7 @@ export default function CustomerFormPage() {
   };
 
   if (isEdit && isLoadingCustomer) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading customer data...</div>
-      </div>
-    );
+    return <Loading message="Loading customer data..." />;
   }
 
   return (

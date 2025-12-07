@@ -25,19 +25,17 @@ export default function InventoryWarehouseList() {
       <div className="rounded-xl border bg-white">
         <div className="overflow-x-auto">
           <Table className="w-full text-sm">
-            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+            <TableHeader>
               <TableRow>
-                <TableCell className="table-header">Warehouse</TableCell>
-                <TableCell className="table-header">Location</TableCell>
-                <TableCell className="table-header">Purchased</TableCell>
-                <TableCell className="table-header">Sold</TableCell>
-                <TableCell className="table-header">Remaining</TableCell>
-                <TableCell className="table-header">Purchase Value</TableCell>
-                <TableCell className="table-header">Sale Value</TableCell>
-                <TableCell className="table-header">Products</TableCell>
-                <TableCell className="table-header text-right">
-                  Actions
-                </TableCell>
+                <TableCell isHeader>Warehouse</TableCell>
+                <TableCell isHeader>Location</TableCell>
+                <TableCell isHeader>Purchased</TableCell>
+                <TableCell isHeader>Sold</TableCell>
+                <TableCell isHeader>Remaining</TableCell>
+                <TableCell isHeader>Purchase Value</TableCell>
+                <TableCell isHeader>Sale Value</TableCell>
+                <TableCell isHeader>Products</TableCell>
+                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -46,37 +44,31 @@ export default function InventoryWarehouseList() {
                 warehouses.map((item: any) => (
                   <TableRow key={item.warehouse_id} className="border-b">
                     {/* Warehouse Name */}
-                    <TableCell className="table-body font-semibold">
-                      {item.warehouse.name}
-                    </TableCell>
+                    <TableCell>{item.warehouse.name}</TableCell>
 
                     {/* Location */}
-                    <TableCell className="table-body">
-                      {item.warehouse.location}
-                    </TableCell>
+                    <TableCell>{item.warehouse.location}</TableCell>
 
                     {/* Purchased */}
-                    <TableCell className="table-body font-medium">
-                      {item.total_stock}
-                    </TableCell>
+                    <TableCell>{item.total_stock}</TableCell>
 
                     {/* Sold */}
-                    <TableCell className="table-body font-medium text-red-500">
+                    <TableCell className=" text-red-500">
                       {item.total_sold_quantity}
                     </TableCell>
 
                     {/* Remaining */}
-                    <TableCell className="table-body font-medium text-green-600">
+                    <TableCell className=" text-green-600">
                       {item.remaining_stock}
                     </TableCell>
 
                     {/* Purchase Value */}
-                    <TableCell className="table-body font-medium">
+                    <TableCell className=" font-medium">
                       {item.purchase_value?.toLocaleString() || 0}
                     </TableCell>
 
                     {/* Sale Value */}
-                    <TableCell className="table-body font-medium">
+                    <TableCell className=" font-medium">
                       {item.sale_value?.toLocaleString() || 0}
                     </TableCell>
 

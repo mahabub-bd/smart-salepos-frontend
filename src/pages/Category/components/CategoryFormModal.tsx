@@ -177,16 +177,21 @@ export default function CategoryFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-xl p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-xl p-6"
+      title={
+        isEdit
           ? isSubCategory
             ? "Update Subcategory"
             : "Update Category"
           : category?.category_id
           ? "Create Subcategory"
-          : "Create Category"}
-      </h2>
+          : "Create Category"
+      }
+    >
+    
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name */}

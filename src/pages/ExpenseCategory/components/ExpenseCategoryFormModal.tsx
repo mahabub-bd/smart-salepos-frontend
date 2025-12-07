@@ -78,10 +78,13 @@ export default function ExpenseCategoryFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Expense Category" : "Create New Expense Category"}
-      </h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-2xl p-6"
+      title={isEdit ? "Update Expense Category" : "Create New Expense Category"}
+    >
+  
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Category Name */}

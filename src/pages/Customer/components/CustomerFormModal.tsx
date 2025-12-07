@@ -150,191 +150,192 @@ export default function CustomerFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-3xl p-6 max-h-[90vh] flex flex-col">
-      <h2 className="text-lg font-semibold mb-4 shrink-0">
-        {isEdit ? "Update Customer" : "Create New Customer"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-3xl p-6 max-h-[90vh] flex flex-col"
+      title={isEdit ? "Update Customer" : "Create New Customer"}
+    >
       <div className="overflow-y-auto flex-1 px-1">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {/* Customer Name */}
-        <div>
-          <Label>
-            Customer Name<span className="text-red-500">*</span>
-          </Label>
-          <Input placeholder="John Doe" {...register("name")} />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
-          )}
-        </div>
-
-        {/* Email & Phone */}
-        <div className="grid grid-cols-2 gap-4">
+          {/* Customer Name */}
           <div>
             <Label>
-              Email<span className="text-red-500">*</span>
+              Customer Name<span className="text-red-500">*</span>
             </Label>
-            <Input
-              type="email"
-              placeholder="email@example.com"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            <Input placeholder="John Doe" {...register("name")} />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
             )}
           </div>
 
+          {/* Email & Phone */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>
+                Email<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="email"
+                placeholder="email@example.com"
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label>
+                Phone<span className="text-red-500">*</span>
+              </Label>
+              <Input placeholder="01700000000" {...register("phone")} />
+              {errors.phone && (
+                <p className="text-red-500 text-sm">{errors.phone.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Billing Address */}
+          <div className="border rounded-lg p-4 bg-gray-50">
+            <h3 className="text-md font-medium mb-3">Billing Address</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Contact Name</Label>
+                <Input
+                  placeholder="John Doe"
+                  {...register("billing_address.contact_name")}
+                />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  placeholder="01700000000"
+                  {...register("billing_address.phone")}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <Label>Street</Label>
+              <Input
+                placeholder="123 Main Street"
+                {...register("billing_address.street")}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <Label>City</Label>
+                <Input
+                  placeholder="Dhaka"
+                  {...register("billing_address.city")}
+                />
+              </div>
+              <div>
+                <Label>Country</Label>
+                <Input
+                  placeholder="Bangladesh"
+                  {...register("billing_address.country")}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Shipping Address */}
+          <div className="border rounded-lg p-4 bg-gray-50">
+            <h3 className="text-md font-medium mb-3">Shipping Address</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Contact Name</Label>
+                <Input
+                  placeholder="John Doe"
+                  {...register("shipping_address.contact_name")}
+                />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  placeholder="01700000000"
+                  {...register("shipping_address.phone")}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <Label>Street</Label>
+              <Input
+                placeholder="456 Shipping Lane"
+                {...register("shipping_address.street")}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <Label>City</Label>
+                <Input
+                  placeholder="Chattogram"
+                  {...register("shipping_address.city")}
+                />
+              </div>
+              <div>
+                <Label>Country</Label>
+                <Input
+                  placeholder="Bangladesh"
+                  {...register("shipping_address.country")}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Group */}
           <div>
-            <Label>
-              Phone<span className="text-red-500">*</span>
-            </Label>
-            <Input placeholder="01700000000" {...register("phone")} />
-            {errors.phone && (
-              <p className="text-red-500 text-sm">{errors.phone.message}</p>
-            )}
+            <Label>Customer Group</Label>
+            <select
+              {...register("group_id")}
+              className="w-full px-3 py-2 border rounded-lg"
+            >
+              <option value="">Select Customer Group (Optional)</option>
+              {customerGroups.map((group: any) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
 
-        {/* Billing Address */}
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <h3 className="text-md font-medium mb-3">Billing Address</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Contact Name</Label>
-              <Input
-                placeholder="John Doe"
-                {...register("billing_address.contact_name")}
-              />
-            </div>
-            <div>
-              <Label>Phone</Label>
-              <Input
-                placeholder="01700000000"
-                {...register("billing_address.phone")}
-              />
-            </div>
-          </div>
-          <div className="mt-3">
-            <Label>Street</Label>
-            <Input
-              placeholder="123 Main Street"
-              {...register("billing_address.street")}
+          {/* Status */}
+          <div className="flex items-center gap-2">
+            <Checkbox
+              label="Active"
+              checked={!!setValue} // To fix initial checkbox state
+              {...register("status")}
+              onChange={(checked) => setValue("status", checked)}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4 mt-3">
-            <div>
-              <Label>City</Label>
-              <Input
-                placeholder="Dhaka"
-                {...register("billing_address.city")}
-              />
-            </div>
-            <div>
-              <Label>Country</Label>
-              <Input
-                placeholder="Bangladesh"
-                {...register("billing_address.country")}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Shipping Address */}
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <h3 className="text-md font-medium mb-3">Shipping Address</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Contact Name</Label>
-              <Input
-                placeholder="John Doe"
-                {...register("shipping_address.contact_name")}
-              />
-            </div>
-            <div>
-              <Label>Phone</Label>
-              <Input
-                placeholder="01700000000"
-                {...register("shipping_address.phone")}
-              />
-            </div>
-          </div>
-          <div className="mt-3">
-            <Label>Street</Label>
-            <Input
-              placeholder="456 Shipping Lane"
-              {...register("shipping_address.street")}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4 mt-3">
-            <div>
-              <Label>City</Label>
-              <Input
-                placeholder="Chattogram"
-                {...register("shipping_address.city")}
-              />
-            </div>
-            <div>
-              <Label>Country</Label>
-              <Input
-                placeholder="Bangladesh"
-                {...register("shipping_address.country")}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Customer Group */}
-        <div>
-          <Label>Customer Group</Label>
-          <select
-            {...register("group_id")}
-            className="w-full px-3 py-2 border rounded-lg"
-          >
-            <option value="">Select Customer Group (Optional)</option>
-            {customerGroups.map((group: any) => (
-              <option key={group.id} value={group.id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Status */}
-        <div className="flex items-center gap-2">
-          <Checkbox
-            label="Active"
-            checked={!!setValue} // To fix initial checkbox state
-            {...register("status")}
-            onChange={(checked) => setValue("status", checked)}
-          />
-        </div>
         </form>
       </div>
 
-        {/* Submit Buttons */}
-        <div className="flex justify-end gap-3 mt-4 shrink-0">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-100 rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 py-2 bg-brand-600 text-white rounded-lg"
-            onClick={handleSubmit(onSubmit)}
-          >
-            {isLoading
-              ? isEdit
-                ? "Updating..."
-                : "Creating..."
-              : isEdit
-              ? "Update Customer"
-              : "Create Customer"}
-          </button>
-        </div>
+      {/* Submit Buttons */}
+      <div className="flex justify-end gap-3 mt-4 shrink-0">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 bg-gray-100 rounded-lg"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="px-4 py-2 bg-brand-600 text-white rounded-lg"
+          onClick={handleSubmit(onSubmit)}
+        >
+          {isLoading
+            ? isEdit
+              ? "Updating..."
+              : "Creating..."
+            : isEdit
+            ? "Update Customer"
+            : "Create Customer"}
+        </button>
+      </div>
     </Modal>
   );
 }

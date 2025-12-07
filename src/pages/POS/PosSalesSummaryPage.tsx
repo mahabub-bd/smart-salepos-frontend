@@ -6,29 +6,23 @@ import {
   Smartphone,
   Wallet,
 } from "lucide-react";
-import { JSX, useState } from "react";
+import { useState } from "react";
+import Loading from "../../components/common/Loading";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import StatCard from "../../components/common/stat-card";
+
 import { useGetPosSalesSummaryQuery } from "../../features/pos/posApi";
+import { formatCurrencyEnglish } from "../../utlis";
+import PaymentBox from "./PaymentBox";
+import DatePicker from "../../components/form/date-picker";
 
 export default function PosSalesSummaryPage() {
-  const today = new Date().toISOString().split("T")[0];
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  // 🔹 Pass the selected date into API
   const { data, isLoading, isError, refetch } = useGetPosSalesSummaryQuery({});
 
   const salesData = data?.data;
-
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "BDT",
-      minimumFractionDigits: 0,
-    })
-      .format(amount)
-      .replace("BDT", "৳");
 
   return (
     <div>
@@ -48,24 +42,26 @@ export default function PosSalesSummaryPage() {
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
             Sales Summary
           </h2>
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="date-select"
-              className="text-sm text-gray-600 dark:text-gray-400"
-            >
-              Date:
-            </label>
-            <input
-              id="date-select"
-              type="date"
-              max={today}
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
+          <div className="flex items-center gap-3">
+            <div className="w-64">
+              <DatePicker
+                id="sales-date-picker"
+                mode="single"
+                value={selectedDate}
+                onChange={(date) => {
+                  if (date instanceof Date) {
+                    setSelectedDate(date);
+                  }
+                }}
+                placeholder="Select date"
+                disableFuture={true}
+                label="Date"
+                isInLine={true}
+              />
+            </div>
             <button
               onClick={() => refetch()}
-              className="px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600"
+              className="px-4 py-2 rounded-lg bg-brand-500 text-white text-sm font-medium hover:bg-brand-600 transition-colors shadow-sm"
             >
               Refresh
             </button>
@@ -73,11 +69,7 @@ export default function PosSalesSummaryPage() {
         </div>
 
         {/* 🔹 Loading State */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500"></div>
-          </div>
-        )}
+        {isLoading && <Loading message="Loading Sale.." />}
 
         {/* 🔹 Error State */}
         {isError && (
@@ -107,21 +99,21 @@ export default function PosSalesSummaryPage() {
               <StatCard
                 icon={DollarSign}
                 title="Total Revenue"
-                value={formatCurrency(salesData.total_revenue)}
+                value={formatCurrencyEnglish(salesData.total_revenue)}
                 bgColor="green"
               />
 
               <StatCard
                 icon={Wallet}
                 title="Cash Payments"
-                value={formatCurrency(salesData.payment_breakdown.cash)}
+                value={formatCurrencyEnglish(salesData.payment_breakdown.cash)}
                 bgColor="blue"
               />
 
               <StatCard
                 icon={CreditCard}
                 title="Card Payments"
-                value={formatCurrency(salesData.payment_breakdown.card)}
+                value={formatCurrencyEnglish(salesData.payment_breakdown.card)}
                 bgColor="purple"
               />
             </div>
@@ -138,7 +130,9 @@ export default function PosSalesSummaryPage() {
                   }
                   bg="bg-blue-100 dark:bg-blue-800/50"
                   label="Cash"
-                  amount={formatCurrency(salesData.payment_breakdown.cash)}
+                  amount={formatCurrencyEnglish(
+                    salesData.payment_breakdown.cash
+                  )}
                 />
                 <PaymentBox
                   icon={
@@ -146,7 +140,9 @@ export default function PosSalesSummaryPage() {
                   }
                   bg="bg-purple-100 dark:bg-purple-800/50"
                   label="Card"
-                  amount={formatCurrency(salesData.payment_breakdown.card)}
+                  amount={formatCurrencyEnglish(
+                    salesData.payment_breakdown.card
+                  )}
                 />
                 <PaymentBox
                   icon={
@@ -154,7 +150,9 @@ export default function PosSalesSummaryPage() {
                   }
                   bg="bg-green-100 dark:bg-green-800/50"
                   label="Mobile"
-                  amount={formatCurrency(salesData.payment_breakdown.mobile)}
+                  amount={formatCurrencyEnglish(
+                    salesData.payment_breakdown.mobile
+                  )}
                 />
               </div>
             </div>
@@ -164,7 +162,7 @@ export default function PosSalesSummaryPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Showing sales data for{" "}
                 <span className="font-semibold text-gray-800 dark:text-white">
-                  {new Date(selectedDate).toLocaleDateString("en-US", {
+                  {selectedDate.toLocaleDateString("en-US", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
@@ -179,30 +177,3 @@ export default function PosSalesSummaryPage() {
     </div>
   );
 }
-
-// 📦 Extract Small Component for Payment Box
-const PaymentBox = ({
-  icon,
-  bg,
-  label,
-  amount,
-}: {
-  icon: JSX.Element;
-  bg: string;
-  label: string;
-  amount: string;
-}) => (
-  <div className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-    <div
-      className={`flex items-center justify-center w-12 h-12 rounded-lg ${bg}`}
-    >
-      {icon}
-    </div>
-    <div>
-      <p className="text-sm text-gray-600 dark:text-gray-400">{label}</p>
-      <p className="text-xl font-bold text-gray-800 dark:text-white">
-        {amount}
-      </p>
-    </div>
-  </div>
-);

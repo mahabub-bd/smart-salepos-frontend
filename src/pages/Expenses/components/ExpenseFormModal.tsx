@@ -8,7 +8,6 @@ import { ExpenseFormValues, expenseSchema } from "./expenseSchema";
 
 import Select from "../../../components/form/Select";
 
-
 // API hooks
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
@@ -16,7 +15,10 @@ import { Modal } from "../../../components/ui/modal";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useGetBranchesQuery } from "../../../features/branch/branchApi";
 import { useGetExpenseCategoriesQuery } from "../../../features/expense-category/expenseCategoryApi";
-import { useCreateExpenseMutation, useUpdateExpenseMutation } from "../../../features/expenses/expensesApi";
+import {
+  useCreateExpenseMutation,
+  useUpdateExpenseMutation,
+} from "../../../features/expenses/expensesApi";
 
 interface ExpenseFormModalProps {
   isOpen: boolean;
@@ -36,17 +38,13 @@ export default function ExpenseFormModal({
   const branches = branchData?.data || [];
 
   const { data: accountsData } = useGetAccountsQuery({
-
     isCash: true,
     isBank: true,
   });
   const accounts = accountsData?.data || [];
 
-
   const [createExpense, { isLoading: creating }] = useCreateExpenseMutation();
   const [updateExpense, { isLoading: updating }] = useUpdateExpenseMutation();
-
-
 
   const {
     register,
@@ -65,7 +63,6 @@ export default function ExpenseFormModal({
       branch_id: 0,
       payment_method: "cash",
       account_code: "",
-
     },
   });
 
@@ -81,9 +78,10 @@ export default function ExpenseFormModal({
         amount: expense.amount ? parseFloat(expense.amount) : 0,
         category_id: expense.category_id || 0,
         branch_id: expense.branch_id || 0,
-        payment_method: (expense.payment_method === "cash" || expense.payment_method === "bank")
-          ? expense.payment_method
-          : "cash",
+        payment_method:
+          expense.payment_method === "cash" || expense.payment_method === "bank"
+            ? expense.payment_method
+            : "cash",
         account_code: expense.account_code || "",
       });
     } else {
@@ -103,8 +101,6 @@ export default function ExpenseFormModal({
   /** FORM SUBMIT */
   const onSubmit = async (values: ExpenseFormValues) => {
     try {
-
-
       const payload = { ...values };
 
       if (expense) {
@@ -122,11 +118,12 @@ export default function ExpenseFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl p-6">
-      <h2 className="text-xl font-semibold mb-4">
-        {expense ? "Edit Expense" : "Create Expense"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-2xl p-6"
+      title={expense ? "Edit Expense" : "Create Expense"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Title */}
         <div>
@@ -161,7 +158,9 @@ export default function ExpenseFormModal({
                 label: c.name,
               }))}
               value={watch("category_id") ? String(watch("category_id")) : ""}
-              onChange={(v) => setValue("category_id", Number(v), { shouldValidate: true })}
+              onChange={(v) =>
+                setValue("category_id", Number(v), { shouldValidate: true })
+              }
             />
             <p className="text-red-500 text-sm">
               {errors.category_id?.message}
@@ -176,7 +175,9 @@ export default function ExpenseFormModal({
                 label: b.name,
               }))}
               value={watch("branch_id") ? String(watch("branch_id")) : ""}
-              onChange={(v) => setValue("branch_id", Number(v), { shouldValidate: true })}
+              onChange={(v) =>
+                setValue("branch_id", Number(v), { shouldValidate: true })
+              }
             />
             <p className="text-red-500 text-sm">{errors.branch_id?.message}</p>
           </div>
@@ -208,16 +209,16 @@ export default function ExpenseFormModal({
             <Select
               options={accounts
                 .filter((acc: any) =>
-                  watch("payment_method") === "cash"
-                    ? acc.isCash
-                    : acc.isBank
+                  watch("payment_method") === "cash" ? acc.isCash : acc.isBank
                 )
                 .map((a: any) => ({
                   value: a.code,
                   label: `${a.name} (${a.code})`,
                 }))}
               value={watch("account_code") || ""}
-              onChange={(v) => setValue("account_code", v, { shouldValidate: true })}
+              onChange={(v) =>
+                setValue("account_code", v, { shouldValidate: true })
+              }
             />
 
             <p className="text-red-500 text-sm">
@@ -225,9 +226,6 @@ export default function ExpenseFormModal({
             </p>
           </div>
         </div>
-
-
-
 
         {/* Buttons */}
         <div className="flex justify-end gap-3 pt-4">
@@ -248,8 +246,8 @@ export default function ExpenseFormModal({
                 ? "Updating..."
                 : "Creating..."
               : isEdit
-                ? "Update Expense"
-                : "Create Expense"}
+              ? "Update Expense"
+              : "Create Expense"}
           </button>
         </div>
       </form>

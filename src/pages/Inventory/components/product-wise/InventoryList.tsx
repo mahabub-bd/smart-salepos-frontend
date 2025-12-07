@@ -26,19 +26,17 @@ export default function InventoryListProductWise() {
       <div className="rounded-xl border bg-white mt-5">
         <div className="overflow-x-auto">
           <Table className="w-full text-sm">
-            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+            <TableHeader>
               <TableRow>
-                <TableCell className="table-header">Product</TableCell>
-                <TableCell className="table-header">SKU</TableCell>
-                <TableCell className="table-header">Purchased</TableCell>
-                <TableCell className="table-header">Sold</TableCell>
-                <TableCell className="table-header">Remaining</TableCell>
-                <TableCell className="table-header">Purchase Value</TableCell>
-                <TableCell className="table-header">Sale Value</TableCell>
-                <TableCell className="table-header">Warehouses</TableCell>
-                <TableCell className="table-header text-right">
-                  Actions
-                </TableCell>
+                <TableCell isHeader>Product</TableCell>
+                <TableCell isHeader>SKU</TableCell>
+                <TableCell isHeader>Purchased</TableCell>
+                <TableCell isHeader>Sold</TableCell>
+                <TableCell isHeader>Remaining</TableCell>
+                <TableCell isHeader>Purchase Value</TableCell>
+                <TableCell isHeader>Sale Value</TableCell>
+                <TableCell isHeader>Warehouses</TableCell>
+                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -47,37 +45,31 @@ export default function InventoryListProductWise() {
                 inventory.map((item) => (
                   <TableRow key={item.product_id} className="border-b">
                     {/* Product Name */}
-                    <TableCell className="table-body font-semibold">
-                      {item.product.name}
-                    </TableCell>
+                    <TableCell>{item.product.name}</TableCell>
 
                     {/* SKU */}
-                    <TableCell className="table-body text-gray-600">
-                      {item.product.sku}
-                    </TableCell>
+                    <TableCell>{item.product.sku}</TableCell>
 
                     {/* Purchased (Total Stock) */}
-                    <TableCell className="table-body font-medium">
-                      {item.total_stock}
-                    </TableCell>
+                    <TableCell>{item.total_stock}</TableCell>
 
                     {/* Sold */}
-                    <TableCell className="table-body font-medium text-red-500">
+                    <TableCell className=" text-red-500">
                       {item.total_sold_quantity}
                     </TableCell>
 
                     {/* Remaining */}
-                    <TableCell className="table-body font-medium text-green-600">
+                    <TableCell className=" text-green-600">
                       {item.remaining_stock}
                     </TableCell>
 
                     {/* Purchase Value */}
-                    <TableCell className="table-body font-medium text-blue-600">
+                    <TableCell className=" text-blue-600">
                       ৳{item.purchase_value.toLocaleString()}
                     </TableCell>
 
                     {/* Sale Value */}
-                    <TableCell className="table-body font-medium text-purple-600">
+                    <TableCell className=" text-purple-600">
                       ৳{item.sale_value.toLocaleString()}
                     </TableCell>
 

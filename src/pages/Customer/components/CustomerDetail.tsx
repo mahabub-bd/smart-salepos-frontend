@@ -1,14 +1,13 @@
-import { Link } from "react-router";
 import Loading from "../../../components/common/Loading";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../../components/ui/table";
 import { useGetCustomerByIdQuery } from "../../../features/customer/customerApi";
-import { Sale } from "../../../types";
+import {
+  DetailCard,
+  HeaderSection,
+  Info,
+  MetricsCard,
+  TableCard,
+} from "./ReuseableComponent";
+import SalesTable from "./SalesTable";
 
 interface Props {
   customerId: string;
@@ -135,100 +134,3 @@ export default function CustomerDetail({ customerId }: Props) {
     </>
   );
 }
-
-/* ---------------------- Reusable Components ---------------------- */
-
-const HeaderSection = ({ customer }: any) => (
-  <div className="flex justify-between mb-4">
-    <h1 className="text-xl font-semibold">Customer Details {customer?.name}</h1>
-  </div>
-);
-
-const DetailCard = ({ title, children }: any) => (
-  <div className="bg-white shadow-sm rounded-xl border p-4 mb-4">
-    <h2 className="text-lg font-medium mb-3">{title}</h2>
-    {children}
-  </div>
-);
-
-const TableCard = ({ title, children }: any) => (
-  <DetailCard title={title}>
-    <div className="overflow-x-auto">{children}</div>
-  </DetailCard>
-);
-
-const Info = ({ label, value }: { label: string; value: any }) => (
-  <div>
-    <p className="text-gray-500 text-xs uppercase">{label}</p>
-    <p className="mt-1 font-medium">{value}</p>
-  </div>
-);
-
-const MetricsCard = ({ sales, paid, due, total }: any) => (
-  <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4 grid grid-cols-4 gap-4 text-center">
-    <Metric label="Sales" value={sales} color="text-blue-600" />
-    <Metric label="Total Amount" value={total} color="text-gray-800" />
-    <Metric label="Paid" value={paid} color="text-green-600" />
-    <Metric label="Due" value={due} color="text-red-600" />
-  </div>
-);
-
-const Metric = ({ label, value, color }: any) => (
-  <div>
-    <p className="text-xs text-gray-500 uppercase">{label}</p>
-    <p className={`text-lg font-bold ${color}`}>
-      {Number(value).toLocaleString()}
-    </p>
-  </div>
-);
-
-/* ---------------- Sales History Table ---------------- */
-
-const SalesTable = ({ sales }: any) => (
-  <div className="max-w-full overflow-x-auto">
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableCell isHeader>Invoice</TableCell>
-          <TableCell isHeader>Date</TableCell>
-          <TableCell isHeader>Items</TableCell>
-          <TableCell isHeader>Total</TableCell>
-          <TableCell isHeader>Paid</TableCell>
-          <TableCell isHeader>Due</TableCell>
-          <TableCell isHeader>Sale Type</TableCell>
-          <TableCell isHeader>Status</TableCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sales.map((s: Sale) => (
-          <TableRow key={s.id} className="border-b">
-            <TableCell className="table-body">
-              <Link
-                to={`/sales/${s.id}`}
-                className="text-blue-600 hover:text-blue-800 font-medium"
-              >
-                {s.invoice_no}
-              </Link>
-            </TableCell>
-
-            <TableCell className="table-body">
-              {new Date(s.created_at).toLocaleDateString()}
-            </TableCell>
-            <TableCell className="table-body">{s.items?.length || 0}</TableCell>
-            <td className="table-body">{Number(s.total).toLocaleString()}</td>
-            <TableCell className="table-body text-green-600 font-medium">
-              {Number(s.paid_amount).toLocaleString()}
-            </TableCell>
-            <TableCell className="table-body text-red-500 font-medium">
-              {(Number(s.total) - Number(s.paid_amount)).toLocaleString()}
-            </TableCell>
-            <TableCell className="capitalize flex items-center gap-1">
-              {s.sale_type === "pos" ? "POS" : "Regular"}
-            </TableCell>
-            <TableCell className="table-body capitalize">{s.status}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </div>
-);

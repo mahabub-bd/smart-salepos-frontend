@@ -15,8 +15,8 @@ import { Role } from "../../../types/role";
 
 // UI
 import Input from "../../../components/form/input/InputField";
-import { Modal } from "../../../components/ui/modal";
 import Label from "../../../components/form/Label";
+import { Modal } from "../../../components/ui/modal";
 
 // Props
 interface Props {
@@ -84,11 +84,12 @@ export default function RoleFormModal({ isOpen, onClose, role }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
-      <h2 className="text-lg font-semibold mb-5">
-        {isEdit ? "Update Role" : "Create New Role"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6"
+      title={isEdit ? "Update Role" : "Create New Role"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <div>
           <Label className="text-sm font-medium mb-1 block">Role Name</Label>

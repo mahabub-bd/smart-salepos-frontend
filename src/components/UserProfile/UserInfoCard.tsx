@@ -111,9 +111,9 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
 
       {/* 📝 Edit Modal */}
       <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
-        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+        <div className="no-scrollbar relative w-full max-w-[500px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-            <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
+            <div className="custom-scrollbar  overflow-y-auto px-2 pb-3">
               <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                 Edit Personal Information
               </h5>
@@ -150,9 +150,9 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
               <Button size="sm" variant="outline" onClick={closeModal}>
                 Close
               </Button>
-              <button type="submit" disabled={isLoading}>
+              <Button size="sm" type="submit" disabled={isLoading}>
                 {isLoading ? "Saving..." : "Save Changes"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

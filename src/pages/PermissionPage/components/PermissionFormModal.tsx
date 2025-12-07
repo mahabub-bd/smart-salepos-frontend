@@ -86,11 +86,12 @@ export default function PermissionFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
-      <h2 className="text-lg font-semibold mb-5">
-        {isEdit ? "Update Permission" : "Create Permission"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6"
+      title={isEdit ? "Update Permission" : "Create Permission"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {/* Permission Key */}
         <Input

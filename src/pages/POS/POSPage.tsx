@@ -16,10 +16,12 @@ import { useGetCustomersQuery } from "../../features/customer/customerApi";
 
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
+import ThermalReceipt58mm from "../../components/receipt/ThermalReceipt58mm";
 import { useGetWarehouseWiseReportQuery } from "../../features/inventory/inventoryApi";
 import { useCreatePosSaleMutation } from "../../features/pos/posApi";
+import { useGetReceiptPreviewQuery } from "../../features/settings/settingsApi";
 import { useGetWarehousesQuery } from "../../features/warehouse/warehouseApi";
-import { Account, Customer, Warehouse } from "../../types";
+import { Account, Customer, Warehouse, ReceiptPreviewData } from "../../types";
 import CustomerFormModal from "../Customer/components/CustomerFormModal";
 
 interface CartItem {
@@ -89,6 +91,8 @@ export default function POSPage() {
   );
   const [paymentAccountCode, setPaymentAccountCode] = useState("");
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [completedSaleData, setCompletedSaleData] = useState<any>(null);
 
   // API Queries
   const { data: warehouseData } = useGetWarehousesQuery();
@@ -103,12 +107,38 @@ export default function POSPage() {
     search: searchProduct,
     warehouse_id: selectedWarehouse || undefined,
   });
+  const { data: receiptSettingsData } = useGetReceiptPreviewQuery();
   const [createSale, { isLoading: isCreating }] = useCreatePosSaleMutation();
 
   // Data extraction
   const warehouses = (warehouseData?.data || []) as Warehouse[];
   const customers = (customerData?.data || []) as Customer[];
   const accounts = (accountsData?.data || []) as Account[];
+  const receiptSettings = (receiptSettingsData?.data || {
+    business_name: null,
+    email: null,
+    phone: null,
+    address: null,
+    website: null,
+    currency: "BDT",
+    currency_symbol: "৳",
+    tax_registration: null,
+    company_registration: null,
+    footer_text: null,
+    receipt_header: null,
+    include_barcode: false,
+    include_customer_details: true,
+    logo_url: "",
+    default_invoice_layout: "standard",
+    show_product_images: false,
+    show_product_skus: true,
+    show_item_tax_details: false,
+    show_payment_breakdown: true,
+    invoice_paper_size: "A4",
+    print_duplicate_copy: false,
+    invoice_footer_message: null,
+    use_thermal_printer: true,
+  }) as ReceiptPreviewData;
 
   // Extract products from warehouse report
   const products: ExtendedProduct[] =
@@ -136,15 +166,16 @@ export default function POSPage() {
     paymentMethod === "cash"
       ? acc.isCash
       : paymentMethod === "bank"
-        ? acc.isBank
-        : false
+      ? acc.isBank
+      : false
   );
 
   // Get selected customer's group discount
   const selectedCustomerData = customers.find(
     (c) => String(c.id) === selectedCustomer
   );
-  const groupDiscountPercentage = selectedCustomerData?.group?.discount_percentage
+  const groupDiscountPercentage = selectedCustomerData?.group
+    ?.discount_percentage
     ? Number(selectedCustomerData.group.discount_percentage)
     : 0;
 
@@ -281,34 +312,56 @@ export default function POSPage() {
     }
 
     try {
-      await createSale({
-        customer_id: Number(selectedCustomer),
-        branch_id: 1,
-        discount_type: discountType,
-        discount: discountValue,
-        tax_percentage: taxPercentage,
-        paid_amount: paidAmount,
-        payment_method: paidAmount > 0 ? paymentMethod : undefined,
-        account_code: paidAmount > 0 ? paymentAccountCode : undefined,
+      const payload: any = {
         items: cart.map((item) => ({
           product_id: item.product_id,
           warehouse_id: item.warehouse_id,
           quantity: item.quantity,
-          unit_price: item.unit_price,
+          discount: 0,
         })),
-        payments:
-          paidAmount > 0
-            ? [
-              {
-                method: paymentMethod,
-                amount: paidAmount,
-                account_code: paymentAccountCode,
-              },
-            ]
-            : [],
-      }).unwrap();
+        branch_id: 1,
+        customer_id: Number(selectedCustomer),
+        discount_type: discountType,
+        discount: discountValue,
+        tax_percentage: taxPercentage,
+        paid_amount: paidAmount,
+      };
+
+      // Only add payment fields if payment is made
+      if (paidAmount > 0 && paymentAccountCode) {
+        payload.payment_method = paymentMethod;
+        payload.account_code = paymentAccountCode;
+      }
+
+      const response = await createSale(payload).unwrap();
 
       toast.success("Sale completed successfully!");
+
+      // Prepare thermal receipt data
+      const receiptData = {
+        invoice_no: response?.data?.invoice_no || `INV-${Date.now()}`,
+        items: cart.map((item) => ({
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          line_total: item.quantity * item.unit_price,
+        })),
+        subtotal: subtotal,
+        discount: totalDiscount,
+        tax: tax,
+        total: total,
+        paid_amount: paidAmount,
+        due_amount: due,
+        customer_name: selectedCustomerData?.name || "Walk-in Customer",
+        customer_phone: selectedCustomerData?.phone,
+        payment_method: paidAmount > 0 ? paymentMethod : undefined,
+        branch_name: "Main Branch",
+        served_by: "Cashier",
+        created_at: new Date().toISOString(),
+      };
+
+      setCompletedSaleData(receiptData);
+      setShowReceipt(true);
       clearCart();
     } catch (error: any) {
       toast.error(error?.data?.message || "Sale failed");
@@ -630,22 +683,22 @@ export default function POSPage() {
               {(paymentMethod === "cash" ||
                 paymentMethod === "bank" ||
                 paymentMethod === "bkash") && (
-                  <div>
-                    <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                      Account
-                    </label>
-                    <Select
-                      className="h-8"
-                      value={paymentAccountCode}
-                      onChange={setPaymentAccountCode}
-                      placeholder="Select Account"
-                      options={filteredAccounts.map((acc) => ({
-                        value: acc.code,
-                        label: `${acc.name} - ${acc.code}`,
-                      }))}
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
+                    Account
+                  </label>
+                  <Select
+                    className="h-8"
+                    value={paymentAccountCode}
+                    onChange={setPaymentAccountCode}
+                    placeholder="Select Account"
+                    options={filteredAccounts.map((acc) => ({
+                      value: acc.code,
+                      label: `${acc.name} - ${acc.code}`,
+                    }))}
+                  />
+                </div>
+              )}
             </div>
 
             <div>
@@ -683,7 +736,8 @@ export default function POSPage() {
               {groupDiscount > 0 && (
                 <div className="flex justify-between text-blue-600 dark:text-blue-400 text-xs">
                   <span>
-                    Group Discount ({selectedCustomerData?.group?.name} - {groupDiscountPercentage}%)
+                    Group Discount ({selectedCustomerData?.group?.name} -{" "}
+                    {groupDiscountPercentage}%)
                   </span>
                   <span>-৳{groupDiscount.toFixed(2)}</span>
                 </div>
@@ -693,7 +747,8 @@ export default function POSPage() {
               {manualDiscount > 0 && (
                 <div className="flex justify-between text-red-600 dark:text-red-400 text-xs">
                   <span>
-                    Discount {discountType === "percentage" && `(${discountValue}%)`}
+                    Discount{" "}
+                    {discountType === "percentage" && `(${discountValue}%)`}
                   </span>
                   <span>-৳{manualDiscount.toFixed(2)}</span>
                 </div>
@@ -741,6 +796,18 @@ export default function POSPage() {
           </div>
         </div>
       </div>
+
+      {/* Thermal Receipt Modal */}
+      {showReceipt && completedSaleData && (
+        <ThermalReceipt58mm
+          receiptSettings={receiptSettings}
+          saleData={completedSaleData}
+          onClose={() => {
+            setShowReceipt(false);
+            setCompletedSaleData(null);
+          }}
+        />
+      )}
     </div>
   );
 }
