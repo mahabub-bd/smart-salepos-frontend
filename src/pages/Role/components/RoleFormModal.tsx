@@ -15,8 +15,9 @@ import { Role } from "../../../types/role";
 
 // UI
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 
 // Props
 interface Props {
@@ -91,32 +92,28 @@ export default function RoleFormModal({ isOpen, onClose, role }: Props) {
       title={isEdit ? "Update Role" : "Create New Role"}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-        <div>
-          <Label className="text-sm font-medium mb-1 block">Role Name</Label>
+        <FormField label="Role Name" error={errors.name?.message}>
           <Input
             {...register("name")}
             placeholder="Enter role name"
-            error={!!errors.name}
-            hint={errors.name?.message}
           />
-        </div>
+        </FormField>
 
-        <div>
-          <Label className="text-sm font-medium mb-1 block">Description</Label>
+        <FormField label="Description" error={errors.description?.message}>
           <Input
             {...register("description")}
             placeholder="Enter description"
-            error={!!errors.description}
-            hint={errors.description?.message}
           />
-        </div>
+        </FormField>
 
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          {isEdit ? "Update Role" : "Create Role"}
-        </button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            {isEdit ? "Update Role" : "Create Role"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import TextArea from "../../../components/form/input/TextArea";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
-
+import Button from "../../../components/ui/button/Button";
 import Checkbox from "../../../components/form/input/Checkbox";
 import {
   useCreateExpenseCategoryMutation,
@@ -88,32 +89,26 @@ export default function ExpenseCategoryFormModal({
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Category Name */}
-        <div>
-          <Label className="text-sm font-medium mb-1 block">
-            Category Name
-          </Label>
+        <FormField label="Category Name">
           <Input
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="Office Supplies"
             required
           />
-        </div>
+        </FormField>
 
         {/* Description */}
-        <div>
-          <Label className="text-sm font-medium mb-1 block">Description</Label>
-          <textarea
+        <FormField label="Description">
+          <TextArea
             value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
+            onChange={(value) =>
+              setFormData({ ...formData, description: value })
             }
             placeholder="Expenses related to office items"
-            required
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
           />
-        </div>
+        </FormField>
 
         {/* Status Toggle */}
         <div className="flex items-center gap-2">
@@ -127,12 +122,14 @@ export default function ExpenseCategoryFormModal({
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50"
-        >
-          {isEdit ? "Update Category" : "Create Category"}
-        </button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            {isEdit ? "Update Category" : "Create Category"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

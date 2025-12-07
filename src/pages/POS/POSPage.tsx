@@ -16,6 +16,7 @@ import { useGetCustomersQuery } from "../../features/customer/customerApi";
 
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
+import { FormField } from "../../components/form/form-elements/SelectFiled";
 import ThermalReceipt58mm from "../../components/receipt/ThermalReceipt58mm";
 import { useGetWarehouseWiseReportQuery } from "../../features/inventory/inventoryApi";
 import { useCreatePosSaleMutation } from "../../features/pos/posApi";
@@ -480,15 +481,17 @@ export default function POSPage() {
         <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide">
           {/* Customer Selection */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <Select
-              value={selectedCustomer}
-              onChange={setSelectedCustomer}
-              placeholder="Select a customer"
-              options={customers.map((c) => ({
-                value: String(c.id),
-                label: `${c.customer_code} — ${c.name}`,
-              }))}
-            />
+            <FormField label="Customer">
+              <Select
+                value={selectedCustomer}
+                onChange={setSelectedCustomer}
+                placeholder="Select a customer"
+                options={customers.map((c) => ({
+                  value: String(c.id),
+                  label: `${c.customer_code} — ${c.name}`,
+                }))}
+              />
+            </FormField>
           </div>
 
           {/* Cart Items */}
@@ -610,10 +613,7 @@ export default function POSPage() {
           {/* Discount & Tax */}
           <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 space-y-2">
             <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                  Discount Type
-                </label>
+              <FormField label="Discount Type">
                 <Select
                   className="h-8"
                   value={discountType}
@@ -621,16 +621,13 @@ export default function POSPage() {
                     setDiscountType(value as "fixed" | "percentage")
                   }
                   options={[
-                    { value: "fixed", label: "Fixed Amount" },
-                    { value: "percentage", label: "Percentage %" },
+                    { value: "fixed", label: "Fixed" },
+                    { value: "percentage", label: "%" },
                   ]}
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                  Discount {discountType === "percentage" && "(%)"}
-                </label>
+              <FormField label={`Discount ${discountType === "percentage" ? "(%)" : ""}`}>
                 <Input
                   type="number"
                   min="0"
@@ -640,12 +637,9 @@ export default function POSPage() {
                   onChange={(e) => setDiscountValue(Number(e.target.value))}
                   placeholder="0.00"
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                  Tax (%)
-                </label>
+              <FormField label="Tax (%)">
                 <Input
                   type="number"
                   min="0"
@@ -655,17 +649,14 @@ export default function POSPage() {
                   onChange={(e) => setTaxPercentage(Number(e.target.value))}
                   placeholder="0.00"
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
           {/* Payment Section */}
           <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                  Method
-                </label>
+              <FormField label="Method">
                 <Select
                   className="h-8"
                   value={paymentMethod}
@@ -678,15 +669,12 @@ export default function POSPage() {
                     { value: "bank", label: "Bank & MFS" },
                   ]}
                 />
-              </div>
+              </FormField>
 
               {(paymentMethod === "cash" ||
                 paymentMethod === "bank" ||
                 paymentMethod === "bkash") && (
-                <div>
-                  <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                    Account
-                  </label>
+                <FormField label="Account">
                   <Select
                     className="h-8"
                     value={paymentAccountCode}
@@ -697,14 +685,11 @@ export default function POSPage() {
                       label: `${acc.name} - ${acc.code}`,
                     }))}
                   />
-                </div>
+                </FormField>
               )}
             </div>
 
-            <div>
-              <label className="block text-xs font-medium mb-0.5 text-gray-700 dark:text-gray-300">
-                Paid Amount
-              </label>
+            <FormField label="Paid Amount">
               <Input
                 type="number"
                 min="0"
@@ -714,7 +699,7 @@ export default function POSPage() {
                 onChange={(e) => setPaidAmount(Number(e.target.value))}
                 placeholder="0.00"
               />
-            </div>
+            </FormField>
           </div>
 
           {/* Summary & Checkout */}

@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
 import { useGetCustomerGroupsQuery } from "../../../features/customer-group/customerGroupApi";
 import {
@@ -73,6 +74,7 @@ export default function CustomerFormModal({
     reset,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
@@ -98,6 +100,8 @@ export default function CustomerFormModal({
       },
     },
   });
+
+  const groupId = watch("group_id");
 
   // Populate form when editing
   useEffect(() => {
@@ -159,146 +163,123 @@ export default function CustomerFormModal({
       <div className="overflow-y-auto flex-1 px-1">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           {/* Customer Name */}
-          <div>
-            <Label>
-              Customer Name<span className="text-red-500">*</span>
-            </Label>
+          <FormField label="Customer Name *" error={errors.name?.message}>
             <Input placeholder="John Doe" {...register("name")} />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
-          </div>
+          </FormField>
 
           {/* Email & Phone */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>
-                Email<span className="text-red-500">*</span>
-              </Label>
+            <FormField label="Email *" error={errors.email?.message}>
               <Input
                 type="email"
                 placeholder="email@example.com"
                 {...register("email")}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label>
-                Phone<span className="text-red-500">*</span>
-              </Label>
+            <FormField label="Phone *" error={errors.phone?.message}>
               <Input placeholder="01700000000" {...register("phone")} />
-              {errors.phone && (
-                <p className="text-red-500 text-sm">{errors.phone.message}</p>
-              )}
-            </div>
+            </FormField>
           </div>
 
           {/* Billing Address */}
-          <div className="border rounded-lg p-4 bg-gray-50">
-            <h3 className="text-md font-medium mb-3">Billing Address</h3>
+          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+            <h3 className="text-md font-medium mb-3 dark:text-white">
+              Billing Address
+            </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Contact Name</Label>
+              <FormField label="Contact Name">
                 <Input
                   placeholder="John Doe"
                   {...register("billing_address.contact_name")}
                 />
-              </div>
-              <div>
-                <Label>Phone</Label>
+              </FormField>
+              <FormField label="Phone">
                 <Input
                   placeholder="01700000000"
                   {...register("billing_address.phone")}
                 />
-              </div>
+              </FormField>
             </div>
             <div className="mt-3">
-              <Label>Street</Label>
-              <Input
-                placeholder="123 Main Street"
-                {...register("billing_address.street")}
-              />
+              <FormField label="Street">
+                <Input
+                  placeholder="123 Main Street"
+                  {...register("billing_address.street")}
+                />
+              </FormField>
             </div>
             <div className="grid grid-cols-2 gap-4 mt-3">
-              <div>
-                <Label>City</Label>
+              <FormField label="City">
                 <Input
                   placeholder="Dhaka"
                   {...register("billing_address.city")}
                 />
-              </div>
-              <div>
-                <Label>Country</Label>
+              </FormField>
+              <FormField label="Country">
                 <Input
                   placeholder="Bangladesh"
                   {...register("billing_address.country")}
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
           {/* Shipping Address */}
-          <div className="border rounded-lg p-4 bg-gray-50">
-            <h3 className="text-md font-medium mb-3">Shipping Address</h3>
+          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+            <h3 className="text-md font-medium mb-3 dark:text-white">
+              Shipping Address
+            </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Contact Name</Label>
+              <FormField label="Contact Name">
                 <Input
                   placeholder="John Doe"
                   {...register("shipping_address.contact_name")}
                 />
-              </div>
-              <div>
-                <Label>Phone</Label>
+              </FormField>
+              <FormField label="Phone">
                 <Input
                   placeholder="01700000000"
                   {...register("shipping_address.phone")}
                 />
-              </div>
+              </FormField>
             </div>
             <div className="mt-3">
-              <Label>Street</Label>
-              <Input
-                placeholder="456 Shipping Lane"
-                {...register("shipping_address.street")}
-              />
+              <FormField label="Street">
+                <Input
+                  placeholder="456 Shipping Lane"
+                  {...register("shipping_address.street")}
+                />
+              </FormField>
             </div>
             <div className="grid grid-cols-2 gap-4 mt-3">
-              <div>
-                <Label>City</Label>
+              <FormField label="City">
                 <Input
                   placeholder="Chattogram"
                   {...register("shipping_address.city")}
                 />
-              </div>
-              <div>
-                <Label>Country</Label>
+              </FormField>
+              <FormField label="Country">
                 <Input
                   placeholder="Bangladesh"
                   {...register("shipping_address.country")}
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
           {/* Customer Group */}
-          <div>
-            <Label>Customer Group</Label>
-            <select
-              {...register("group_id")}
-              className="w-full px-3 py-2 border rounded-lg"
-            >
-              <option value="">Select Customer Group (Optional)</option>
-              {customerGroups.map((group: any) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FormField label="Customer Group">
+            <Select
+              value={groupId || ""}
+              onChange={(value) => setValue("group_id", value)}
+              placeholder="Select Customer Group (Optional)"
+              options={customerGroups.map((group: any) => ({
+                value: String(group.id),
+                label: group.name,
+              }))}
+            />
+          </FormField>
 
           {/* Status */}
           <div className="flex items-center gap-2">

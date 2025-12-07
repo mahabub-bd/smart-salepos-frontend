@@ -4,11 +4,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod"; // 🔹 FIXED import
 
-import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Switch from "../../../components/form/switch/Switch";
 import { Modal } from "../../../components/ui/modal";
-
 import Button from "../../../components/ui/button/Button";
 import {
   useCreateWarehouseMutation,
@@ -98,31 +97,19 @@ export default function WarehouseFormModal({
       title={isEdit ? "Update Warehouse" : "Create New Warehouse"}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <div>
-          <Label>Name</Label>
+        <FormField label="Name *" error={errors.name?.message}>
           <Input {...register("name")} />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-          )}
-        </div>
+        </FormField>
 
-        <div>
-          <Label>Location</Label>
+        <FormField label="Location">
           <Input {...register("location")} />
-        </div>
+        </FormField>
 
-        <div>
-          <Label>Address</Label>
+        <FormField label="Address" error={errors.address?.message}>
           <Input {...register("address")} />
-          {errors.address && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.address.message}
-            </p>
-          )}
-        </div>
+        </FormField>
 
         <div className="flex items-center gap-3">
-          <Label>Status</Label>
           <Switch
             label="Active"
             defaultChecked={statusValue}
@@ -132,12 +119,8 @@ export default function WarehouseFormModal({
           />
         </div>
 
-        <div className="flex justify-end gap-2 mt-4">
-          <Button
-            type="button"
-            className="px-4 py-2 border rounded"
-            onClick={onClose}
-          >
+        <div className="flex justify-end gap-3 mt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>

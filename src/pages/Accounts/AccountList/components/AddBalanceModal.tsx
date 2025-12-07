@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import Input from "../../../../components/form/input/InputField";
+import { FormField } from "../../../../components/form/form-elements/SelectFiled";
 import Button from "../../../../components/ui/button/Button";
 import { Modal } from "../../../../components/ui/modal";
 import { useAddBankBalanceMutation } from "../../../../features/accounts/accountsApi";
@@ -64,39 +65,28 @@ export default function AddBalanceModal({
 
       <AccountInfo account={account} />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Input
-          type="number"
-          placeholder="Enter Amount"
-          {...register("amount", { valueAsNumber: true })}
-          error={!!errors.amount}
-          hint={errors.amount?.message}
-        />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormField label="Amount *" error={errors.amount?.message}>
+          <Input
+            type="number"
+            placeholder="Enter Amount"
+            {...register("amount", { valueAsNumber: true })}
+          />
+        </FormField>
 
-        <Input
-          type="text"
-          placeholder="Narration (Optional)"
-          className="mt-3"
-          {...register("narration")}
-        />
+        <FormField label="Narration">
+          <Input
+            type="text"
+            placeholder="Narration (Optional)"
+            {...register("narration")}
+          />
+        </FormField>
 
-        <div className="flex justify-end gap-2 mt-4">
-          <Button
-            size="sm"
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded"
-          >
+        <div className="flex justify-end gap-3 mt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            size="sm"
-            type="submit"
-            disabled={isLoading}
-            className={`px-4 py-2 bg-green-600 text-white rounded ${
-              isLoading && "opacity-50"
-            }`}
-          >
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? "Saving..." : "Add Balance"}
           </Button>
         </div>

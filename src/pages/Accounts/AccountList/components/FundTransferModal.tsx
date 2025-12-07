@@ -1,5 +1,7 @@
 import Select from "../../../../components/form/Select";
 import Input from "../../../../components/form/input/InputField";
+import { FormField } from "../../../../components/form/form-elements/SelectFiled";
+import Button from "../../../../components/ui/button/Button";
 import { Modal } from "../../../../components/ui/modal";
 import {
   useFundTransferMutation,
@@ -79,61 +81,50 @@ export default function FundTransferModal({
 
       <AccountInfo account={fromAccount} />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Controller
-          name="toAccountCode"
-          control={control}
-          render={({ field }) => (
-            <Select
-              options={filteredAccounts.map(
-                (acc: { code: any; name: any }) => ({
-                  value: acc.code,
-                  label: `${acc.name} (${acc.code})`,
-                })
-              )}
-              placeholder="Select Account"
-              defaultValue=""
-              onChange={field.onChange}
-            />
-          )}
-        />
-        <p className="text-red-500 text-xs mt-1">
-          {errors.toAccountCode?.message}
-        </p>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormField label="To Account *" error={errors.toAccountCode?.message as string}>
+          <Controller
+            name="toAccountCode"
+            control={control}
+            render={({ field }) => (
+              <Select
+                options={filteredAccounts.map(
+                  (acc: { code: any; name: any }) => ({
+                    value: acc.code,
+                    label: `${acc.name} (${acc.code})`,
+                  })
+                )}
+                placeholder="Select Account"
+                defaultValue=""
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </FormField>
 
-        <Input
-          type="number"
-          placeholder="Amount"
-          {...register("amount", { valueAsNumber: true })}
-          error={!!errors.amount}
-          hint={errors.amount?.message}
-          className="mt-3"
-        />
+        <FormField label="Amount *" error={errors.amount?.message}>
+          <Input
+            type="number"
+            placeholder="Amount"
+            {...register("amount", { valueAsNumber: true })}
+          />
+        </FormField>
 
-        <Input
-          type="text"
-          placeholder="Narration (Optional)"
-          {...register("narration")}
-          className="mt-3"
-        />
+        <FormField label="Narration">
+          <Input
+            type="text"
+            placeholder="Narration (Optional)"
+            {...register("narration")}
+          />
+        </FormField>
 
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-500 rounded text-white"
-          >
+        <div className="flex justify-end gap-3 mt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`px-4 py-2 bg-purple-600 rounded text-white ${
-              isLoading && "opacity-50"
-            }`}
-          >
+          </Button>
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? "Processing..." : "Transfer"}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

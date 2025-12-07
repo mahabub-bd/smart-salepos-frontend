@@ -19,7 +19,9 @@ import { Role } from "../../../types/role";
 import { toast } from "react-toastify";
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Select from "../../../components/form/Select";
+import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { User } from "../../../types";
 
@@ -155,70 +157,71 @@ export default function UserFormModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {/* Username */}
-        <Input
-          {...register("username")}
-          placeholder="Username"
-          error={!!errors.username}
-          hint={errors.username?.message}
-        />
+        <FormField label="Username *" error={errors.username?.message}>
+          <Input
+            {...register("username")}
+            placeholder="Username"
+          />
+        </FormField>
 
         {/* Email */}
-        <Input
-          type="email"
-          {...register("email")}
-          placeholder="Email Address"
-          error={!!errors.email}
-          hint={errors.email?.message}
-        />
+        <FormField label="Email *" error={errors.email?.message}>
+          <Input
+            type="email"
+            {...register("email")}
+            placeholder="Email Address"
+          />
+        </FormField>
 
         {/* Full Name */}
-        <Input
-          {...register("full_name")}
-          placeholder="Full Name"
-          error={!!errors.full_name}
-          hint={errors.full_name?.message}
-        />
+        <FormField label="Full Name *" error={errors.full_name?.message}>
+          <Input
+            {...register("full_name")}
+            placeholder="Full Name"
+          />
+        </FormField>
 
         {/* Phone */}
-        <Input
-          {...register("phone")}
-          placeholder="Phone Number"
-          error={!!errors.phone}
-          hint={errors.phone?.message}
-        />
+        <FormField label="Phone *" error={errors.phone?.message}>
+          <Input
+            {...register("phone")}
+            placeholder="Phone Number"
+          />
+        </FormField>
 
         {/* Password (only for create) */}
         {!isEdit && (
-          <Input
-            type="password"
-            {...register("password")}
-            placeholder="Password"
-            error={!!errors.password}
-            hint={errors.password?.message}
-          />
+          <FormField label="Password *" error={errors.password?.message}>
+            <Input
+              type="password"
+              {...register("password")}
+              placeholder="Password"
+            />
+          </FormField>
         )}
 
         {/* User Status */}
-        <Controller
-          name="status"
-          control={control}
-          render={({ field }) => (
-            <Select
-              options={[
-                { value: "pending", label: "Pending" },
-                { value: "active", label: "Active" },
-                { value: "suspend", label: "Suspend" },
-                { value: "deactive", label: "Deactive" },
-              ]}
-              defaultValue={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
+        <FormField label="Status">
+          <Controller
+            name="status"
+            control={control}
+            render={({ field }) => (
+              <Select
+                options={[
+                  { value: "pending", label: "Pending" },
+                  { value: "active", label: "Active" },
+                  { value: "suspend", label: "Suspend" },
+                  { value: "deactive", label: "Deactive" },
+                ]}
+                defaultValue={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </FormField>
 
         {/* Roles */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Roles *</label>
+        <FormField label="Roles *" error={errors.roles?.message}>
           <Controller
             name="roles"
             control={control}
@@ -232,8 +235,8 @@ export default function UserFormModal({
                       onChange={(checked) =>
                         field.onChange(
                           checked
-                            ? [...field.value, r.name] // Add role
-                            : field.value.filter((role) => role !== r.name) // Remove role
+                            ? [...field.value, r.name]
+                            : field.value.filter((role) => role !== r.name)
                         )
                       }
                     />
@@ -242,14 +245,10 @@ export default function UserFormModal({
               </div>
             )}
           />
-          {errors.roles && (
-            <p className="text-red-500 text-sm">{errors.roles.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Branches */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Branches</label>
+        <FormField label="Branches" error={errors.branch_ids?.message}>
           <Controller
             name="branch_ids"
             control={control}
@@ -263,10 +262,10 @@ export default function UserFormModal({
                       onChange={(checked) =>
                         field.onChange(
                           checked
-                            ? [...(field.value || []), branch.id] // Add branch
+                            ? [...(field.value || []), branch.id]
                             : (field.value || []).filter(
                                 (id) => id !== branch.id
-                              ) // Remove branch
+                              )
                         )
                       }
                     />
@@ -275,18 +274,17 @@ export default function UserFormModal({
               </div>
             )}
           />
-          {errors.branch_ids && (
-            <p className="text-red-500 text-sm">{errors.branch_ids.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Submit button */}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          {isEdit ? "Update User" : "Create User"}
-        </button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            {isEdit ? "Update User" : "Create User"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

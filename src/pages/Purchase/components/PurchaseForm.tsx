@@ -253,6 +253,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
               <h2 className="text-lg font-semibold">Purchase Items</h2>
 
               <Button
+                type="button"
                 size="sm"
                 onClick={() => append({ product_id: 0, quantity: 1, price: 0 })}
               >
@@ -360,6 +361,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                         {/* Remove */}
                         <td className="p-3 text-right">
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             onClick={() => remove(index)}
@@ -393,21 +395,20 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
 
           {/* Actions */}
           <div className="flex justify-end gap-3">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => navigate("/purchase")}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
             >
               Cancel
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="submit"
               disabled={isCreating || isUpdating}
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50"
             >
               {isEdit ? "Update Purchase" : "Create Purchase"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Modal } from "../../../components/ui/modal";
 
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 
 import {
   useCreateSupplierMutation,
@@ -116,50 +116,43 @@ export default function SupplierFormModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Name */}
-        <div>
-          <Label>Name</Label>
+        <FormField label="Name *" error={errors.name?.message}>
           <Input {...register("name")} />
-          {errors.name && (
-            <p className="text-sm text-red-600">{errors.name.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Contact Person */}
-        <div>
-          <Label>Contact Person</Label>
+        <FormField label="Contact Person">
           <Input {...register("contact_person")} />
-        </div>
+        </FormField>
 
         {/* Phone */}
-        <div>
-          <Label>Phone</Label>
+        <FormField label="Phone">
           <Input {...register("phone")} />
-        </div>
+        </FormField>
 
         {/* Email */}
-        <div>
-          <Label>Email</Label>
+        <FormField label="Email" error={errors.email?.message}>
           <Input {...register("email")} />
-          {errors.email && (
-            <p className="text-sm text-red-600">{errors.email.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Address */}
-        <div>
-          <Label>Address</Label>
+        <FormField label="Address">
           <Input {...register("address")} />
-        </div>
+        </FormField>
 
         {/* Payment Terms */}
-        <div>
-          <Label>Payment Terms</Label>
+        <FormField label="Payment Terms">
           <Input {...register("payment_terms")} />
-        </div>
+        </FormField>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isEdit ? "Update Supplier" : "Create Supplier"}
-        </Button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isEdit ? "Update Supplier" : "Create Supplier"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

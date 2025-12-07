@@ -9,7 +9,7 @@ import Button from "../../../components/ui/button/Button";
 
 import FileInput from "../../../components/form/input/FileInput";
 
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
 import {
@@ -230,25 +230,26 @@ const BusinessSettings = () => {
                 )}
               </div>
               <div className="flex-1">
-                <Label>Upload Logo</Label>
-                <FileInput
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="mb-3"
-                />
-                {selectedLogo && (
-                  <Button
-                    size="sm"
-                    disabled={isUploadingLogo}
-                    onClick={handleLogoUpload}
-                    type="button"
-                  >
-                    {isUploadingLogo ? "Uploading..." : "Upload"}
-                  </Button>
-                )}
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  PNG, JPG, GIF up to 5MB
-                </p>
+                <FormField label="Upload Logo">
+                  <FileInput
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="mb-3"
+                  />
+                  {selectedLogo && (
+                    <Button
+                      size="sm"
+                      disabled={isUploadingLogo}
+                      onClick={handleLogoUpload}
+                      type="button"
+                    >
+                      {isUploadingLogo ? "Uploading..." : "Upload"}
+                    </Button>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    PNG, JPG, GIF up to 5MB
+                  </p>
+                </FormField>
               </div>
             </div>
           </div>
@@ -259,121 +260,88 @@ const BusinessSettings = () => {
               Business Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="business_name">Business Name</Label>
+              <FormField label="Business Name" error={errors.business_name?.message}>
                 <Input
                   {...register("business_name")}
                   id="business_name"
                   type="text"
                   placeholder="Enter business name"
-                  error={!!errors.business_name}
                 />
-                {errors.business_name && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.business_name.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="tagline">Tagline</Label>
+              <FormField label="Tagline">
                 <Input
                   {...register("tagline")}
                   id="tagline"
                   type="text"
                   placeholder="Enter business tagline"
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="email">Email</Label>
+              <FormField label="Email" error={errors.email?.message}>
                 <Input
                   {...register("email")}
                   id="email"
                   type="email"
                   placeholder="contact@business.com"
-                  error={!!errors.email}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="phone">Phone</Label>
+              <FormField label="Phone">
                 <Input
                   {...register("phone")}
                   id="phone"
                   type="tel"
                   placeholder="+1-234-567-8900"
                 />
-              </div>
+              </FormField>
 
               <div className="md:col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <TextArea
-                  placeholder="Enter business address"
-                  rows={3}
-                  value={watch("address") || ""}
-                  onChange={(value) => setValue("address", value)}
-                />
+                <FormField label="Address">
+                  <TextArea
+                    placeholder="Enter business address"
+                    rows={3}
+                    value={watch("address") || ""}
+                    onChange={(value) => setValue("address", value)}
+                  />
+                </FormField>
               </div>
 
-              <div>
-                <Label htmlFor="country">Country</Label>
+              <FormField label="Country *" error={errors.country?.message}>
                 <Input
                   {...register("country")}
                   id="country"
                   type="text"
                   placeholder="Enter country"
-                  error={!!errors.country}
                 />
-                {errors.country && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.country.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="website">Website</Label>
+              <FormField label="Website" error={errors.website?.message}>
                 <Input
                   {...register("website")}
                   id="website"
                   type="url"
                   placeholder="https://business.com"
-                  error={!!errors.website}
                 />
-                {errors.website && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.website.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="tax_registration">Tax Registration</Label>
+              <FormField label="Tax Registration">
                 <Input
                   {...register("tax_registration")}
                   id="tax_registration"
                   type="text"
                   placeholder="Tax registration number"
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="company_registration">
-                  Company Registration
-                </Label>
+              <FormField label="Company Registration">
                 <Input
                   {...register("company_registration")}
                   id="company_registration"
                   type="text"
                   placeholder="Company registration number"
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
@@ -383,8 +351,7 @@ const BusinessSettings = () => {
               Currency & Tax Settings
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="currency">Currency</Label>
+              <FormField label="Currency *" error={errors.currency?.message}>
                 <select
                   {...register("currency")}
                   id="currency"
@@ -396,33 +363,18 @@ const BusinessSettings = () => {
                     </option>
                   ))}
                 </select>
-                {errors.currency && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.currency.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="currency_symbol">Currency Symbol</Label>
+              <FormField label="Currency Symbol *" error={errors.currency_symbol?.message}>
                 <Input
                   {...register("currency_symbol")}
                   id="currency_symbol"
                   type="text"
                   placeholder="৳"
-                  error={!!errors.currency_symbol}
                 />
-                {errors.currency_symbol && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.currency_symbol.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="default_tax_percentage">
-                  Default Tax Percentage
-                </Label>
+              <FormField label="Default Tax Percentage" error={errors.default_tax_percentage?.message}>
                 <Input
                   {...register("default_tax_percentage", {
                     valueAsNumber: true,
@@ -433,17 +385,10 @@ const BusinessSettings = () => {
                   min="0"
                   max="100"
                   placeholder="0"
-                  error={!!errors.default_tax_percentage}
                 />
-                {errors.default_tax_percentage && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.default_tax_percentage.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="low_stock_threshold">Low Stock Threshold</Label>
+              <FormField label="Low Stock Threshold">
                 <Input
                   {...register("low_stock_threshold", { valueAsNumber: true })}
                   id="low_stock_threshold"
@@ -451,7 +396,7 @@ const BusinessSettings = () => {
                   min="0"
                   placeholder="20"
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
@@ -461,8 +406,7 @@ const BusinessSettings = () => {
               Invoice Settings
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="default_invoice_layout">Invoice Layout</Label>
+              <FormField label="Invoice Layout">
                 <select
                   {...register("default_invoice_layout")}
                   id="default_invoice_layout"
@@ -471,10 +415,9 @@ const BusinessSettings = () => {
                   <option value="standard">Standard</option>
                   <option value="detailed">Detailed</option>
                 </select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="invoice_paper_size">Paper Size</Label>
+              <FormField label="Paper Size">
                 <select
                   {...register("invoice_paper_size")}
                   id="invoice_paper_size"
@@ -484,36 +427,35 @@ const BusinessSettings = () => {
                   <option value="A5">A5</option>
                   <option value="Thermal">Thermal</option>
                 </select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="receipt_header">Receipt Header</Label>
+              <FormField label="Receipt Header">
                 <Input
                   {...register("receipt_header")}
                   id="receipt_header"
                   type="text"
                   placeholder="Original Receipt"
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="invoice_footer_message">Invoice Footer Message</Label>
+              <FormField label="Invoice Footer Message">
                 <Input
                   {...register("invoice_footer_message")}
                   id="invoice_footer_message"
                   type="text"
                   placeholder="Thank you for your business!"
                 />
-              </div>
+              </FormField>
 
               <div className="md:col-span-2">
-                <Label htmlFor="footer_text">Footer Text</Label>
-                <TextArea
-                  placeholder="Additional footer text for receipts"
-                  rows={2}
-                  value={watch("footer_text") || ""}
-                  onChange={(value) => setValue("footer_text", value)}
-                />
+                <FormField label="Footer Text">
+                  <TextArea
+                    placeholder="Additional footer text for receipts"
+                    rows={2}
+                    value={watch("footer_text") || ""}
+                    onChange={(value) => setValue("footer_text", value)}
+                  />
+                </FormField>
               </div>
 
               <div className="md:col-span-2 space-y-3">
@@ -628,10 +570,7 @@ const BusinessSettings = () => {
                 </span>
               </label>
 
-              <div>
-                <Label htmlFor="backup_retention_days">
-                  Backup Retention Days
-                </Label>
+              <FormField label="Backup Retention Days" error={errors.backup_retention_days?.message}>
                 <Input
                   {...register("backup_retention_days", {
                     valueAsNumber: true,
@@ -641,14 +580,8 @@ const BusinessSettings = () => {
                   min="1"
                   max="365"
                   placeholder="30"
-                  error={!!errors.backup_retention_days}
                 />
-                {errors.backup_retention_days && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.backup_retention_days.message}
-                  </p>
-                )}
-              </div>
+              </FormField>
             </div>
           </div>
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import FileInput from "../../../components/form/input/FileInput";
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
 import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 
@@ -132,29 +132,28 @@ export default function BrandFormModal({ isOpen, onClose, brand }: Props) {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Brand Name */}
-        <div>
-          <Label className="text-sm font-medium mb-1 block">Brand Name</Label>
+        <FormField label="Brand Name *">
           <Input
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
+            placeholder="Enter brand name"
           />
-        </div>
+        </FormField>
 
         {/* Description */}
-        <div>
-          <Label className="text-sm font-medium mb-1 block">Description</Label>
+        <FormField label="Description">
           <Input
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
+            placeholder="Enter brand description"
           />
-        </div>
+        </FormField>
 
         {/* Logo Upload */}
-        <div>
-          <Label className="text-sm font-medium mb-1 block">Brand Logo</Label>
+        <FormField label="Brand Logo *">
           <FileInput
             accept="image/*"
             onChange={handleFileChange}
@@ -174,12 +173,17 @@ export default function BrandFormModal({ isOpen, onClose, brand }: Props) {
               />
             </div>
           )}
-        </div>
+        </FormField>
 
         {/* Submit */}
-        <Button type="submit" disabled={isUploading || !attachmentId}>
-          {isEdit ? "Update Brand" : "Create Brand"}
-        </Button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isUploading || !attachmentId}>
+            {isEdit ? "Update Brand" : "Create Brand"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

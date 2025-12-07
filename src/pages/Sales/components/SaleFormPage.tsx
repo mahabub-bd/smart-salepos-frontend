@@ -9,8 +9,9 @@ import IconButton from "../../../components/common/IconButton";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Select from "../../../components/form/Select";
+import Button from "../../../components/ui/button/Button";
 
 import { useEffect } from "react";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
@@ -187,8 +188,7 @@ export default function SaleFormPage() {
                 className="flex flex-col gap-5 p-5 border bg-white dark:bg-gray-800 rounded-xl shadow-sm"
             >
                 {/* Customer */}
-                <div className="w-full">
-                    <Label htmlFor="customer_id">Customer</Label>
+                <FormField label="Customer" error={errors.customer_id?.message}>
                     <Controller
                         name="customer_id"
                         control={control}
@@ -204,14 +204,11 @@ export default function SaleFormPage() {
                             />
                         )}
                     />
-                    {errors.customer_id && (
-                        <p className="text-red-500 text-sm mt-1.5">{errors.customer_id.message}</p>
-                    )}
-                </div>
+                </FormField>
 
                 {/* Items Section */}
                 <div className="w-full">
-                    <Label>Sale Items</Label>
+                    <h3 className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Sale Items</h3>
 
                     {/* Column Headers */}
                     <div className="grid grid-cols-5 gap-3 items-center font-medium text-sm text-gray-600 dark:text-gray-400 mb-3 px-1">
@@ -350,8 +347,7 @@ export default function SaleFormPage() {
                 {/* Discount & Tax Section */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Discount Type */}
-                    <div>
-                        <Label htmlFor="discount_type">Discount Type</Label>
+                    <FormField label="Discount Type">
                         <Controller
                             name="discount_type"
                             control={control}
@@ -366,41 +362,32 @@ export default function SaleFormPage() {
                                 />
                             )}
                         />
-                    </div>
+                    </FormField>
 
                     {/* Discount Value */}
-                    <div>
-                        <Label htmlFor="discount_value">
-                            Discount Value {formValues.discount_type === "percentage" && "(%)"}
-                        </Label>
+                    <FormField
+                        label={`Discount Value ${formValues.discount_type === "percentage" ? "(%)" : ""}`}
+                        error={errors.discount_value?.message}
+                    >
                         <Input
-                            id="discount_value"
                             type="number"
                             min="0"
                             step="0.01"
                             {...register("discount_value", { valueAsNumber: true })}
                             placeholder="0.00"
                         />
-                        {errors.discount_value && (
-                            <p className="text-red-500 text-sm mt-1">{errors.discount_value.message}</p>
-                        )}
-                    </div>
+                    </FormField>
 
                     {/* Tax Percentage */}
-                    <div>
-                        <Label htmlFor="tax_percentage">Tax Percentage (%)</Label>
+                    <FormField label="Tax Percentage (%)" error={errors.tax_percentage?.message}>
                         <Input
-                            id="tax_percentage"
                             type="number"
                             min="0"
                             step="0.01"
                             {...register("tax_percentage", { valueAsNumber: true })}
                             placeholder="0.00"
                         />
-                        {errors.tax_percentage && (
-                            <p className="text-red-500 text-sm mt-1">{errors.tax_percentage.message}</p>
-                        )}
-                    </div>
+                    </FormField>
                 </div>
 
                 {/* Payment Section */}
@@ -411,24 +398,18 @@ export default function SaleFormPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Paid Amount */}
-                        <div>
-                            <Label htmlFor="paid_amount">Paid Amount</Label>
+                        <FormField label="Paid Amount" error={errors.paid_amount?.message}>
                             <Input
-                                id="paid_amount"
                                 type="number"
                                 min="0"
                                 step="0.01"
                                 {...register("paid_amount", { valueAsNumber: true })}
                                 placeholder="0.00"
                             />
-                            {errors.paid_amount && (
-                                <p className="text-red-500 text-sm mt-1">{errors.paid_amount.message}</p>
-                            )}
-                        </div>
+                        </FormField>
 
                         {/* Payment Method */}
-                        <div>
-                            <Label htmlFor="payment_method">Payment Method</Label>
+                        <FormField label="Payment Method" error={errors.payment_method?.message}>
                             <Controller
                                 name="payment_method"
                                 control={control}
@@ -449,15 +430,11 @@ export default function SaleFormPage() {
                                     />
                                 )}
                             />
-                            {errors.payment_method && (
-                                <p className="text-red-500 text-sm mt-1">{errors.payment_method.message}</p>
-                            )}
-                        </div>
+                        </FormField>
 
                         {/* Payment Account - Only show if method is selected */}
                         {selectedPaymentMethod && (selectedPaymentMethod === "cash" || selectedPaymentMethod === "bank") && (
-                            <div>
-                                <Label htmlFor="payment_account_code">Payment Account</Label>
+                            <FormField label="Payment Account" error={errors.payment_account_code?.message}>
                                 <Controller
                                     name="payment_account_code"
                                     control={control}
@@ -473,10 +450,7 @@ export default function SaleFormPage() {
                                         />
                                     )}
                                 />
-                                {errors.payment_account_code && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.payment_account_code.message}</p>
-                                )}
-                            </div>
+                            </FormField>
                         )}
                     </div>
                 </div>
@@ -488,16 +462,14 @@ export default function SaleFormPage() {
                     </h3>
 
                     <div className="flex justify-between items-center">
-                        <Label className="mb-0 text-gray-600 dark:text-gray-300">Subtotal:</Label>
+                        <span className="text-gray-600 dark:text-gray-300">Subtotal:</span>
                         <span className="font-medium text-gray-800 dark:text-white">
                             ৳{subtotal.toFixed(2)}
                         </span>
                     </div>
 
-
-
                     <div className="flex justify-between items-center">
-                        <Label className="mb-0 text-gray-600 dark:text-gray-300">Tax:</Label>
+                        <span className="text-gray-600 dark:text-gray-300">Tax:</span>
                         <span className="font-medium text-green-600">
                             +৳{tax.toFixed(2)}
                         </span>
@@ -506,9 +478,9 @@ export default function SaleFormPage() {
                     {/* Group Discount */}
                     {groupDiscount > 0 && (
                         <div className="flex justify-between items-center">
-                            <Label className="mb-0 text-blue-600 dark:text-blue-400 text-sm">
+                            <span className="text-blue-600 dark:text-blue-400 text-sm">
                                 Group Discount ({selectedCustomerData?.group?.name} - {groupDiscountPercentage}%):
-                            </Label>
+                            </span>
                             <span className="font-medium text-blue-600 dark:text-blue-400">
                                 -৳{groupDiscount.toFixed(2)}
                             </span>
@@ -518,9 +490,9 @@ export default function SaleFormPage() {
                     {/* Manual Discount */}
                     {manualDiscount > 0 && (
                         <div className="flex justify-between items-center">
-                            <Label className="mb-0 text-red-600 dark:text-red-400 text-sm">
+                            <span className="text-red-600 dark:text-red-400 text-sm">
                                 Discount {formValues.discount_type === "percentage" && `(${formValues.discount_value}%)`}:
-                            </Label>
+                            </span>
                             <span className="font-medium text-red-600">
                                 -৳{manualDiscount.toFixed(2)}
                             </span>
@@ -530,7 +502,7 @@ export default function SaleFormPage() {
                     {/* Total Discount */}
                     {totalDiscount > 0 && (
                         <div className="flex justify-between items-center">
-                            <Label className="mb-0 text-red-700 dark:text-red-500 font-semibold">Total Discount:</Label>
+                            <span className="text-red-700 dark:text-red-500 font-semibold">Total Discount:</span>
                             <span className="font-semibold text-red-700 dark:text-red-500">
                                 -৳{totalDiscount.toFixed(2)}
                             </span>
@@ -538,23 +510,23 @@ export default function SaleFormPage() {
                     )}
 
                     <div className="flex justify-between items-center border-t border-gray-300 dark:border-gray-600 pt-3 mt-3">
-                        <Label className="mb-0 text-lg font-bold text-gray-800 dark:text-white">
+                        <span className="text-lg font-bold text-gray-800 dark:text-white">
                             Total:
-                        </Label>
+                        </span>
                         <span className="text-xl font-bold text-gray-800 dark:text-white">
                             ৳{total.toFixed(2)}
                         </span>
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
-                        <Label className="mb-0 text-green-700 dark:text-green-400">Paid:</Label>
+                        <span className="text-green-700 dark:text-green-400">Paid:</span>
                         <span className="font-semibold text-green-700 dark:text-green-400">
                             ৳{formValues.paid_amount.toFixed(2)}
                         </span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                        <Label className="mb-0 text-red-700 dark:text-red-400 font-bold">Due:</Label>
+                        <span className="text-red-700 dark:text-red-400 font-bold">Due:</span>
                         <span className="text-lg font-bold text-red-700 dark:text-red-400">
                             ৳{due.toFixed(2)}
                         </span>
@@ -563,17 +535,16 @@ export default function SaleFormPage() {
 
                 {/* Action Buttons */}
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         onClick={() => navigate("/sales")}
-                        className="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         disabled={isCreating}
-                        className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium flex items-center gap-2"
                     >
                         {isCreating ? (
                             <>
@@ -583,7 +554,7 @@ export default function SaleFormPage() {
                         ) : (
                             "Save Sale"
                         )}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>

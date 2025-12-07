@@ -10,7 +10,8 @@ import Select from "../../../components/form/Select";
 
 // API hooks
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useGetBranchesQuery } from "../../../features/branch/branchApi";
@@ -126,32 +127,27 @@ export default function ExpenseFormModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Title */}
-        <div>
-          <Label className="font-medium">Title *</Label>
-          <Input {...register("title")} error={!!errors.title} />
-          <p className="text-red-500 text-sm">{errors.title?.message}</p>
-        </div>
-        <div>
-          <Label className="font-medium">Description </Label>
-          <Input {...register("description")} error={!!errors.description} />
-          <p className="text-red-500 text-sm">{errors.description?.message}</p>
-        </div>
+        <FormField label="Title *" error={errors.title?.message}>
+          <Input {...register("title")} />
+        </FormField>
+
+        {/* Description */}
+        <FormField label="Description" error={errors.description?.message}>
+          <Input {...register("description")} />
+        </FormField>
+
         {/* Amount */}
-        <div>
-          <Label className="font-medium">Amount *</Label>
+        <FormField label="Amount *" error={errors.amount?.message}>
           <Input
             type="number"
             step="0.01"
             {...register("amount", { valueAsNumber: true })}
-            error={!!errors.amount}
           />
-          <p className="text-red-500 text-sm">{errors.amount?.message}</p>
-        </div>
+        </FormField>
 
         {/* Category + Branch */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="font-medium">Category *</Label>
+          <FormField label="Category *" error={errors.category_id?.message}>
             <Select
               options={categories.map((c: any) => ({
                 value: String(c.id),
@@ -162,13 +158,9 @@ export default function ExpenseFormModal({
                 setValue("category_id", Number(v), { shouldValidate: true })
               }
             />
-            <p className="text-red-500 text-sm">
-              {errors.category_id?.message}
-            </p>
-          </div>
+          </FormField>
 
-          <div>
-            <Label className="font-medium">Branch *</Label>
+          <FormField label="Branch *" error={errors.branch_id?.message}>
             <Select
               options={branches.map((b: any) => ({
                 value: String(b.id),
@@ -179,14 +171,12 @@ export default function ExpenseFormModal({
                 setValue("branch_id", Number(v), { shouldValidate: true })
               }
             />
-            <p className="text-red-500 text-sm">{errors.branch_id?.message}</p>
-          </div>
+          </FormField>
         </div>
 
         {/* Payment Method + Account */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label className="font-medium">Payment Method *</Label>
+          <FormField label="Payment Method *">
             <Select
               options={[
                 { value: "cash", label: "Cash" },
@@ -200,11 +190,9 @@ export default function ExpenseFormModal({
                 setValue("account_code", "", { shouldValidate: true });
               }}
             />
-          </div>
+          </FormField>
 
-          <div>
-            <Label className="font-medium">Account *</Label>
-
+          <FormField label="Account *" error={errors.account_code?.message}>
             {/* Filter Accounts Automatically */}
             <Select
               options={accounts
@@ -220,27 +208,15 @@ export default function ExpenseFormModal({
                 setValue("account_code", v, { shouldValidate: true })
               }
             />
-
-            <p className="text-red-500 text-sm">
-              {errors.account_code?.message}
-            </p>
-          </div>
+          </FormField>
         </div>
 
         {/* Buttons */}
         <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          </Button>
+          <Button type="submit" disabled={isLoading}>
             {isLoading
               ? isEdit
                 ? "Updating..."
@@ -248,7 +224,7 @@ export default function ExpenseFormModal({
               : isEdit
               ? "Update Expense"
               : "Create Expense"}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

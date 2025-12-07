@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
-import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Switch from "../../../components/form/switch/Switch";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 
 import {
   useCreateTagMutation,
@@ -97,36 +98,35 @@ export default function TagFormModal({ isOpen, onClose, tag }: Props) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6">
-      <h2 className="text-lg font-semibold mb-4">
-        {isEdit ? "Update Tag" : "Create New Tag"}
-      </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-w-lg p-6"
+      title={isEdit ? "Update Tag" : "Create New Tag"}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Name */}
-        <div>
-          <Label>Name</Label>
-          <Input {...register("name")} />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-          )}
-        </div>
+        <FormField label="Name" error={errors.name?.message}>
+          <Input {...register("name")} placeholder="Enter tag name" />
+        </FormField>
 
         {/* Slug */}
-        <div>
-          <Label>Slug</Label>
-          <Input {...register("slug")} />
-        </div>
+        <FormField label="Slug">
+          <Input {...register("slug")} placeholder="auto-generated-slug" />
+          {!isEdit && (
+            <p className="text-xs text-gray-500 mt-1">
+              Auto-generated from name. You can edit it if needed.
+            </p>
+          )}
+        </FormField>
 
         {/* Description */}
-        <div>
-          <Label>Description</Label>
-          <Input {...register("description")} />
-        </div>
+        <FormField label="Description">
+          <Input {...register("description")} placeholder="Describe this tag..." />
+        </FormField>
 
         {/* Status */}
         <div className="flex items-center gap-3">
-          <Label>Status</Label>
           <Switch
             label="Active"
             defaultChecked={watch("status")}
@@ -135,21 +135,13 @@ export default function TagFormModal({ isOpen, onClose, tag }: Props) {
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            type="button"
-            className="px-4 py-2 border rounded"
-            onClick={onClose}
-          >
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 bg-brand-600 text-white rounded"
-          >
-            {isSubmitting ? "Saving..." : isEdit ? "Update" : "Create"}
-          </button>
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : isEdit ? "Update Tag" : "Create Tag"}
+          </Button>
         </div>
       </form>
     </Modal>

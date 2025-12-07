@@ -342,7 +342,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState<
                     className="flex-1"
                   />
                   <Button
-                  
+                    type="button"
                     size="sm"
                     variant="outline"
                     onClick={() => setValue("sku", generateSKU(getValues("name")))}
@@ -360,7 +360,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState<
                     className="flex-1"
                   />
                   <Button
-                  
+                    type="button"
                     size="sm"
                     variant="outline"
                     onClick={() => setValue("barcode", generateBarcode())}
@@ -577,7 +577,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState<
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
             <Button
-              
+              type="button"
               variant="outline"
               onClick={() => navigate("/products")}
               disabled={createLoading || updateLoading}
@@ -585,7 +585,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState<
               Cancel
             </Button>
             <Button
-           
+              type="submit"
               variant="primary"
               disabled={createLoading || updateLoading}
             >

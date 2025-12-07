@@ -4,11 +4,13 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
-import Label from "../../../components/form/Label";
 import FileInput from "../../../components/form/input/FileInput";
 import Input from "../../../components/form/input/InputField";
+import Select from "../../../components/form/Select";
 import Switch from "../../../components/form/switch/Switch";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 
 import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 import {
@@ -195,67 +197,54 @@ export default function CategoryFormModal({
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name */}
-        <div>
-          <Label>Name</Label>
+        <FormField label="Name *" error={errors.name?.message}>
           <Input {...register("name")} placeholder="e.g., Electronics" />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Slug */}
-        <div>
-          <Label>Slug</Label>
+        <FormField label="Slug *" error={errors.slug?.message}>
           <Input
             {...register("slug")}
             placeholder="e.g., electronics or electronics-laptops"
           />
-          {errors.slug && (
-            <p className="text-red-500 text-sm">{errors.slug.message}</p>
-          )}
           {!isEdit && (
             <p className="text-xs text-gray-500 mt-1">
               Auto-generated from name. You can edit it if needed.
             </p>
           )}
-        </div>
+        </FormField>
 
         {/* Description */}
-        <div>
-          <Label>Description</Label>
+        <FormField label="Description">
           <Input
             {...register("description")}
             placeholder="Describe this category..."
           />
-        </div>
+        </FormField>
 
         {/* Parent Category (subcategory assign) */}
         {!isEdit || !category?.category_id ? (
-          <div>
-            <Label>Parent Category</Label>
-            <select
-              className="w-full border rounded-lg p-2 dark:bg-gray-800 dark:border-gray-700"
-              {...register("category_id")}
+          <FormField label="Parent Category">
+            <Select
+              value={watch("category_id") || ""}
+              onChange={(value) => setValue("category_id", value || null)}
               disabled={isEdit && isSubCategory}
-            >
-              <option value="">Main Category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Main Category"
+              options={categories.map((c) => ({
+                value: String(c.id),
+                label: c.name,
+              }))}
+            />
             {isEdit && isSubCategory && (
               <p className="text-sm text-gray-500 mt-1">
                 Cannot change parent category for existing subcategories
               </p>
             )}
-          </div>
+          </FormField>
         ) : null}
 
         {/* Logo Upload */}
-        <div>
-          <Label>Category Logo</Label>
+        <FormField label="Category Logo *">
           <FileInput
             accept="image/*"
             onChange={handleFileChange}
@@ -275,7 +264,7 @@ export default function CategoryFormModal({
               />
             </div>
           )}
-        </div>
+        </FormField>
 
         {/* Status */}
         <div className="flex items-center gap-3">
@@ -293,19 +282,20 @@ export default function CategoryFormModal({
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isUploading}
-        >
-          {isEdit
-            ? isSubCategory
-              ? "Update Subcategory"
-              : "Update Category"
-            : category?.category_id
-            ? "Create Subcategory"
-            : "Create Category"}
-        </button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isUploading || !attachmentId}>
+            {isEdit
+              ? isSubCategory
+                ? "Update Subcategory"
+                : "Update Category"
+              : category?.category_id
+              ? "Create Subcategory"
+              : "Create Category"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

@@ -5,9 +5,10 @@ import { toast } from "react-toastify";
 
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
 import Select from "../../../components/form/Select";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 
 import {
   useCreateBranchMutation,
@@ -109,21 +110,16 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Branch Code */}
-        <div>
-          <Label>Branch Code</Label>
+        <FormField label="Branch Code" error={errors.code?.message}>
           <Controller
             name="code"
             control={control}
             render={({ field }) => <Input {...field} placeholder="BR-001" />}
           />
-          {errors.code && (
-            <p className="text-red-500 text-sm">{errors.code.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Branch Name */}
-        <div>
-          <Label>Branch Name</Label>
+        <FormField label="Branch Name" error={errors.name?.message}>
           <Controller
             name="name"
             control={control}
@@ -131,14 +127,10 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
               <Input {...field} placeholder="Main Branch" />
             )}
           />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Address */}
-        <div>
-          <Label>Address</Label>
+        <FormField label="Address" error={errors.address?.message}>
           <Controller
             name="address"
             control={control}
@@ -146,15 +138,11 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
               <Input {...field} placeholder="123 Street, City" />
             )}
           />
-          {errors.address && (
-            <p className="text-red-500 text-sm">{errors.address.message}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Phone + Email */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Phone</Label>
+          <FormField label="Phone" error={errors.phone?.message}>
             <Controller
               name="phone"
               control={control}
@@ -162,13 +150,9 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
                 <Input {...field} placeholder="+8801712345678" />
               )}
             />
-            {errors.phone && (
-              <p className="text-red-500 text-sm">{errors.phone.message}</p>
-            )}
-          </div>
+          </FormField>
 
-          <div>
-            <Label>Email</Label>
+          <FormField label="Email" error={errors.email?.message}>
             <Controller
               name="email"
               control={control}
@@ -180,15 +164,11 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
                 />
               )}
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
+          </FormField>
         </div>
 
         {/* Default Warehouse */}
-        <div>
-          <Label>Default Warehouse (Optional)</Label>
+        <FormField label="Default Warehouse (Optional)">
           {isLoadingWarehouses ? (
             <p className="text-sm text-gray-500">Loading warehouses...</p>
           ) : (
@@ -210,7 +190,7 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
               )}
             />
           )}
-        </div>
+        </FormField>
 
         {/* Active Status */}
         <div className="flex items-center gap-2">
@@ -227,12 +207,15 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
           />
         </div>
 
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          {isEdit ? "Update Branch" : "Create Branch"}
-        </button>
+        {/* Submit Buttons */}
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            {isEdit ? "Update Branch" : "Create Branch"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

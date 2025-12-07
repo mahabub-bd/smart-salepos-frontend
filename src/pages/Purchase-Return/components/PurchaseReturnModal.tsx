@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import {
@@ -155,84 +155,84 @@ export default function PurchaseReturnModal({
         <form onSubmit={handleSubmit}>
           {/* Purchase Info */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="flex gap-2 items-center ">
-              <Label>Supplier :{purchase.supplier.name} </Label>
+            <div className="flex gap-2 items-center">
+              <span className="text-sm font-medium text-gray-700">
+                Supplier: {purchase.supplier.name}
+              </span>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700">
                 Warehouse: {purchase.warehouse.name}
-              </Label>
+              </span>
             </div>
           </div>
 
           {/* Reason */}
           <div className="mb-6">
-            <Label className="block text-sm font-medium text-gray-700 mb-2">
-              Reason for Return *
-            </Label>
-            <TextArea
-              rows={3}
-              className="w-full"
-              placeholder="Enter reason for return..."
-              value={reason}
-              onChange={(value) => setReason(value)}
-            />
+            <FormField label="Reason for Return *">
+              <TextArea
+                rows={3}
+                className="w-full"
+                placeholder="Enter reason for return..."
+                value={reason}
+                onChange={(value) => setReason(value)}
+              />
+            </FormField>
           </div>
 
           {/* Items Table */}
           <div className="mb-6">
-            <Label className="block text-sm font-medium text-gray-700 mb-3">
-              Return Items
-            </Label>
-            <div className="border rounded-lg overflow-hidden">
-              <Table className="w-full">
-                <TableHeader className="bg-gray-50">
-                  <TableRow>
-                    <TableCell isHeader>Product</TableCell>
-                    <TableCell isHeader>Ordered</TableCell>
-                    <TableCell isHeader>Return Qty</TableCell>
-                    <TableCell isHeader>Price</TableCell>
-                    <TableCell isHeader>Total</TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="divide-y">
-                  {returnItems.map((item, index) => (
-                    <TableRow
-                      key={item.purchase_item_id}
-                      className="hover:bg-gray-50"
-                    >
-                      <TableCell>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {purchase.items[index].product.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            SKU: {purchase.items[index].product.sku}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>{item.max_quantity}</TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          max={item.max_quantity}
-                          value={item.returned_quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(index, e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>{item.price.toLocaleString()}</TableCell>
-                      <TableCell>
-                        {(item.returned_quantity * item.price).toLocaleString()}
-                      </TableCell>
+            <FormField label="Return Items">
+              <div className="border rounded-lg overflow-hidden">
+                <Table className="w-full">
+                  <TableHeader className="bg-gray-50">
+                    <TableRow>
+                      <TableCell isHeader>Product</TableCell>
+                      <TableCell isHeader>Ordered</TableCell>
+                      <TableCell isHeader>Return Qty</TableCell>
+                      <TableCell isHeader>Price</TableCell>
+                      <TableCell isHeader>Total</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody className="divide-y">
+                    {returnItems.map((item, index) => (
+                      <TableRow
+                        key={item.purchase_item_id}
+                        className="hover:bg-gray-50"
+                      >
+                        <TableCell>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {purchase.items[index].product.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              SKU: {purchase.items[index].product.sku}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>{item.max_quantity}</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            min="0"
+                            max={item.max_quantity}
+                            value={item.returned_quantity}
+                            onChange={(e) =>
+                              handleQuantityChange(index, e.target.value)
+                            }
+                            className="w-20 text-center"
+                          />
+                        </TableCell>
+                        <TableCell>{item.price.toLocaleString()}</TableCell>
+                        <TableCell>
+                          {(item.returned_quantity * item.price).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </FormField>
           </div>
 
           {/* Total */}

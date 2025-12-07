@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
-import Label from "../../../components/form/Label";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import {
@@ -157,14 +157,14 @@ export default function PurchaseReturnEditModal({
           {/* Purchase Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Purchase Order</Label>
+              <p className="text-sm font-medium text-gray-700">Purchase Order</p>
               <p className="font-medium mt-1">
                 {purchaseReturn.purchase?.po_no ||
                   `PO #${purchaseReturn.purchase_id}`}
               </p>
             </div>
             <div>
-              <Label>Supplier</Label>
+              <p className="text-sm font-medium text-gray-700">Supplier</p>
               <p className="font-medium mt-1">
                 {purchaseReturn.supplier?.name}
               </p>
@@ -210,10 +210,7 @@ export default function PurchaseReturnEditModal({
           {isDraft && (
             <form onSubmit={handleUpdate} className="space-y-6">
               {/* Reason */}
-              <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason for Return *
-                </Label>
+              <FormField label="Reason for Return *">
                 <TextArea
                   rows={3}
                   className="w-full"
@@ -221,13 +218,10 @@ export default function PurchaseReturnEditModal({
                   value={reason}
                   onChange={(value) => setReason(value)}
                 />
-              </div>
+              </FormField>
 
               {/* Items Table */}
-              <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-3">
-                  Return Items
-                </Label>
+              <FormField label="Return Items">
                 <div className="border rounded-lg overflow-hidden">
                   <Table className="w-full">
                     <TableHeader className="bg-gray-50">
@@ -297,7 +291,7 @@ export default function PurchaseReturnEditModal({
                     </TableBody>
                   </Table>
                 </div>
-              </div>
+              </FormField>
 
               {/* Total */}
               <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
@@ -322,6 +316,7 @@ export default function PurchaseReturnEditModal({
               <h3 className="text-lg font-semibold mb-4">Actions</h3>
               <div className="flex flex-wrap gap-3">
                 <Button
+                  type="button"
                   onClick={handleApprove}
                   disabled={isLoading}
                   className="bg-blue-600 hover:bg-blue-700"
@@ -329,6 +324,7 @@ export default function PurchaseReturnEditModal({
                   Approve Return
                 </Button>
                 <Button
+                  type="button"
                   onClick={handleCancel}
                   disabled={isLoading}
                   variant="outline"
@@ -347,6 +343,7 @@ export default function PurchaseReturnEditModal({
               <div className="flex flex-wrap gap-3">
                 {isApproved && (
                   <Button
+                    type="button"
                     onClick={handleProcess}
                     disabled={isProcessed}
                     className="bg-green-600 hover:bg-green-700"
@@ -356,6 +353,7 @@ export default function PurchaseReturnEditModal({
                 )}
                 {!isProcessed && (
                   <Button
+                    type="button"
                     onClick={handleCancel}
                     disabled={isLoading}
                     variant="outline"

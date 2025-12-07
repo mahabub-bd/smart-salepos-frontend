@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 
 import Input from "../../../components/form/input/InputField";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import {
   useCreatePermissionMutation,
@@ -94,28 +96,30 @@ export default function PermissionFormModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {/* Permission Key */}
-        <Input
-          {...register("key")}
-          placeholder="permission.create"
-          error={!!errors.key}
-          hint={errors.key?.message}
-        />
+        <FormField label="Permission Key *" error={errors.key?.message}>
+          <Input
+            {...register("key")}
+            placeholder="permission.create"
+          />
+        </FormField>
 
         {/* Description */}
-        <Input
-          {...register("description")}
-          placeholder="Allow creating new permissions"
-          error={!!errors.description}
-          hint={errors.description?.message}
-        />
+        <FormField label="Description *" error={errors.description?.message}>
+          <Input
+            {...register("description")}
+            placeholder="Allow creating new permissions"
+          />
+        </FormField>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg"
-        >
-          {isEdit ? "Update" : "Create"}
-        </button>
+        <div className="flex gap-3 justify-end mt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">
+            {isEdit ? "Update" : "Create"}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import Input from "../../../../components/form/input/InputField";
+import { FormField } from "../../../../components/form/form-elements/SelectFiled";
+import Button from "../../../../components/ui/button/Button";
 import { Modal } from "../../../../components/ui/modal";
 import { useAddCashMutation } from "../../../../features/accounts/accountsApi";
 import AccountInfo from "./AccountInfo";
@@ -61,37 +63,29 @@ export default function AddCashModal({
       <AccountInfo account={account} />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input
-          type="number"
-          placeholder="Enter Amount"
-          {...register("amount", { valueAsNumber: true })}
-          error={!!errors.amount}
-          hint={errors.amount?.message}
-        />
+        <FormField label="Amount *" error={errors.amount?.message}>
+          <Input
+            type="number"
+            placeholder="Enter Amount"
+            {...register("amount", { valueAsNumber: true })}
+          />
+        </FormField>
 
-        <Input
-          type="text"
-          placeholder="Narration (Optional)"
-          {...register("narration")}
-        />
+        <FormField label="Narration">
+          <Input
+            type="text"
+            placeholder="Narration (Optional)"
+            {...register("narration")}
+          />
+        </FormField>
 
         <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-gray-600 transition"
-          >
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition ${
-              isLoading && "opacity-50 cursor-not-allowed"
-            }`}
-          >
+          </Button>
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? "Processing..." : "Add Cash"}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>
