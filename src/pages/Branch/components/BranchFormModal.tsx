@@ -64,7 +64,7 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
         phone: branch.phone,
         email: branch.email,
         is_active: branch.is_active,
-        default_warehouse_id: branch.default_warehouse_id?.toString() || "",
+        default_warehouse_id: branch.default_warehouse?.id?.toString() || "",
       });
     } else {
       reset({
@@ -177,15 +177,13 @@ export default function BranchFormModal({ isOpen, onClose, branch }: Props) {
               control={control}
               render={({ field }) => (
                 <Select
-                  value={field.value?.toString()}
+                  value={field.value || ""}
                   onChange={field.onChange}
-                  options={[
-                    { value: "", label: "Select a warehouse" },
-                    ...warehouses.map((w) => ({
-                      value: w.id.toString(),
-                      label: `${w.name}${w.location ? ` - ${w.location}` : ""}`,
-                    })),
-                  ]}
+                  placeholder="Select a warehouse"
+                  options={warehouses.map((w) => ({
+                    value: w.id.toString(),
+                    label: `${w.name}${w.location ? ` - ${w.location}` : ""}`,
+                  }))}
                 />
               )}
             />

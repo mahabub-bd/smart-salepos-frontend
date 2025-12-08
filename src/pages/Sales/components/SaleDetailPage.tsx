@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import Info from "../../../components/common/Info";
 import Button from "../../../components/ui/button/Button";
 import { useGetSaleByIdQuery } from "../../../features/sale/saleApi";
+import { useGetReceiptPreviewQuery } from "../../../features/settings/settingsApi";
 import { SaleItem, SalePayment } from "../../../types";
 import SingleSalePDF from "./pdf/SingleSalePDF";
 import SalePaymentModal from "./SalePaymentModal";
@@ -29,7 +30,10 @@ export default function SaleDetailPage() {
   const { id } = useParams<{ id: string }>();
 
   const { data, isLoading, isError, refetch } = useGetSaleByIdQuery(String(id));
+  const { data: receiptData } = useGetReceiptPreviewQuery();
+
   const sale = data?.data;
+  const receiptSettings = receiptData?.data;
 
   // Modal state
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -57,7 +61,9 @@ export default function SaleDetailPage() {
             </Button>
           </Link>
           <PDFDownloadLink
-            document={<SingleSalePDF sale={sale} />}
+            document={
+              <SingleSalePDF sale={sale} settings={receiptSettings} />
+            }
             fileName={`sale-${sale.invoice_no}.pdf`}
           >
             {({ loading }) => (
@@ -86,14 +92,14 @@ export default function SaleDetailPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <Info label="Invoice No" value={sale.invoice_no} />
-            <Info label="Subtotal" value={`${sale.subtotal} ৳`} />
-            <Info label="Tax" value={`${sale.tax} ৳`} />
+            <Info label="Subtotal" value={`${sale.subtotal}`} />
+            <Info label="Tax" value={`${sale.tax}`} />
 
             {/* Group Discount - only show if exists */}
             {sale.group_discount && Number(sale.group_discount) > 0 && (
               <Info
                 label="Group Discount"
-                value={`${sale.group_discount} ৳`}
+                value={`${sale.group_discount}`}
                 className="text-blue-600 dark:text-blue-400"
               />
             )}
@@ -102,7 +108,7 @@ export default function SaleDetailPage() {
             {sale.manual_discount && Number(sale.manual_discount) > 0 && (
               <Info
                 label="Manual Discount"
-                value={`${sale.manual_discount} ৳`}
+                value={`${sale.manual_discount}`}
                 className="text-red-600 dark:text-red-400"
               />
             )}
@@ -110,13 +116,13 @@ export default function SaleDetailPage() {
             {/* Total Discount */}
             <Info
               label="Total Discount"
-              value={`${sale.discount} ৳`}
+              value={`${sale.discount}`}
               className="font-semibold"
             />
 
-            <Info label="Total Amount" value={`${sale.total} ৳`} />
-            <Info label="Paid Amount" value={`${sale.paid_amount} ৳`} />
-            <Info label="Due Amount" value={`${dueAmount} ৳`} />
+            <Info label="Total Amount" value={`${sale.total}`} />
+            <Info label="Paid Amount" value={`${sale.paid_amount}`} />
+            <Info label="Due Amount" value={`${dueAmount}`} />
             <Info label="Sale Type" value={`${sale.sale_type} `} />
             <div className="inline-flex items-center gap-2">
               Status:

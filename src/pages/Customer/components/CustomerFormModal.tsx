@@ -5,6 +5,7 @@ import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 import { useGetCustomerGroupsQuery } from "../../../features/customer-group/customerGroupApi";
 import {
   useCreateCustomerMutation,
@@ -295,17 +296,13 @@ export default function CustomerFormModal({
 
       {/* Submit Buttons */}
       <div className="flex justify-end gap-3 mt-4 shrink-0">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 bg-gray-100 rounded-lg"
-        >
+        <Button type="button" variant="outline" onClick={onClose}>
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
+          variant="primary"
           disabled={isLoading}
-          className="px-4 py-2 bg-brand-600 text-white rounded-lg"
           onClick={handleSubmit(onSubmit)}
         >
           {isLoading
@@ -315,7 +312,7 @@ export default function CustomerFormModal({
             : isEdit
             ? "Update Customer"
             : "Create Customer"}
-        </button>
+        </Button>
       </div>
     </Modal>
   );

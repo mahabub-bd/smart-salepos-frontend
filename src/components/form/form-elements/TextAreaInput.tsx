@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import TextArea from "../input/TextArea";
-import Label from "../Label";
+import { FormField } from "./SelectFiled";
 
 export default function TextAreaInput() {
   const [message, setMessage] = useState("");
@@ -10,32 +10,28 @@ export default function TextAreaInput() {
     <ComponentCard title="Textarea input field">
       <div className="space-y-6">
         {/* Default TextArea */}
-        <div>
-          <Label>Description</Label>
+        <FormField label="Description">
           <TextArea
             value={message}
             onChange={(value) => setMessage(value)}
             rows={6}
           />
-        </div>
+        </FormField>
 
         {/* Disabled TextArea */}
-        <div>
-          <Label>Description</Label>
+        <FormField label="Description">
           <TextArea rows={6} disabled />
-        </div>
+        </FormField>
 
         {/* Error TextArea */}
-        <div>
-          <Label>Description</Label>
+        <FormField label="Description" error="Please enter a valid message.">
           <TextArea
             rows={6}
             value={messageTwo}
             error
             onChange={(value) => setMessageTwo(value)}
-            hint="Please enter a valid message."
           />
-        </div>
+        </FormField>
       </div>
     </ComponentCard>
   );

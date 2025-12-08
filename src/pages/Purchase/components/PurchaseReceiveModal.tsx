@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useReceivePurchaseMutation } from "../../../features/purchases/purchasesApi";
 import { Purchase } from "../../../types";
@@ -67,12 +68,11 @@ export default function PurchaseReceiveModal({
         ))}
       </div>
 
-      <button
-        onClick={handleSubmit}
-        className="mt-4 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg w-full"
-      >
-        Confirm Receive
-      </button>
+      <div className="mt-4">
+        <Button onClick={handleSubmit} variant="primary" className="w-full">
+          Confirm Receive
+        </Button>
+      </div>
     </Modal>
   );
 }

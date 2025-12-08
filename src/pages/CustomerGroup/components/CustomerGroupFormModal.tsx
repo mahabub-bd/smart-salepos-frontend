@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import InputField from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import TextArea from "../../../components/form/input/TextArea";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 
 import Checkbox from "../../../components/form/input/Checkbox";
 import {
@@ -79,34 +81,38 @@ export default function CustomerGroupFormModal({
       title={isEdit ? "Update Customer Group" : "Create Customer Group"}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Label>Group Name *</Label>
-        <InputField
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
+        <FormField label="Group Name *">
+          <InputField
+            value={formData.name}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
+            required
+          />
+        </FormField>
 
-        <Label>Description</Label>
-        <textarea
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          className="border rounded-lg p-2"
-          rows={3}
-        />
+        <FormField label="Description">
+          <TextArea
+            value={formData.description}
+            onChange={(value) =>
+              setFormData({ ...formData, description: value })
+            }
+            rows={3}
+          />
+        </FormField>
 
-        <Label>Discount (%)</Label>
-        <InputField
-          type="number"
-          value={formData.discount_percentage}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              discount_percentage: Number(e.target.value),
-            })
-          }
-        />
+        <FormField label="Discount (%)">
+          <InputField
+            type="number"
+            value={formData.discount_percentage}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                discount_percentage: Number(e.target.value),
+              })
+            }
+          />
+        </FormField>
 
         <div className="flex items-center gap-2">
           <Checkbox
@@ -119,20 +125,12 @@ export default function CustomerGroupFormModal({
         </div>
 
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 rounded-lg"
-          >
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 py-2 bg-brand-600 text-white rounded-lg"
-          >
+          </Button>
+          <Button type="submit" variant="primary" disabled={isLoading}>
             {isLoading ? "Saving..." : isEdit ? "Update" : "Create"}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>
