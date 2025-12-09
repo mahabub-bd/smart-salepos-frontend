@@ -99,6 +99,20 @@ export const departmentApi = apiSlice.injectEndpoints({
         { type: "Departments", id: `${id}-count` },
       ],
     }),
+
+    // GET DEPARTMENT WITH EMPLOYEES
+    getDepartmentWithEmployees: builder.query<
+      ApiResponse<Department>,
+      string | number
+    >({
+      query: (id) => ({
+        url: `/departments/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, id) => [
+        { type: "Departments", id: `${id}-employees` },
+      ],
+    }),
   }),
 });
 
@@ -109,4 +123,5 @@ export const {
   useUpdateDepartmentMutation,
   useDeleteDepartmentMutation,
   useGetDepartmentEmployeeCountQuery,
+  useGetDepartmentWithEmployeesQuery,
 } = departmentApi;

@@ -1,5 +1,6 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
@@ -22,6 +23,7 @@ import { Department } from "../../../types";
 import DepartmentFormModal from "./DepartmentFormModal";
 
 export default function DepartmentList() {
+  const navigate = useNavigate();
   const { data, isLoading, isError } = useGetDepartmentsQuery();
   const [deleteDepartment] = useDeleteDepartmentMutation();
 
@@ -34,6 +36,7 @@ export default function DepartmentList() {
   const canCreate = useHasPermission("department.create");
   const canUpdate = useHasPermission("department.update");
   const canDelete = useHasPermission("department.delete");
+  const canView = useHasPermission("department.view");
 
   const departments = data?.data || [];
 
@@ -50,6 +53,10 @@ export default function DepartmentList() {
   const openDeleteDialog = (department: Department) => {
     setDepartmentToDelete(department);
     setIsDeleteModalOpen(true);
+  };
+
+  const viewDepartment = (department: Department) => {
+    navigate(`/departments/${department.id}`);
   };
 
   const confirmDelete = async () => {
@@ -82,26 +89,14 @@ export default function DepartmentList() {
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
           <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-white/5">
+            <TableHeader>
               <TableRow>
-                <TableCell isHeader className="table-header">
-                  Code
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Department Name
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Description
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Manager
-                </TableCell>
-                <TableCell isHeader className="table-header">
-                  Status
-                </TableCell>
-                <TableCell isHeader className="table-header text-right">
-                  Actions
-                </TableCell>
+                <TableCell isHeader>Code</TableCell>
+                <TableCell isHeader>Department Name</TableCell>
+                <TableCell isHeader>Description</TableCell>
+                <TableCell isHeader>Manager</TableCell>
+                <TableCell isHeader>Status</TableCell>
+                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -150,7 +145,15 @@ export default function DepartmentList() {
                     </TableCell>
 
                     <TableCell className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-start gap-2">
+                        {canView && (
+                          <IconButton
+                            icon={Eye}
+                            tooltip="View"
+                            onClick={() => viewDepartment(department)}
+                            color="green"
+                          />
+                        )}
                         {canUpdate && (
                           <IconButton
                             icon={Pencil}

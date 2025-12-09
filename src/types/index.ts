@@ -852,7 +852,7 @@ export interface Department {
   id: number;
   name: string;
   description?: string;
-  status: "active" | "inactive";
+  status: EmployeeStatus;
   code: string;
   manager_name?: string;
   manager_email?: string;
@@ -873,13 +873,17 @@ export interface CreateDepartmentPayload {
   notes?: string;
 }
 
-export interface UpdateDepartmentPayload extends Partial<CreateDepartmentPayload> {
+export interface UpdateDepartmentPayload
+  extends Partial<CreateDepartmentPayload> {
   id: number;
 }
 
 export interface DepartmentEmployeeCount {
-  department_id: number;
-  employee_count: number;
+  department_id?: number;
+  department_name?: string;
+  total_employees: number;
+  active_employees: number;
+  inactive_employees: number;
 }
 
 // HRM - Designation Types
@@ -887,7 +891,14 @@ export interface Designation {
   id: number;
   title: string;
   code: string;
-  level: "junior_officer" | "officer" | "senior_officer" | "manager" | "senior_manager" | "director" | string;
+  level:
+    | "junior_officer"
+    | "officer"
+    | "senior_officer"
+    | "manager"
+    | "senior_manager"
+    | "director"
+    | string;
   description?: string;
   minSalary: string;
   maxSalary: string;
@@ -920,7 +931,8 @@ export interface CreateDesignationPayload {
   sortOrder?: number;
 }
 
-export interface UpdateDesignationPayload extends Partial<CreateDesignationPayload> {
+export interface UpdateDesignationPayload
+  extends Partial<CreateDesignationPayload> {
   id: number;
 }
 
@@ -937,16 +949,115 @@ export interface AssignEmployeeToDesignationPayload {
   designation_id: number;
 }
 
-// HRM - Employee Types (basic structure, can be expanded)
+// HRM - Employee Types
 export interface Employee {
   id: number;
-  full_name: string;
+  employee_code: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone?: string;
-  department_id?: number;
+  phone: string;
+  address: string;
+  date_of_birth: string;
+  hire_date: string;
+  termination_date?: string | null;
+  status: EmployeeStatus;
+  employee_type: EmployeeType;
   department?: Department;
-  designation_id?: number;
+  departmentId: number;
+  base_salary: string;
+  branch?: Branch;
+  user?: User;
+  userId: number;
   designation?: Designation;
+  designationId: number;
+  reportingManagerId?: number | null;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEmployeePayload {
+  employee_code?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  date_of_birth: string;
+  hire_date: string;
+  status?: EmployeeStatus;
+  employee_type?: EmployeeType;
+  designationId: number;
+  departmentId: number;
+  base_salary: number;
+  branch_id: number;
+  userId: number;
+  notes?: string;
+}
+
+export interface UpdateEmployeePayload extends Partial<CreateEmployeePayload> {
+  id: number;
+  termination_date?: string | null;
+}
+
+export enum EmployeeStatus {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  TERMINATED = "terminated",
+  ON_LEAVE = "on_leave",
+}
+
+export enum EmployeeType {
+  FULL_TIME = "full_time",
+  PART_TIME = "part_time",
+  CONTRACT = "contract",
+  INTERN = "intern",
+}
+
+export interface GetEmployeesParams {
+  search?: string;
+  status?: "active" | "inactive" | "terminated";
+  department_id?: number;
+  designation_id?: number;
+  branch_id?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface GetAttendanceParams {
+  start_date: string;
+  end_date: string;
+}
+
+export interface PayrollHistory {
+  id: number;
+  employee_id: number;
+  month: string;
+  year: number;
+  basic_salary: string;
+  allowance: string;
+  deduction: string;
+  overtime: string;
+  net_salary: string;
+  pay_date: string | null;
+  status: "pending" | "paid" | "failed";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AttendanceRecord {
+  id: number;
+  employee_id: number;
+  date: string;
+  check_in: string;
+  check_out: string | null;
+  break_start: string | null;
+  break_end: string | null;
+  regular_hours: string;
+  overtime_hours: string;
+  status: "present" | "absent" | "late" | "half_day" | "leave";
+  notes?: string;
   created_at: string;
   updated_at: string;
 }

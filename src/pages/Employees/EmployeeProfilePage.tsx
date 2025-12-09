@@ -1,15 +1,15 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
-import EmployeeList from "./components/EmployeeList";
+import EmployeeProfile from "./components/EmployeeProfile";
 
-export default function EmployeePage() {
+export default function EmployeeProfilePage() {
   return (
     <div>
-      <PageMeta title="Employees" description="Employees" />
-      <PageBreadcrumb pageTitle="Employees" />
+      <PageMeta title="Employee Profile" description="Employee Profile Details" />
+      <PageBreadcrumb pageTitle="Employee Profile" />
 
       <div className="flex flex-col gap-5 min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/3">
-        <EmployeeList />
+        <EmployeeProfile />
       </div>
     </div>
   );

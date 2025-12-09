@@ -234,7 +234,7 @@ const navItems: NavItem[] = [
       {
         name: "Employees",
         path: "/hrm/employees",
-        requiredPermission: "hrm.employees.view",
+        requiredPermission: "employee.view",
       },
       {
         name: "Departments",
@@ -244,17 +244,17 @@ const navItems: NavItem[] = [
       {
         name: "Payroll",
         path: "/hrm/payroll",
-        requiredPermission: "hrm.payroll.view",
+        requiredPermission: "payroll.view",
       },
       {
         name: "Attendance",
         path: "/hrm/attendance",
-        requiredPermission: "hrm.attendance.view",
+        requiredPermission: "attendance.view",
       },
       {
         name: "Leave Requests",
         path: "/hrm/leave-requests",
-        requiredPermission: "hrm.leave_requests.view",
+        requiredPermission: "leave_requests.view",
       },
       {
         name: "Designations",

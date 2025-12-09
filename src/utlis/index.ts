@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
+import { EmployeeStatus, EmployeeType } from "../types";
 export const baseUrl = import.meta.env.VITE_API_URL;
 export const statusOptions = [
   { value: "pending", label: "Pending" },
@@ -72,3 +73,83 @@ export const formatDate = (dateString: string) => {
     day: "numeric",
   });
 };
+
+export const getEmployeeStatusColor = (status: EmployeeStatus) => {
+  switch (status) {
+    case EmployeeStatus.ACTIVE:
+      return "success";
+    case EmployeeStatus.INACTIVE:
+      return "warning";
+    case EmployeeStatus.TERMINATED:
+      return "error";
+    case EmployeeStatus.ON_LEAVE:
+      return "info";
+    default:
+      return "light";
+  }
+};
+
+export const getEmployeeTypeColor = (type: EmployeeType) => {
+  switch (type) {
+    case EmployeeType.FULL_TIME:
+      return "primary";
+    case EmployeeType.PART_TIME:
+      return "info";
+    case EmployeeType.CONTRACT:
+      return "warning";
+    case EmployeeType.INTERN:
+      return "light";
+    default:
+      return "light";
+  }
+};
+
+export const getStatusColor = (status: EmployeeStatus) => {
+  switch (status) {
+    case EmployeeStatus.ACTIVE:
+      return "success";
+    case EmployeeStatus.INACTIVE:
+      return "warning";
+    case EmployeeStatus.TERMINATED:
+      return "error";
+    case EmployeeStatus.ON_LEAVE:
+      return "info";
+    default:
+      return "light";
+  }
+};
+
+
+
+
+  export const getDesignationLevelColor = (level?: string) => {
+    switch (level) {
+      case "managing_director":
+        return "primary";
+      case "director":
+      case "cfo":
+      case "cto":
+      case "cio":
+        return "success";
+      case "head_of_department":
+        return "info";
+      case "senior_manager":
+        return "warning";
+      case "manager":
+        return "dark";
+      case "assistant_manager":
+        return "primary";
+      case "senior_executive":
+        return "success";
+      case "executive":
+        return "info";
+      case "senior_officer":
+        return "warning";
+      case "officer":
+        return "light";
+      case "junior_officer":
+        return "dark";
+      default:
+        return "light";
+    }
+  };
