@@ -58,6 +58,9 @@ import SalesPage from "./pages/Sales";
 import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
 import SaleFormPage from "./pages/Sales/components/SaleFormPage";
 
+import DepartmentPage from "./pages/Departments";
+import DesignationPage from "./pages/Designations";
+import EmployeePage from "./pages/Employees";
 import PurchaseReturnPage from "./pages/Purchase-Return";
 import PurchaseReturnDetailPage from "./pages/Purchase-Return/components/PurchaseReturnDetailPage";
 import ReceiptSettingsPage from "./pages/Settings";
@@ -191,6 +194,10 @@ export default function App() {
             path="/pos/transactions"
             element={<PosTransactionHistoryPage />}
           />
+          {/* HRM */}
+          <Route path="/hrm/departments" element={<DepartmentPage />} />
+          <Route path="/hrm/designations" element={<DesignationPage />} />
+          <Route path="/employees" element={<EmployeePage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

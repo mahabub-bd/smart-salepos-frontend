@@ -330,6 +330,17 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
+// Paginated Response
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message: string;
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 // Response can be either paginated or simple array
 export interface CustomerListResponse {
   data: Customer[];
@@ -834,4 +845,108 @@ export interface PurchaseReturn {
   debit_account_code: string;
   refund_amount: string;
   refund_history?: RefundHistory[];
+}
+
+// HRM - Department Types
+export interface Department {
+  id: number;
+  name: string;
+  description?: string;
+  status: "active" | "inactive";
+  code: string;
+  manager_name?: string;
+  manager_email?: string;
+  notes?: string;
+  employees?: Employee[];
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string | null;
+}
+
+export interface CreateDepartmentPayload {
+  name: string;
+  description?: string;
+  status?: "active" | "inactive";
+  code: string;
+  manager_name?: string;
+  manager_email?: string;
+  notes?: string;
+}
+
+export interface UpdateDepartmentPayload extends Partial<CreateDepartmentPayload> {
+  id: number;
+}
+
+export interface DepartmentEmployeeCount {
+  department_id: number;
+  employee_count: number;
+}
+
+// HRM - Designation Types
+export interface Designation {
+  id: number;
+  title: string;
+  code: string;
+  level: "junior_officer" | "officer" | "senior_officer" | "manager" | "senior_manager" | "director" | string;
+  description?: string;
+  minSalary: string;
+  maxSalary: string;
+  autoApproveLeaveDays: number;
+  canApproveLeave: boolean;
+  canApprovePayroll: boolean;
+  parentDesignation?: Designation | null;
+  parentDesignationId?: number | null;
+  childDesignations?: Designation[];
+  employees?: Employee[];
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export interface CreateDesignationPayload {
+  title: string;
+  code: string;
+  level: string;
+  description?: string;
+  minSalary: number;
+  maxSalary: number;
+  autoApproveLeaveDays?: number;
+  canApproveLeave?: boolean;
+  canApprovePayroll?: boolean;
+  parentDesignationId?: number | null;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateDesignationPayload extends Partial<CreateDesignationPayload> {
+  id: number;
+}
+
+export interface DesignationHierarchy {
+  id: number;
+  title: string;
+  code: string;
+  level: string;
+  children?: DesignationHierarchy[];
+}
+
+export interface AssignEmployeeToDesignationPayload {
+  employee_id: number;
+  designation_id: number;
+}
+
+// HRM - Employee Types (basic structure, can be expanded)
+export interface Employee {
+  id: number;
+  full_name: string;
+  email: string;
+  phone?: string;
+  department_id?: number;
+  department?: Department;
+  designation_id?: number;
+  designation?: Designation;
+  created_at: string;
+  updated_at: string;
 }
