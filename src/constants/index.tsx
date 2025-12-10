@@ -252,9 +252,14 @@ const navItems: NavItem[] = [
         requiredPermission: "attendance.view",
       },
       {
+        name: "Attendance Summary",
+        path: "/hrm/attendance/summary-report",
+        requiredPermission: "attendance.view",
+      },
+      {
         name: "Leave Requests",
         path: "/hrm/leave-requests",
-        requiredPermission: "leave_requests.view",
+        requiredPermission: "leave.view",
       },
       {
         name: "Designations",

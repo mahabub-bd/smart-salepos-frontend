@@ -43,6 +43,12 @@ export const apiSlice = createApi({
     "Designations",
     "Employees",
     "Attendance",
+    "LeaveRequests",
+    "LeaveBalance",
+    "LeaveSummary",
+    "LeaveApprovalHistory",
+    "PendingApprovals",
+    "LeaveApprovalDashboard",
   ],
   endpoints: () => ({}),
 });

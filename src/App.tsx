@@ -59,11 +59,15 @@ import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
 import SaleFormPage from "./pages/Sales/components/SaleFormPage";
 
 import AttendanceListPage from "./pages/Attendance/AttendanceList";
+import AttendanceSummaryPage from "./pages/Attendance/AttendanceSummary";
 import DepartmentPage from "./pages/Departments";
 import DepartmentProfilePage from "./pages/Departments/DepartmentProfilePage";
 import DesignationPage from "./pages/Designations";
 import EmployeePage from "./pages/Employees";
 import EmployeeProfilePage from "./pages/Employees/EmployeeProfilePage";
+import LeaveRequestPage from "./pages/Leave";
+import LeaveRequestDetail from "./pages/Leave/components/LeaveRequestDetail";
+import LeaveApprovalsPage from "./pages/LeaveApprovals";
 import PurchaseReturnPage from "./pages/Purchase-Return";
 import PurchaseReturnDetailPage from "./pages/Purchase-Return/components/PurchaseReturnDetailPage";
 import ReceiptSettingsPage from "./pages/Settings";
@@ -208,6 +212,10 @@ export default function App() {
           <Route path="/hrm/designations" element={<DesignationPage />} />
           <Route path="/hrm/employees" element={<EmployeePage />} />
           <Route path="/hrm/attendance" element={<AttendanceListPage />} />
+          <Route path="/hrm/attendance/summary-report" element={<AttendanceSummaryPage />} />
+          <Route path="/hrm/leave-requests" element={<LeaveRequestPage />} />
+          <Route path="/hrm/leave-requests/:id" element={<LeaveRequestDetail />} />
+          <Route path="/hrm/leave-approvals" element={<LeaveApprovalsPage />} />
           <Route path="/employees" element={<EmployeePage />} />
           <Route path="/employees/:id" element={<EmployeeProfilePage />} />
           <Route path="/alerts" element={<Alerts />} />

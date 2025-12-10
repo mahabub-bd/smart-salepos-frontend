@@ -4,20 +4,17 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import Input from "../../../../components/form/input/InputField";
-import {
-  FormField,
-  SelectField,
-} from "../../../../components/form/form-elements/SelectFiled";
-import { Modal } from "../../../../components/ui/modal";
+import DatePicker from "../../../../components/form/date-picker";
+import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
 import Button from "../../../../components/ui/button/Button";
+import { Modal } from "../../../../components/ui/modal";
 
 import {
   useCheckInMutation,
   useCheckOutMutation,
 } from "../../../../features/attendance/attendanceApi";
-import { useGetEmployeesQuery } from "../../../../features/employee/employeeApi";
 import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
+import { useGetEmployeesQuery } from "../../../../features/employee/employeeApi";
 
 import { CheckInOutFormType, checkInOutSchema } from "./check-in-out.schema";
 
@@ -111,7 +108,7 @@ export default function CheckInOutModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-md"
+      className="max-w-lg"
       title="Employee Attendance"
     >
       {/* Mode Toggle */}
@@ -183,16 +180,20 @@ export default function CheckInOutModal({
             name="check_in_time"
             control={control}
             render={({ field }) => (
-              <FormField
+              <DatePicker
+                id="check-in-time"
                 label="Check In Time"
-                error={errors.check_in_time?.message}
-              >
-                <Input
-                  type="datetime-local"
-                  value={field.value}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-              </FormField>
+                mode="datetime"
+                placeholder="Select date and time"
+                value={field.value ? new Date(field.value) : null}
+                onChange={(date) => {
+                  if (date && !(date instanceof Array)) {
+                    field.onChange(date.toISOString());
+                  } else {
+                    field.onChange("");
+                  }
+                }}
+              />
             )}
           />
         ) : (
@@ -200,16 +201,20 @@ export default function CheckInOutModal({
             name="check_out_time"
             control={control}
             render={({ field }) => (
-              <FormField
+              <DatePicker
+                id="check-out-time"
                 label="Check Out Time"
-                error={errors.check_out_time?.message}
-              >
-                <Input
-                  type="datetime-local"
-                  value={field.value}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-              </FormField>
+                mode="datetime"
+                placeholder="Select date and time"
+                value={field.value ? new Date(field.value) : null}
+                onChange={(date) => {
+                  if (date && !(date instanceof Array)) {
+                    field.onChange(date.toISOString());
+                  } else {
+                    field.onChange("");
+                  }
+                }}
+              />
             )}
           />
         )}

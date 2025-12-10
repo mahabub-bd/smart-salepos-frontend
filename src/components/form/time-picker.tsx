@@ -2,79 +2,60 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import type { Instance } from "flatpickr/dist/types/instance";
 import { useEffect, useRef } from "react";
-import { CalenderIcon, TimeIcon } from "../../icons";
+import { TimeIcon } from "../../icons";
 
-type PropsType = {
+interface TimePickerProps {
   id: string;
-  mode?: "single" | "multiple" | "range" | "time" | "datetime";
-  onChange?: (dates: Date | Date[] | null) => void;
-  value?: Date | Date[] | null;
   label?: string;
   placeholder?: string;
+  value?: Date | null;
+  onChange?: (date: Date | null) => void;
   error?: boolean;
   hint?: string;
-  disableFuture?: boolean;
   isRequired?: boolean;
   isInLine?: boolean;
-  enableTime?: boolean;
   time_24hr?: boolean;
   minuteIncrement?: number;
   hourIncrement?: number;
-};
+  disablePast?: boolean;
+}
 
-export default function DatePicker({
+export default function TimePicker({
   id,
-  mode = "single",
-  onChange,
-  value,
   label,
-  placeholder,
+  placeholder = "Select time",
+  value,
+  onChange,
   error = false,
   hint,
-  disableFuture = true,
   isRequired = false,
   isInLine = false,
-  enableTime = false,
   time_24hr = true,
-  minuteIncrement = 1,
+  minuteIncrement = 15,
   hourIncrement = 1,
-}: PropsType) {
+  disablePast = false,
+}: TimePickerProps) {
   const flatpickrRef = useRef<Instance | null>(null);
 
   useEffect(() => {
     const element = document.getElementById(id);
     if (!element) return;
 
-    const config: any = {
-      mode: mode === "datetime" ? "single" : mode,
-      static: true,
-      position: "below",
-      dateFormat: mode === "time" || mode === "datetime" ? "F j, Y H:i" : "F j, Y",
-      monthSelectorType: "dropdown",
+    const config = {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr,
+      minuteIncrement,
+      hourIncrement,
       defaultDate: value || undefined,
-      maxDate: disableFuture ? "today" : undefined,
+      minDate: disablePast ? "now" : undefined,
       onChange: (selectedDates: any[]) => {
         if (onChange) {
-          if (mode === "single" || mode === "datetime" || mode === "time") {
-            onChange(selectedDates[0] || null);
-          } else {
-            onChange(selectedDates);
-          }
+          onChange(selectedDates[0] || null);
         }
       },
     };
-
-    // Enable time picker for datetime or time mode
-    if (mode === "datetime" || mode === "time" || enableTime) {
-      config.enableTime = true;
-      config.time_24hr = time_24hr;
-      config.minuteIncrement = minuteIncrement;
-      config.hourIncrement = hourIncrement;
-      if (mode === "time") {
-        config.noCalendar = true;
-        config.dateFormat = "H:i";
-      }
-    }
 
     flatpickrRef.current = flatpickr(element, config);
 
@@ -84,11 +65,11 @@ export default function DatePicker({
         flatpickrRef.current = null;
       }
     };
-  }, [id, mode, disableFuture]);
+  }, [id, time_24hr, minuteIncrement, hourIncrement, disablePast]);
 
   useEffect(() => {
-    if (flatpickrRef.current && value !== undefined) {
-      flatpickrRef.current.setDate(value || [], false);
+    if (flatpickrRef.current && value) {
+      flatpickrRef.current.setDate([value]);
     }
   }, [value]);
 
@@ -135,11 +116,7 @@ export default function DatePicker({
         />
 
         <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400 ">
-          {(mode === "time" || mode === "datetime" || enableTime) ? (
-            <TimeIcon className="size-5 cursor-pointer" />
-          ) : (
-            <CalenderIcon className="size-5 cursor-pointer" />
-          )}
+          <TimeIcon className="size-5 cursor-pointer" />
         </span>
         {hint && <p className={getHintClasses()}>{hint}</p>}
       </div>

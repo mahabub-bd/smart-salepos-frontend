@@ -1,277 +1,344 @@
-import { Edit, X } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-
-import Input from "../../../../components/form/input/InputField";
+import { z } from "zod";
+import DatePicker from "../../../../components/form/date-picker";
+import {
+  FormField,
+  SelectField,
+} from "../../../../components/form/form-elements/SelectFiled";
+import Button from "../../../../components/ui/button/Button";
+import { Modal } from "../../../../components/ui/modal";
 import { useUpdateAttendanceMutation } from "../../../../features/attendance/attendanceApi";
 import { AttendanceRecord } from "../../../../types";
-import Button from "../../../../components/ui/button/Button";
 
 interface AttendanceFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   attendance: AttendanceRecord | null;
+  onSuccess?: () => void;
 }
+
+const attendanceSchema = z.object({
+  date: z.string().min(1, "Date is required"),
+  check_in: z.string().optional(),
+  check_out: z.string().optional(),
+  break_start: z.string().optional(),
+  break_end: z.string().optional(),
+  status: z.enum(["present", "absent", "late", "half_day", "leave"]),
+  notes: z.string().optional(),
+});
+
+type AttendanceFormData = z.infer<typeof attendanceSchema>;
+
+const statusOptions = [
+  { id: "present", name: "Present" },
+  { id: "absent", name: "Absent" },
+  { id: "late", name: "Late" },
+  { id: "half_day", name: "Half Day" },
+  { id: "leave", name: "Leave" },
+];
 
 export default function AttendanceFormModal({
   isOpen,
   onClose,
   attendance,
+  onSuccess,
 }: AttendanceFormModalProps) {
-  const [formData, setFormData] = useState({
-    date: "",
-    check_in: "",
-    check_out: "",
-    break_start: "",
-    break_end: "",
-    status: "present",
-    notes: "",
+  const [checkInDate, setCheckInDate] = useState<Date | null>(null);
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
+  const [breakStartDate, setBreakStartDate] = useState<Date | null>(null);
+  const [breakEndDate, setBreakEndDate] = useState<Date | null>(null);
+  const [attendanceDate, setAttendanceDate] = useState<Date | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+  } = useForm<AttendanceFormData>({
+    resolver: zodResolver(attendanceSchema),
   });
+
+  const statusValue = watch("status");
 
   const [updateAttendance, { isLoading }] = useUpdateAttendanceMutation();
 
-  // Helper function to safely format datetime for input
-  const formatDateTimeForInput = (dateString: string | null | undefined): string => {
-    if (!dateString) return "";
+  // Helper function to safely parse datetime (handles both full ISO and time-only strings)
+  const parseDateTime = (
+    dateString: string | null | undefined
+  ): Date | null => {
+    if (!dateString) return null;
+    try {
+      // If it's just time (HH:mm:ss), combine with attendance date
+      if (
+        dateString.includes(":") &&
+        !dateString.includes("T") &&
+        !dateString.includes("-")
+      ) {
+        const attendanceDate =
+          attendance?.date || new Date().toISOString().split("T")[0];
+        const dateTimeString = `${attendanceDate}T${dateString}`;
+        const date = new Date(dateTimeString);
+        if (isNaN(date.getTime())) return null;
+        return date;
+      }
+
+      // For full datetime strings
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+      return date;
+    } catch {
+      return null;
+    }
+  };
+
+  // Helper function to safely parse date
+  const parseDate = (dateString: string | null | undefined): Date | null => {
+    if (!dateString) return null;
     try {
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return "";
-      return date.toISOString().slice(0, 16);
+      if (isNaN(date.getTime())) return null;
+      return date;
     } catch {
-      return "";
+      return null;
     }
   };
 
   useEffect(() => {
     if (attendance) {
-      setFormData({
+      const formData = {
         date: attendance.date,
-        check_in: formatDateTimeForInput(attendance.check_in),
-        check_out: formatDateTimeForInput(attendance.check_out),
-        break_start: formatDateTimeForInput(attendance.break_start),
-        break_end: formatDateTimeForInput(attendance.break_end),
         status: attendance.status,
         notes: attendance.notes || "",
+      };
+
+      Object.entries(formData).forEach(([key, value]) => {
+        setValue(key as keyof AttendanceFormData, value);
       });
+
+      setAttendanceDate(parseDate(attendance.date));
+
+      // Set date picker values
+      setCheckInDate(parseDateTime(attendance.check_in));
+      setCheckOutDate(parseDateTime(attendance.check_out));
+      setBreakStartDate(parseDateTime(attendance.break_start));
+      setBreakEndDate(parseDateTime(attendance.break_end));
     }
-  }, [attendance]);
+  }, [attendance, setValue]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: AttendanceFormData) => {
     if (!attendance) return;
+
+    const formatForAPI = (date: Date | null): string | undefined => {
+      if (!date) return undefined;
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    };
 
     try {
       await updateAttendance({
         id: attendance.id,
-        date: formData.date,
-        check_in: formData.check_in || undefined,
-        check_out: formData.check_out || undefined,
-        break_start: formData.break_start || undefined,
-        break_end: formData.break_end || undefined,
-        status: formData.status as any,
-        notes: formData.notes || undefined,
+        date: data.date,
+        check_in: formatForAPI(checkInDate),
+        check_out: formatForAPI(checkOutDate),
+        break_start: formatForAPI(breakStartDate),
+        break_end: formatForAPI(breakEndDate),
+        status: data.status,
+        notes: data.notes || undefined,
       }).unwrap();
 
       toast.success("Attendance updated successfully");
+      reset();
       onClose();
+      onSuccess?.();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update attendance");
     }
   };
 
-  if (!isOpen || !attendance) return null;
+  const handleClose = () => {
+    reset();
+    setCheckInDate(null);
+    setCheckOutDate(null);
+    setAttendanceDate(null);
+    setBreakStartDate(null);
+    setBreakEndDate(null);
+    onClose();
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-[#1e1e1e]">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Edit className="text-blue-600 dark:text-blue-400" size={24} />
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-              Edit Attendance Record
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-white/5"
-          >
-            <X size={20} className="text-gray-500 dark:text-gray-400" />
-          </button>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Edit Attendance Record"
+      className="max-w-2xl"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Employee Info */}
-        <div className="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-white/5">
+        <div className="mb-4 rounded-lg bg-gray-50 p-4 dark:bg-white/5">
           <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Employee Information
           </h3>
           <div className="text-base font-semibold text-gray-900 dark:text-white">
-            {attendance.employee
+            {attendance?.employee
               ? `${attendance.employee.first_name} ${attendance.employee.last_name}`
               : "Unknown Employee"}
           </div>
-          {attendance.employee?.employee_code && (
+          {attendance?.employee?.employee_code && (
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Code: {attendance.employee.employee_code}
             </div>
           )}
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Date */}
+        {/* Date */}
+        <DatePicker
+          id="attendance-date"
+          label="Attendance Date"
+          value={attendanceDate}
+          onChange={(date) => {
+            if (date && !(date instanceof Array)) {
+              setAttendanceDate(date); // UI তে দেখানোর জন্য
+              setValue("date", date.toISOString().split("T")[0]); // form এ string
+            } else {
+              setAttendanceDate(null);
+              setValue("date", "");
+            }
+          }}
+        />
+
+        {/* Check In & Check Out */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Date <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="date"
-              value={formData.date}
-              onChange={(e) =>
-                setFormData({ ...formData, date: e.target.value })
+            <DatePicker
+              id="check-in-time"
+              label="Check In Time"
+              mode="datetime"
+              placeholder="Select date and time"
+              value={checkInDate}
+              onChange={(date) =>
+                setCheckInDate(date && !(date instanceof Array) ? date : null)
               }
-              required
             />
           </div>
 
-          {/* Check In & Check Out */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Check In Time
-              </label>
-              <Input
-                type="datetime-local"
-                value={formData.check_in}
-                onChange={(e) =>
-                  setFormData({ ...formData, check_in: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Check Out Time
-              </label>
-              <Input
-                type="datetime-local"
-                value={formData.check_out}
-                onChange={(e) =>
-                  setFormData({ ...formData, check_out: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          {/* Break Start & Break End */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Break Start
-              </label>
-              <Input
-                type="datetime-local"
-                value={formData.break_start}
-                onChange={(e) =>
-                  setFormData({ ...formData, break_start: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Break End
-              </label>
-              <Input
-                type="datetime-local"
-                value={formData.break_end}
-                onChange={(e) =>
-                  setFormData({ ...formData, break_end: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          {/* Status */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Status <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) =>
-                setFormData({ ...formData, status: e.target.value })
+            <DatePicker
+              id="check-out-time"
+              label="Check Out Time"
+              mode="datetime"
+              placeholder="Select date and time"
+              value={checkOutDate}
+              onChange={(date) =>
+                setCheckOutDate(date && !(date instanceof Array) ? date : null)
               }
-              required
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2a] dark:border-white/10 dark:text-white"
-            >
-              <option value="present">Present</option>
-              <option value="absent">Absent</option>
-              <option value="late">Late</option>
-              <option value="half_day">Half Day</option>
-              <option value="leave">Leave</option>
-            </select>
+            />
           </div>
+        </div>
 
-          {/* Hours Display */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-              <div className="text-xs text-blue-700 dark:text-blue-400">
-                Regular Hours
-              </div>
-              <div className="mt-1 text-lg font-semibold text-blue-900 dark:text-blue-300">
-                {attendance.regular_hours || "0.00"} hrs
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-orange-50 p-3 dark:bg-orange-900/20">
-              <div className="text-xs text-orange-700 dark:text-orange-400">
-                Overtime Hours
-              </div>
-              <div className="mt-1 text-lg font-semibold text-orange-900 dark:text-orange-300">
-                {attendance.overtime_hours || "0.00"} hrs
-              </div>
-            </div>
-          </div>
-
-          {/* Notes */}
+        {/* Break Start & Break End */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Notes
-            </label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
+            <DatePicker
+              id="break-start"
+              label="Break Start"
+              mode="datetime"
+              placeholder="Select date and time"
+              value={breakStartDate}
+              onChange={(date) =>
+                setBreakStartDate(
+                  date && !(date instanceof Array) ? date : null
+                )
               }
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2a] dark:border-white/10 dark:text-white"
-              placeholder="Add any additional notes..."
             />
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              onClick={onClose}
-              variant="secondary"
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              className="flex-1"
-              disabled={isLoading}
-            >
-              {isLoading ? "Updating..." : "Update Attendance"}
-            </Button>
+          <div>
+            <DatePicker
+              id="break-end"
+              label="Break End"
+              mode="datetime"
+              placeholder="Select date and time"
+              value={breakEndDate}
+              onChange={(date) =>
+                setBreakEndDate(date && !(date instanceof Array) ? date : null)
+              }
+            />
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        {/* Status */}
+        <SelectField
+          label="Status"
+          data={statusOptions}
+          value={statusValue}
+          onChange={(value) => setValue("status", value as any)}
+          error={errors.status?.message}
+        />
+
+        {/* Hours Display */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+            <div className="text-xs text-blue-700 dark:text-blue-400">
+              Regular Hours
+            </div>
+            <div className="mt-1 text-lg font-semibold text-blue-900 dark:text-blue-300">
+              {attendance?.regular_hours || "0.00"} hrs
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-orange-50 p-3 dark:bg-orange-900/20">
+            <div className="text-xs text-orange-700 dark:text-orange-400">
+              Overtime Hours
+            </div>
+            <div className="mt-1 text-lg font-semibold text-orange-900 dark:text-orange-300">
+              {attendance?.overtime_hours || "0.00"} hrs
+            </div>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <FormField label="Notes" error={errors.notes?.message}>
+          <textarea
+            {...register("notes")}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2a] dark:border-white/10 dark:text-white"
+            placeholder="Add any additional notes..."
+          />
+        </FormField>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4">
+          <Button
+            type="button"
+            onClick={handleClose}
+            variant="outline"
+            disabled={isLoading}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isLoading}
+            className="flex-1"
+          >
+            {isLoading ? "Updating..." : "Update Attendance"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

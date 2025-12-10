@@ -17,6 +17,7 @@ import {
 } from "../../../../components/ui/table";
 import {
   useDeleteAttendanceMutation,
+  useGetAttendanceByIdQuery,
   useGetAttendanceListQuery,
 } from "../../../../features/attendance/attendanceApi";
 import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
@@ -36,6 +37,14 @@ export default function AttendanceList() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCheckInOutModalOpen, setIsCheckInOutModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [editAttendanceId, setEditAttendanceId] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [attendanceToDelete, setAttendanceToDelete] =
+    useState<AttendanceRecord | null>(null);
+
   const { data, isLoading, isError } = useGetAttendanceListQuery({
     employee_id: selectedEmployee ? Number(selectedEmployee) : undefined,
     branch_id: selectedBranch ? Number(selectedBranch) : undefined,
@@ -46,17 +55,12 @@ export default function AttendanceList() {
 
   const { data: employeesData } = useGetEmployeesQuery();
   const { data: branchesData } = useGetBranchesQuery();
+  const { data: editAttendanceData, isFetching: isEditAttendanceFetching } =
+    useGetAttendanceByIdQuery(editAttendanceId ?? "", {
+      skip: !editAttendanceId,
+      refetchOnMountOrArgChange: true,
+    });
   const [deleteAttendance] = useDeleteAttendanceMutation();
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isCheckInOutModalOpen, setIsCheckInOutModalOpen] = useState(false);
-  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-  const [editAttendance, setEditAttendance] = useState<AttendanceRecord | null>(
-    null
-  );
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [attendanceToDelete, setAttendanceToDelete] =
-    useState<AttendanceRecord | null>(null);
 
   const canCreate = useHasPermission("attendance.create");
   const canUpdate = useHasPermission("attendance.update");
@@ -65,6 +69,7 @@ export default function AttendanceList() {
   const attendanceRecords = data?.data || [];
   const employees = employeesData?.data || [];
   const branches = branchesData?.data || [];
+  console.log(editAttendanceData);
 
   // Filter attendance based on search input
   const filteredAttendance = attendanceRecords.filter((record) => {
@@ -80,7 +85,7 @@ export default function AttendanceList() {
   });
 
   const openEditModal = (attendance: AttendanceRecord) => {
-    setEditAttendance(attendance);
+    setEditAttendanceId(attendance.id);
     setIsEditModalOpen(true);
   };
 
@@ -344,8 +349,17 @@ export default function AttendanceList() {
       {canUpdate && (
         <AttendanceFormModal
           isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          attendance={editAttendance}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditAttendanceId(null);
+          }}
+          attendance={
+            isEditAttendanceFetching ? null : editAttendanceData?.data || null
+          }
+          onSuccess={() => {
+            setIsEditModalOpen(false);
+            setEditAttendanceId(null);
+          }}
         />
       )}
 

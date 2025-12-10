@@ -177,3 +177,41 @@ export const getStatusColorAttendence = (
       return "light";
   }
 };
+
+export const getStatusColorLeave = (
+  status: string
+): "primary" | "success" | "error" | "warning" | "info" | "light" | "dark" => {
+  switch (status) {
+    case "pending":
+      return "warning";
+    case "approved":
+      return "success";
+    case "rejected":
+      return "error";
+    case "cancelled":
+      return "light";
+    default:
+      return "light";
+  }
+};
+
+export const getLeaveTypeColor = (
+  leaveType: string
+): "primary" | "success" | "error" | "warning" | "info" | "light" | "dark" => {
+  switch (leaveType) {
+    case "annual":
+      return "primary";
+    case "sick":
+      return "error";
+    case "maternity":
+      return "info";
+    case "paternity":
+      return "success";
+    case "unpaid":
+      return "warning";
+    case "compassionate":
+      return "dark";
+    default:
+      return "light";
+  }
+};
