@@ -1,4 +1,4 @@
-import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,6 +6,7 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
+import Input from "../../../components/form/input/InputField";
 import Badge from "../../../components/ui/badge/Badge";
 import {
   Table,
@@ -34,6 +35,7 @@ export default function EmployeeList() {
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
     null
   );
+  const [searchInput, setSearchInput] = useState("");
 
   const canCreate = useHasPermission("employee.create");
   const canUpdate = useHasPermission("employee.update");
@@ -41,6 +43,18 @@ export default function EmployeeList() {
   const canView = useHasPermission("employee.view");
 
   const employees = data?.data || [];
+
+  // Filter employees based on search input
+  const filteredEmployees = employees.filter((employee) => {
+    const searchLower = searchInput.toLowerCase();
+    const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
+    return (
+      fullName.includes(searchLower) ||
+      employee.email?.toLowerCase().includes(searchLower) ||
+      employee.phone?.toLowerCase().includes(searchLower) ||
+      employee.employee_code?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const openCreateModal = () => {
     setEditEmployee(null);
@@ -84,33 +98,71 @@ export default function EmployeeList() {
         permission="employee.create"
       />
 
+      {/* Search Bar */}
+      <div className="mb-4 flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10"
+            size={20}
+          />
+          <Input
+            type="text"
+            placeholder="Search by name, email, or phone..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/5">
               <TableRow>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden sm:table-cell"
+                >
                   Employee Code
                 </TableCell>
                 <TableCell isHeader className="table-header">
                   Name
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden md:table-cell"
+                >
                   Email
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden lg:table-cell"
+                >
                   Phone
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden lg:table-cell"
+                >
                   Department
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden xl:table-cell"
+                >
                   Designation
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden xl:table-cell"
+                >
                   Type
                 </TableCell>
-                <TableCell isHeader className="table-header">
+                <TableCell
+                  isHeader
+                  className="table-header hidden sm:table-cell"
+                >
                   Status
                 </TableCell>
                 <TableCell isHeader className="table-header text-right">
@@ -120,10 +172,10 @@ export default function EmployeeList() {
             </TableHeader>
 
             <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-              {employees.length > 0 ? (
-                employees.map((employee) => (
+              {filteredEmployees.length > 0 ? (
+                filteredEmployees.map((employee) => (
                   <TableRow key={employee.id}>
-                    <TableCell className="table-body font-medium">
+                    <TableCell className="table-body font-medium hidden sm:table-cell">
                       {employee.employee_code}
                     </TableCell>
 
@@ -132,26 +184,44 @@ export default function EmployeeList() {
                         <div className="font-medium">
                           {employee.first_name} {employee.last_name}
                         </div>
+                        {/* Show employee code on mobile */}
+                        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {employee.employee_code}
+                        </div>
+                        {/* Show email on mobile/tablet */}
+                        <div className="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {employee.email}
+                        </div>
+                        {/* Show status badge on mobile */}
+                        <div className="sm:hidden mt-1">
+                          <Badge
+                            size="sm"
+                            color={getStatusColor(employee.status)}
+                          >
+                            {employee.status.charAt(0).toUpperCase() +
+                              employee.status.slice(1)}
+                          </Badge>
+                        </div>
                       </div>
                     </TableCell>
 
-                    <TableCell className="table-body">
+                    <TableCell className="table-body hidden md:table-cell">
                       {employee.email}
                     </TableCell>
 
-                    <TableCell className="table-body">
+                    <TableCell className="table-body hidden lg:table-cell">
                       {employee.phone}
                     </TableCell>
 
-                    <TableCell className="table-body">
+                    <TableCell className="table-body hidden lg:table-cell">
                       {employee.department?.name || "-"}
                     </TableCell>
 
-                    <TableCell className="table-body">
+                    <TableCell className="table-body hidden xl:table-cell">
                       {employee.designation?.title || "-"}
                     </TableCell>
 
-                    <TableCell className="table-body">
+                    <TableCell className="table-body hidden xl:table-cell">
                       <Badge
                         size="sm"
                         color={getEmployeeTypeColor(employee.employee_type)}
@@ -160,15 +230,15 @@ export default function EmployeeList() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="table-body">
+                    <TableCell className="table-body hidden sm:table-cell">
                       <Badge size="sm" color={getStatusColor(employee.status)}>
                         {employee.status.charAt(0).toUpperCase() +
                           employee.status.slice(1)}
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                    <TableCell className="px-2 py-3 sm:px-4">
+                      <div className="flex justify-end gap-1">
                         {canView && (
                           <IconButton
                             icon={Eye}
@@ -205,7 +275,9 @@ export default function EmployeeList() {
                     colSpan={9}
                     className="py-6 text-center text-gray-500 dark:text-gray-400"
                   >
-                    No employees found
+                    {searchInput
+                      ? "No employees match your search"
+                      : "No employees found"}
                   </TableCell>
                 </TableRow>
               )}

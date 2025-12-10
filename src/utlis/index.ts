@@ -119,37 +119,34 @@ export const getStatusColor = (status: EmployeeStatus) => {
   }
 };
 
-
-
-
-  export const getDesignationLevelColor = (level?: string) => {
-    switch (level) {
-      case "managing_director":
-        return "primary";
-      case "director":
-      case "cfo":
-      case "cto":
-      case "cio":
-        return "success";
-      case "head_of_department":
-        return "info";
-      case "senior_manager":
-        return "warning";
-      case "manager":
-        return "dark";
-      case "assistant_manager":
-        return "primary";
-      case "senior_executive":
-        return "success";
-      case "executive":
-        return "info";
-      case "senior_officer":
-        return "warning";
-      case "officer":
-        return "light";
-      case "junior_officer":
-        return "dark";
-      default:
-        return "light";
-    }
-  };
+export const getDesignationLevelColor = (level?: string) => {
+  switch (level) {
+    case "managing_director":
+      return "primary";
+    case "director":
+    case "cfo":
+    case "cto":
+    case "cio":
+      return "success";
+    case "head_of_department":
+      return "info";
+    case "senior_manager":
+      return "warning";
+    case "manager":
+      return "dark";
+    case "assistant_manager":
+      return "primary";
+    case "senior_executive":
+      return "success";
+    case "executive":
+      return "info";
+    case "senior_officer":
+      return "warning";
+    case "officer":
+      return "light";
+    case "junior_officer":
+      return "dark";
+    default:
+      return "light";
+  }
+};

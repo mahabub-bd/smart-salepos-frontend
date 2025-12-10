@@ -94,7 +94,7 @@ export default function CustomerList() {
       <PageHeader
         title="Customer Management"
         icon={<Plus size={16} />}
-        addLabel="Add Customer"
+        addLabel="Add"
         onAdd={() => navigate("/customers/new")}
         permission="customer.create"
       />

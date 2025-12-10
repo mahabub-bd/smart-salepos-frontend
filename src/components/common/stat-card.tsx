@@ -95,32 +95,35 @@ export default function StatCard({
         <Icon className="text-6xl text-gray-800 dark:text-white" />
       </div>
 
-      {/* Main Icon */}
-      <div
-        className={cn(
-          "relative z-10 flex items-center justify-center w-9 h-9 rounded-lg",
-          iconBgClasses[bgColor]
-        )}
-      >
-        <Icon className="text-gray-800 text-lg dark:text-white/90" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 flex items-end justify-between mt-3">
-        <div>
-          <span className="text-xs text-gray-600 dark:text-gray-400">
-            {title}
-          </span>
-          <h4 className="mt-1 font-bold text-gray-800 text-lg dark:text-white/90">
-            {value}
-          </h4>
+      {/* Header with Icon and Badge */}
+      <div className="relative z-10 flex items-center justify-between">
+        {/* Main Icon */}
+        <div
+          className={cn(
+            "flex items-center justify-center w-9 h-9 rounded-lg",
+            iconBgClasses[bgColor]
+          )}
+        >
+          <Icon className="text-gray-800 text-lg dark:text-white/90" />
         </div>
+
+        {/* Badge */}
         {badge && (
           <Badge color={badge.color}>
             {badge.icon && <badge.icon className="text-sm" />}
             {badge.text}
           </Badge>
         )}
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 mt-3">
+        <span className="text-xs text-gray-600 dark:text-gray-400">
+          {title}
+        </span>
+        <h4 className="mt-1 font-bold text-gray-800 text-base dark:text-white/90">
+          {value}
+        </h4>
       </div>
     </div>
   );

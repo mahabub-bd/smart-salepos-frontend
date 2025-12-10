@@ -46,7 +46,8 @@ export default function AccountBalancePage() {
       const type = account.type.toLowerCase();
 
       if (type in totals) {
-        totals[type as keyof typeof totals] += balance;
+        // Use absolute value for proper balance sheet totals
+        totals[type as keyof typeof totals] += Math.abs(balance);
       }
     });
 
