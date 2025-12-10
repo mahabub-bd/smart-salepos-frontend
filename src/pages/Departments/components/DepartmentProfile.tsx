@@ -14,6 +14,7 @@ import {
 import {
   useGetDepartmentEmployeeCountQuery,
   useGetDepartmentWithEmployeesQuery,
+ 
 } from "../../../features/department/departmentApi";
 import { useGetEmployeesQuery } from "../../../features/employee/employeeApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
@@ -260,9 +261,9 @@ export default function DepartmentProfile() {
                           <TableRow
                             key={employee.id}
                             className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                            onClick={() =>
-                              navigate(`/employees/${employee.id}`)
-                            }
+                            onClick={() => {
+                              navigate(`/employees/${employee.id}`);
+                            }}
                           >
                             <TableCell className="font-medium">
                               {employee.first_name} {employee.last_name}

@@ -58,6 +58,7 @@ import SalesPage from "./pages/Sales";
 import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
 import SaleFormPage from "./pages/Sales/components/SaleFormPage";
 
+import AttendanceListPage from "./pages/Attendance/AttendanceList";
 import DepartmentPage from "./pages/Departments";
 import DepartmentProfilePage from "./pages/Departments/DepartmentProfilePage";
 import DesignationPage from "./pages/Designations";
@@ -198,11 +199,15 @@ export default function App() {
           />
           {/* HRM */}
           <Route path="/hrm/departments" element={<DepartmentPage />} />
-          <Route path="/hrm/departments/:id" element={<DepartmentProfilePage />} />
+          <Route
+            path="/hrm/departments/:id"
+            element={<DepartmentProfilePage />}
+          />
           <Route path="/departments" element={<DepartmentPage />} />
           <Route path="/departments/:id" element={<DepartmentProfilePage />} />
           <Route path="/hrm/designations" element={<DesignationPage />} />
           <Route path="/hrm/employees" element={<EmployeePage />} />
+          <Route path="/hrm/attendance" element={<AttendanceListPage />} />
           <Route path="/employees" element={<EmployeePage />} />
           <Route path="/employees/:id" element={<EmployeeProfilePage />} />
           <Route path="/alerts" element={<Alerts />} />

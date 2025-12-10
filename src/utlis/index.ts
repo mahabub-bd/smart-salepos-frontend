@@ -150,3 +150,30 @@ export const getDesignationLevelColor = (level?: string) => {
       return "light";
   }
 };
+
+export const formatTime = (time: string | null) => {
+  if (!time) return "-";
+  return new Date(time).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+export const getStatusColorAttendence = (
+  status: string
+): "primary" | "success" | "error" | "warning" | "info" | "light" | "dark" => {
+  switch (status) {
+    case "present":
+      return "success";
+    case "absent":
+      return "error";
+    case "late":
+      return "warning";
+    case "half_day":
+      return "info";
+    case "leave":
+      return "light";
+    default:
+      return "light";
+  }
+};
