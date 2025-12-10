@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-const statusOptions = ["present", "absent", "late", "half_day", "leave"] as const;
+const statusOptions = [
+  "present",
+  "absent",
+  "late",
+  "half_day",
+  "leave",
+] as const;
 
 export const attendanceFormSchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -9,7 +15,7 @@ export const attendanceFormSchema = z.object({
   break_start: z.string().optional(),
   break_end: z.string().optional(),
   status: z.enum(statusOptions, {
-    errorMap: () => ({ message: "Status is required" }),
+    message: "Status is required",
   }),
   notes: z.string().optional(),
 });
