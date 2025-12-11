@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "../../../../components/ui/table";
 import { useGetAccountJournalQuery, useGetAccountsQuery } from "../../../../features/accounts/accountsApi";
+import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
 
 export default function JournalList() {
   const [selectedAccountCode, setSelectedAccountCode] = useState<string>("");
@@ -16,28 +17,27 @@ export default function JournalList() {
   const journal = data?.data || [];
   const accounts = accountsData?.data || [];
 
+  // Transform accounts data for SelectField
+  const accountOptions = accounts.map((account: any) => ({
+    id: account.code,
+    name: `${account.name} (${account.code})`,
+  }));
+
   if (isLoading) return <Loading message="Loading journal entries..." />;
   if (isError)
     return <p className="text-red-500 p-4">Failed to load journal entries.</p>;
   return (
     <>
-      <div className="mb-4 flex items-center gap-3">
-        <label htmlFor="accountFilter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Filter by Account:
-        </label>
-        <select
-          id="accountFilter"
+      <div className="mb-4">
+        <SelectField
+          label="Filter by Account"
+          data={accountOptions}
           value={selectedAccountCode}
-          onChange={(e) => setSelectedAccountCode(e.target.value)}
-          className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-        >
-          <option value="">All Accounts</option>
-          {accounts.map((account: any) => (
-            <option key={account.code} value={account.code}>
-              {account.name} ({account.code})
-            </option>
-          ))}
-        </select>
+          onChange={setSelectedAccountCode}
+          allowEmpty={true}
+          emptyLabel="All Accounts"
+          placeholder="Select an account"
+        />
       </div>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
@@ -84,11 +84,11 @@ export default function JournalList() {
                     <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
                       {entry.account_name}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                      {Number(entry.debit).toLocaleString()}
+                    <TableCell className="px-4 py-3 text-sm text-right font-semibold text-green-600 dark:text-green-400">
+                      {Number(entry.debit) > 0 ? Number(entry.debit).toLocaleString() : "-"}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-right text-gray-800 dark:text-gray-100">
-                      {Number(entry.credit).toLocaleString()}
+                    <TableCell className="px-4 py-3 text-sm text-right font-semibold text-blue-600 dark:text-blue-400">
+                      {Number(entry.credit) > 0 ? Number(entry.credit).toLocaleString() : "-"}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
                       {entry.narration || "-"}

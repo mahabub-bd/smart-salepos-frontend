@@ -7,6 +7,7 @@ import Loading from "../../../../components/common/Loading";
 import PageHeader from "../../../../components/common/PageHeader";
 import DatePicker from "../../../../components/form/date-picker";
 import Input from "../../../../components/form/input/InputField";
+import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
 import Badge from "../../../../components/ui/badge/Badge";
 import {
   Table,
@@ -69,7 +70,7 @@ export default function AttendanceList() {
   const attendanceRecords = data?.data || [];
   const employees = employeesData?.data || [];
   const branches = branchesData?.data || [];
-  console.log(editAttendanceData);
+  
 
   // Filter attendance based on search input
   const filteredAttendance = attendanceRecords.filter((record) => {
@@ -154,44 +155,45 @@ export default function AttendanceList() {
 
         {/* Filter Dropdowns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <select
+          <SelectField
+            label=""
             value={selectedEmployee}
-            onChange={(e) => setSelectedEmployee(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1e1e1e] dark:border-white/10 dark:text-white"
-          >
-            <option value="">All Employees</option>
-            {employees.map((emp) => (
-              <option key={emp.id} value={emp.id}>
-                {emp.first_name} {emp.last_name}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => setSelectedEmployee(value)}
+            data={[
+              { id: "", name: "All Employees" },
+              ...employees.map((emp) => ({
+                id: emp.id,
+                name: `${emp.first_name} ${emp.last_name}`,
+              })),
+            ]}
+          />
 
-          <select
+          <SelectField
+            label=""
             value={selectedBranch}
-            onChange={(e) => setSelectedBranch(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1e1e1e] dark:border-white/10 dark:text-white"
-          >
-            <option value="">All Branches</option>
-            {branches.map((branch) => (
-              <option key={branch.id} value={branch.id}>
-                {branch.name}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => setSelectedBranch(value)}
+            data={[
+              { id: "", name: "All Branches" },
+              ...branches.map((branch) => ({
+                id: branch.id,
+                name: branch.name,
+              })),
+            ]}
+          />
 
-          <select
+          <SelectField
+            label=""
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1e1e1e] dark:border-white/10 dark:text-white"
-          >
-            <option value="">All Status</option>
-            <option value="present">Present</option>
-            <option value="absent">Absent</option>
-            <option value="late">Late</option>
-            <option value="half_day">Half Day</option>
-            <option value="leave">Leave</option>
-          </select>
+            onChange={(value) => setSelectedStatus(value)}
+            data={[
+              { id: "", name: "All Status" },
+              { id: "present", name: "Present" },
+              { id: "absent", name: "Absent" },
+              { id: "late", name: "Late" },
+              { id: "half_day", name: "Half Day" },
+              { id: "leave", name: "Leave" },
+            ]}
+          />
 
           <DatePicker
             id="attendance-start-date"

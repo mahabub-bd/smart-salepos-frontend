@@ -2,6 +2,10 @@ import { FileText } from "lucide-react";
 import { useState } from "react";
 import Loading from "../../../../components/common/Loading";
 import PageHeader from "../../../../components/common/PageHeader";
+import {
+  FormField,
+  SelectField,
+} from "../../../../components/form/form-elements/SelectFiled";
 import Input from "../../../../components/form/input/InputField";
 import { useGetAttendanceSummaryQuery } from "../../../../features/attendance/attendanceApi";
 import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
@@ -44,71 +48,58 @@ export default function AttendanceSummaryReport() {
 
   return (
     <>
-      <PageHeader title="Attendance Summary Report" icon={<FileText size={16} />} />
+      <PageHeader
+        title="Attendance Summary Report"
+        icon={<FileText size={16} />}
+      />
 
       {/* Filters */}
       <div className="mb-6 space-y-4">
         {/* Date and Filter Dropdowns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">
-              Start Date
-            </label>
+          <FormField label="Start Date">
             <Input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               className="text-sm"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">
-              End Date
-            </label>
+          <FormField label="End Date">
             <Input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               className="text-sm"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">
-              Branch
-            </label>
-            <select
-              value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1e1e1e] dark:border-white/10 dark:text-white"
-            >
-              <option value="">All Branches</option>
-              {branches.map((branch) => (
-                <option key={branch.id} value={branch.id}>
-                  {branch.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Branch"
+            value={selectedBranch}
+            onChange={(value) => setSelectedBranch(value)}
+            data={[
+              { id: "", name: "All Branches" },
+              ...branches.map((branch) => ({
+                id: branch.id,
+                name: branch.name,
+              })),
+            ]}
+          />
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">
-              Department
-            </label>
-            <select
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1e1e1e] dark:border-white/10 dark:text-white"
-            >
-              <option value="">All Departments</option>
-              {departments.map((dept) => (
-                <option key={dept.id} value={dept.id}>
-                  {dept.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Department"
+            value={selectedDepartment}
+            onChange={(value) => setSelectedDepartment(value)}
+            data={[
+              { id: "", name: "All Departments" },
+              ...departments.map((dept) => ({
+                id: dept.id,
+                name: dept.name,
+              })),
+            ]}
+          />
         </div>
       </div>
 
@@ -121,7 +112,7 @@ export default function AttendanceSummaryReport() {
                 Total Days
               </div>
               <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                {summaryData.total_days}
+                {summaryData.total_records}
               </div>
             </div>
 
@@ -157,7 +148,7 @@ export default function AttendanceSummaryReport() {
                 Attendance Rate
               </div>
               <div className="mt-1 text-2xl font-bold text-purple-600 dark:text-purple-400">
-                {summaryData.total_days > 0
+                {summaryData.total_records > 0
                   ? (
                       (summaryData.status_breakdown.present /
                         (summaryData.status_breakdown.present +

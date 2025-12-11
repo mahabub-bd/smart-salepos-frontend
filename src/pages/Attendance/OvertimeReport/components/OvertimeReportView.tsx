@@ -13,6 +13,7 @@ import {
 } from "../../../../components/ui/table";
 import { useGetOvertimeReportQuery } from "../../../../features/attendance/attendanceApi";
 import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
+import { getOvertimeBadgeColor } from "../../../../utlis";
 
 export default function OvertimeReportView() {
   const today = new Date();
@@ -51,21 +52,6 @@ export default function OvertimeReportView() {
     if (hoursNum >= 40) return "high";
     if (hoursNum >= 20) return "medium";
     return "low";
-  };
-
-  const getOvertimeBadgeColor = (
-    level: string
-  ): "primary" | "success" | "error" | "warning" | "info" | "light" | "dark" => {
-    switch (level) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "info";
-      default:
-        return "light";
-    }
   };
 
   if (isLoading) return <Loading message="Loading Overtime Report" />;

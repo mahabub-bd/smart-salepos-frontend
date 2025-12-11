@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import DatePicker from "../../../../components/form/date-picker";
 import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
+import TimePicker from "../../../../components/form/time-picker";
 import Button from "../../../../components/ui/button/Button";
 import { Modal } from "../../../../components/ui/modal";
 
@@ -113,30 +113,24 @@ export default function CheckInOutModal({
     >
       {/* Mode Toggle */}
       <div className="mb-6 flex gap-2">
-        <button
+        <Button
           type="button"
           onClick={() => setMode("check_in")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-            mode === "check_in"
-              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-              : "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
-          }`}
+          variant={mode === "check_in" ? "success" : "secondary"}
+          startIcon={<LogIn size={18} />}
+          className="flex-1"
         >
-          <LogIn size={18} />
           Check In
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => setMode("check_out")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-            mode === "check_out"
-              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-              : "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
-          }`}
+          variant={mode === "check_out" ? "destructive" : "secondary"}
+          startIcon={<LogOut size={18} />}
+          className="flex-1"
         >
-          <LogOut size={18} />
           Check Out
-        </button>
+        </Button>
       </div>
 
       {/* Form */}
@@ -180,19 +174,20 @@ export default function CheckInOutModal({
             name="check_in_time"
             control={control}
             render={({ field }) => (
-              <DatePicker
+              <TimePicker
                 id="check-in-time"
                 label="Check In Time"
-                mode="datetime"
-                placeholder="Select date and time"
+                placeholder="Select time"
                 value={field.value ? new Date(field.value) : null}
                 onChange={(date) => {
-                  if (date && !(date instanceof Array)) {
+                  if (date) {
                     field.onChange(date.toISOString());
                   } else {
                     field.onChange("");
                   }
                 }}
+                error={!!errors.check_in_time}
+                hint={errors.check_in_time?.message}
               />
             )}
           />
@@ -201,19 +196,20 @@ export default function CheckInOutModal({
             name="check_out_time"
             control={control}
             render={({ field }) => (
-              <DatePicker
+              <TimePicker
                 id="check-out-time"
                 label="Check Out Time"
-                mode="datetime"
-                placeholder="Select date and time"
+                placeholder="Select time"
                 value={field.value ? new Date(field.value) : null}
                 onChange={(date) => {
-                  if (date && !(date instanceof Array)) {
+                  if (date) {
                     field.onChange(date.toISOString());
                   } else {
                     field.onChange("");
                   }
                 }}
+                error={!!errors.check_out_time}
+                hint={errors.check_out_time?.message}
               />
             )}
           />

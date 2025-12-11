@@ -215,3 +215,18 @@ export const getLeaveTypeColor = (
       return "light";
   }
 };
+
+export const getOvertimeBadgeColor = (
+  level: string
+): "primary" | "success" | "error" | "warning" | "info" | "light" | "dark" => {
+  switch (level) {
+    case "high":
+      return "error";
+    case "medium":
+      return "warning";
+    case "low":
+      return "info";
+    default:
+      return "light";
+  }
+};

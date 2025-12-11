@@ -1130,7 +1130,7 @@ export interface OvertimeReportParams {
 }
 
 export interface AttendanceSummary {
-  total_days: number;
+  total_records: number;
   total_employees: number;
   status_breakdown: {
     present: number;

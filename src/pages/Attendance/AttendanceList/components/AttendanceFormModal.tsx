@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import DatePicker from "../../../../components/form/date-picker";
+import TimePicker from "../../../../components/form/time-picker";
 import {
   FormField,
   SelectField,
@@ -221,28 +222,22 @@ export default function AttendanceFormModal({
         {/* Check In & Check Out */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <DatePicker
+            <TimePicker
               id="check-in-time"
               label="Check In Time"
-              mode="datetime"
-              placeholder="Select date and time"
+              placeholder="Select time"
               value={checkInDate}
-              onChange={(date) =>
-                setCheckInDate(date && !(date instanceof Array) ? date : null)
-              }
+              onChange={(date) => setCheckInDate(date)}
             />
           </div>
 
           <div>
-            <DatePicker
+            <TimePicker
               id="check-out-time"
               label="Check Out Time"
-              mode="datetime"
-              placeholder="Select date and time"
+              placeholder="Select time"
               value={checkOutDate}
-              onChange={(date) =>
-                setCheckOutDate(date && !(date instanceof Array) ? date : null)
-              }
+              onChange={(date) => setCheckOutDate(date)}
             />
           </div>
         </div>
@@ -250,30 +245,22 @@ export default function AttendanceFormModal({
         {/* Break Start & Break End */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <DatePicker
+            <TimePicker
               id="break-start"
               label="Break Start"
-              mode="datetime"
-              placeholder="Select date and time"
+              placeholder="Select time"
               value={breakStartDate}
-              onChange={(date) =>
-                setBreakStartDate(
-                  date && !(date instanceof Array) ? date : null
-                )
-              }
+              onChange={(date) => setBreakStartDate(date)}
             />
           </div>
 
           <div>
-            <DatePicker
+            <TimePicker
               id="break-end"
               label="Break End"
-              mode="datetime"
-              placeholder="Select date and time"
+              placeholder="Select time"
               value={breakEndDate}
-              onChange={(date) =>
-                setBreakEndDate(date && !(date instanceof Array) ? date : null)
-              }
+              onChange={(date) => setBreakEndDate(date)}
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import DatePicker from "../../../components/form/date-picker";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useTerminateEmployeeMutation } from "../../../features/employee/employeeApi";
@@ -28,6 +29,7 @@ export default function TerminateEmployeeModal({
   const [terminateEmployee] = useTerminateEmployeeMutation();
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -60,9 +62,6 @@ export default function TerminateEmployeeModal({
     onClose();
   };
 
-  // Set minimum date to today
-  const today = new Date().toISOString().split("T")[0];
-
   return (
     <Modal
       isOpen={isOpen}
@@ -73,26 +72,33 @@ export default function TerminateEmployeeModal({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Termination Date *
-          </label>
-          <input
-            type="date"
-            {...register("termination_date", {
+          <Controller
+            name="termination_date"
+            control={control}
+            rules={{
               required: "Termination date is required",
-              min: {
-                value: today,
-                message: "Termination date cannot be in the past",
-              },
-            })}
-            min={today}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            }}
+            render={({ field }) => (
+              <DatePicker
+                id="termination_date"
+                label="Termination Date"
+                placeholder="Select termination date"
+                isRequired
+                disableFuture={false}
+                value={field.value ? new Date(field.value) : null}
+                onChange={(date) => {
+                  if (date && date instanceof Date) {
+                    const formattedDate = date.toISOString().split("T")[0];
+                    field.onChange(formattedDate);
+                  } else {
+                    field.onChange("");
+                  }
+                }}
+                error={!!errors.termination_date}
+                hint={errors.termination_date?.message}
+              />
+            )}
           />
-          {errors.termination_date && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.termination_date.message}
-            </p>
-          )}
         </div>
 
         <div>
