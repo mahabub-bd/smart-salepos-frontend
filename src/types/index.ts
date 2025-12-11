@@ -1155,3 +1155,308 @@ export interface OvertimeReport {
     total_regular_hours: string;
   }>;
 }
+
+// HRM - Leave Request Types
+export enum LeaveStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  CANCELLED = "cancelled",
+}
+
+export enum LeaveType {
+  ANNUAL = "annual",
+  SICK = "sick",
+  MATERNITY = "maternity",
+  PATERNITY = "paternity",
+  UNPAID = "unpaid",
+  COMPASSIONATE = "compassionate",
+}
+
+export interface LeaveRequest {
+  id: number;
+  start_date: string;
+  end_date: string;
+  days_count: string;
+  leave_type: LeaveType;
+  status: LeaveStatus;
+  reason: string;
+  rejection_reason?: string | null;
+  approved_date?: string | null;
+  approver_notes?: string | null;
+  employee?: {
+    id: number;
+    employee_code: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    address: string;
+    date_of_birth: string;
+    hire_date: string;
+    termination_date?: string | null;
+    status: string;
+    employee_type: string;
+    department?: {
+      id: number;
+      name: string;
+      description: string;
+      status: string;
+      code: string;
+      manager_name: string;
+      manager_email: string;
+      notes: string;
+      created_at: string;
+      updated_at: string;
+      deleted_at?: string | null;
+    };
+    departmentId: number;
+    base_salary: string;
+    user?: {
+      id: number;
+      username: string;
+      email: string;
+      full_name: string;
+      phone: string;
+      status: string;
+      last_login_at?: string;
+      created_at: string;
+      updated_at?: string;
+    };
+    userId: number;
+    designation?: {
+      id: number;
+      title: string;
+      code: string;
+      level: string;
+      description: string;
+      minSalary: string;
+      maxSalary: string;
+      autoApproveLeaveDays: number;
+      canApproveLeave: boolean;
+      canApprovePayroll: boolean;
+      parentDesignationId?: number;
+      isActive: boolean;
+      sortOrder: number;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt?: string | null;
+    };
+    designationId: number;
+    reportingManagerId?: number;
+    notes?: string;
+    created_at: string;
+    updated_at?: string;
+  };
+  branch?: {
+    id: number;
+    code: string;
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+  };
+  currentApproverId?: number | null;
+  currentApprovalLevel?: number | null;
+  totalApprovalLevels?: number | null;
+  completedApprovalLevels: number;
+  isFullyApproved: boolean;
+  requiresMultiLevelApproval: boolean;
+  created_at: string;
+  updated_at?: string;
+  leave_balance?: {
+    employee_id: number;
+    year: number;
+    entitlements: {
+      annual: string;
+      sick: string;
+      maternity: string;
+      paternity: string;
+      unpaid: string;
+      compassionate: string;
+      study: string;
+    };
+    used: {
+      annual: string;
+      sick: string;
+      maternity: string;
+      paternity: string;
+      unpaid: string;
+      compassionate: string;
+      study: string;
+    };
+    available: {
+      annual: string;
+      sick: string;
+      maternity: string;
+      paternity: string;
+      unpaid: string;
+      compassionate: string;
+      study: string;
+    };
+  };
+}
+
+export interface CreateLeaveRequestPayload {
+  start_date: string;
+  end_date: string;
+  leave_type: LeaveType;
+  reason: string;
+  employee_id: number;
+  branch_id: number;
+}
+
+export interface UpdateLeaveRequestPayload {
+  start_date?: string;
+  end_date?: string;
+  leave_type?: LeaveType;
+  reason?: string;
+  employee_id?: number;
+  branch_id?: number;
+}
+
+export interface GetLeaveRequestsParams {
+  employee_id?: number;
+  status?: LeaveStatus;
+  leave_type?: LeaveType;
+  start_date?: string;
+  end_date?: string;
+  branch_id?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface LeaveBalance {
+  employee_id: number;
+  annual_leave: {
+    total: number;
+    used: number;
+    remaining: number;
+  };
+  sick_leave: {
+    total: number;
+    used: number;
+    remaining: number;
+  };
+  maternity_leave: {
+    total: number;
+    used: number;
+    remaining: number;
+  };
+  paternity_leave: {
+    total: number;
+    used: number;
+    remaining: number;
+  };
+  unpaid_leave: {
+    taken: number;
+  };
+  compassionate_leave: {
+    taken: number;
+  };
+}
+
+export interface LeaveSummary {
+  total_requests: number;
+  pending_requests: number;
+  approved_requests: number;
+  rejected_requests: number;
+  cancelled_requests: number;
+  status_breakdown: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    cancelled: number;
+  };
+  type_breakdown: {
+    annual: number;
+    sick: number;
+    maternity: number;
+    paternity: number;
+    unpaid: number;
+    compassionate: number;
+    study: number;
+  };
+  total_days_taken: number;
+  employees_on_leave: number;
+  year: number;
+  monthly_breakdown: Array<{
+    month: string;
+    year: number;
+    total_requests: number;
+    approved_requests: number;
+    rejected_requests: number;
+  }>;
+}
+
+// HRM - Leave Approval Types
+export interface LeaveApproval {
+  id: number;
+  leave_request_id: number;
+  approver_id: number;
+  action: "approve" | "reject";
+  approver_notes?: string;
+  rejection_reason?: string;
+  created_at: string;
+  approver?: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
+}
+
+export interface ApproveLeaveRequestPayload {
+  approverNotes?: string;
+}
+
+export interface RejectLeaveRequestPayload {
+  rejectionReason: string;
+}
+
+export interface LeaveApprovalHistory {
+  leave_request_id: number;
+  approvals: LeaveApproval[];
+  current_step: number;
+  total_steps: number;
+  status: LeaveStatus;
+}
+
+export interface PendingLeaveApprovals {
+  pending_requests: Array<{
+    id: number;
+    employee: {
+      id: number;
+      first_name: string;
+      last_name: string;
+      employee_code: string;
+    };
+    leave_type: LeaveType;
+    start_date: string;
+    end_date: string;
+    days_count: number;
+    reason: string;
+    requested_at: string;
+    workflow_current_step: number;
+    workflow_total_steps: number;
+  }>;
+  total_count: number;
+}
+
+export interface LeaveApprovalDashboardStats {
+  pending_approvals: number;
+  approvals_today: number;
+  rejections_today: number;
+  average_response_time: number; // in hours
+  pending_urgent: number; // requests starting within 24 hours
+  monthly_approvals: Array<{
+    month: string;
+    year: number;
+    approved: number;
+    rejected: number;
+    total: number;
+  }>;
+}

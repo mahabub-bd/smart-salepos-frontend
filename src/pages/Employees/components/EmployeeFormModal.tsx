@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import {
   SelectField,
 } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
+import DatePicker from "../../../components/form/date-picker";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useGetBranchesQuery } from "../../../features/branch/branchApi";
@@ -32,8 +33,6 @@ const employeeSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(1, "Phone number is required"),
   address: z.string().min(1, "Address is required"),
-  date_of_birth: z.string().min(1, "Date of birth is required"),
-  hire_date: z.string().min(1, "Hire date is required"),
   status: z.nativeEnum(EmployeeStatus),
   employee_type: z.nativeEnum(EmployeeType),
   designationId: z.string().min(1, "Designation is required"),
@@ -62,6 +61,10 @@ export default function EmployeeFormModal({
   const [updateEmployee, { isLoading: isUpdating }] =
     useUpdateEmployeeMutation();
 
+  // State for date pickers
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+  const [hireDate, setHireDate] = useState<Date | null>(null);
+
   // Fetch departments, designations, and branches
   const { data: departmentsData } = useGetDepartmentsQuery();
   const { data: designationsData } = useGetDesignationsQuery();
@@ -89,8 +92,6 @@ export default function EmployeeFormModal({
       email: employee?.email || "",
       phone: employee?.phone || "",
       address: employee?.address || "",
-      date_of_birth: employee?.date_of_birth || "",
-      hire_date: employee?.hire_date || "",
       status: employee?.status || EmployeeStatus.ACTIVE,
       employee_type: employee?.employee_type || EmployeeType.FULL_TIME,
       designationId: employee?.designationId?.toString() || "",
@@ -112,8 +113,6 @@ export default function EmployeeFormModal({
         email: employee?.email || "",
         phone: employee?.phone || "",
         address: employee?.address || "",
-        date_of_birth: employee?.date_of_birth || "",
-        hire_date: employee?.hire_date || "",
         status: employee?.status || EmployeeStatus.ACTIVE,
         employee_type: employee?.employee_type || EmployeeType.FULL_TIME,
         designationId: employee?.designationId?.toString() || "",
@@ -123,18 +122,47 @@ export default function EmployeeFormModal({
         userId: employee?.userId?.toString() || "",
         notes: employee?.notes || "",
       });
+
+      // Set date picker values with robust date parsing
+      if (employee?.date_of_birth) {
+        const dob = new Date(employee.date_of_birth);
+        setDateOfBirth(isNaN(dob.getTime()) ? null : dob);
+      } else {
+        setDateOfBirth(null);
+      }
+
+      if (employee?.hire_date) {
+        const hire = new Date(employee.hire_date);
+        setHireDate(isNaN(hire.getTime()) ? null : hire);
+      } else {
+        setHireDate(null);
+      }
+    } else {
+      // Reset dates when modal closes
+      setDateOfBirth(null);
+      setHireDate(null);
     }
   }, [isOpen, employee, reset]);
 
   const onSubmit = async (data: EmployeeFormData) => {
+    // Validate date pickers
+    if (!dateOfBirth) {
+      toast.error("Date of birth is required");
+      return;
+    }
+    if (!hireDate) {
+      toast.error("Hire date is required");
+      return;
+    }
+
     const payload: CreateEmployeePayload = {
       first_name: data.first_name,
       last_name: data.last_name,
       email: data.email,
       phone: data.phone,
       address: data.address,
-      date_of_birth: data.date_of_birth,
-      hire_date: data.hire_date,
+      date_of_birth: dateOfBirth.toISOString().split('T')[0],
+      hire_date: hireDate.toISOString().split('T')[0],
       status: data.status,
       employee_type: data.employee_type,
       designationId: parseInt(data.designationId),
@@ -227,26 +255,32 @@ export default function EmployeeFormModal({
           </FormField>
 
           {/* Date of Birth */}
-          <FormField label="Date of Birth *">
-            <Input {...register("date_of_birth")} type="date" />
-            {errors.date_of_birth && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.date_of_birth.message}
-              </p>
-            )}
-          </FormField>
+          <div>
+            <DatePicker
+              id="date_of_birth"
+              label="Date of Birth *"
+              value={dateOfBirth}
+              onChange={(dates) => setDateOfBirth(Array.isArray(dates) ? dates[0] : dates)}
+              placeholder="Select date of birth"
+              disableFuture={true}
+              isRequired={true}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           {/* Hire Date */}
-          <FormField label="Hire Date *">
-            <Input {...register("hire_date")} type="date" />
-            {errors.hire_date && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.hire_date.message}
-              </p>
-            )}
-          </FormField>
+          <div>
+            <DatePicker
+              id="hire_date"
+              label="Hire Date *"
+              value={hireDate}
+              onChange={(dates) => setHireDate(Array.isArray(dates) ? dates[0] : dates)}
+              placeholder="Select hire date"
+              disableFuture={false}
+              isRequired={true}
+            />
+          </div>
 
           {/* Base Salary */}
           <FormField label="Base Salary *">

@@ -139,15 +139,16 @@ export default function PurchaseReturnDetailPage() {
                 </Button>
               </>
             )}
-            {purchaseReturn.status === "processed" && !purchaseReturn.refund_to_supplier && (
-              <Button
-                size="sm"
-                onClick={handleRefundClick}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Process Refund
-              </Button>
-            )}
+            {purchaseReturn.status === "processed" &&
+              !purchaseReturn.refund_to_supplier && (
+                <Button
+                  size="sm"
+                  onClick={handleRefundClick}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Process Refund
+                </Button>
+              )}
           </div>
         </div>
       </div>
@@ -159,15 +160,15 @@ export default function PurchaseReturnDetailPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <FileText size={18} />
-              Purchase Information
+              Purchase Return Information
             </h2>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-600">Purchase Order</p>
+                <p className="text-sm text-gray-600">Purchase Return</p>
                 <p className="font-medium">
-                  {purchaseReturn.purchase?.po_no ||
-                    `PO #${purchaseReturn.purchase_id}`}
+                  {purchaseReturn.return_no ||
+                    `PO #${purchaseReturn.return_no}`}
                 </p>
               </div>
 
@@ -398,94 +399,103 @@ export default function PurchaseReturnDetailPage() {
           )}
 
           {/* Refund History */}
-          {purchaseReturn.refund_history && purchaseReturn.refund_history.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <FileText size={18} />
-                Refund Transaction History
-              </h2>
+          {purchaseReturn.refund_history &&
+            purchaseReturn.refund_history.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <FileText size={18} />
+                  Refund Transaction History
+                </h2>
 
-              <div className="space-y-3">
-                {purchaseReturn.refund_history.map((history, index) => (
-                  <div key={history.id || index} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                          Amount
-                        </p>
-                        <p className="font-semibold text-lg text-green-600">
-                          {parseFloat(history.amount || "0").toLocaleString()}
-                        </p>
+                <div className="space-y-3">
+                  {purchaseReturn.refund_history.map((history, index) => (
+                    <div
+                      key={history.id || index}
+                      className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-700"
+                    >
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                            Amount
+                          </p>
+                          <p className="font-semibold text-lg text-green-600">
+                            {parseFloat(history.amount || "0").toLocaleString()}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                            Method
+                          </p>
+                          <p className="font-medium capitalize">
+                            {history.method || "-"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                            Date & Time
+                          </p>
+                          <p className="font-medium text-sm">
+                            {history.created_at
+                              ? new Date(
+                                  history.created_at
+                                ).toLocaleDateString() +
+                                " " +
+                                new Date(history.created_at).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )
+                              : "-"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                            Debit Account
+                          </p>
+                          <p className="font-mono text-sm">
+                            {history.debit_account_code || "-"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                            Credit Account
+                          </p>
+                          <p className="font-mono text-sm">
+                            {history.credit_account_code || "-"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                            Type
+                          </p>
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
+                            {history.type?.replace(/_/g, " ") || "-"}
+                          </span>
+                        </div>
                       </div>
 
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                          Method
-                        </p>
-                        <p className="font-medium capitalize">
-                          {history.method || "-"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                          Date & Time
-                        </p>
-                        <p className="font-medium text-sm">
-                          {history.created_at
-                            ? new Date(history.created_at).toLocaleDateString() +
-                              " " +
-                              new Date(history.created_at).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : "-"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                          Debit Account
-                        </p>
-                        <p className="font-mono text-sm">
-                          {history.debit_account_code || "-"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                          Credit Account
-                        </p>
-                        <p className="font-mono text-sm">
-                          {history.credit_account_code || "-"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
-                          Type
-                        </p>
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
-                          {history.type?.replace(/_/g, " ") || "-"}
-                        </span>
-                      </div>
+                      {history.note && (
+                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">
+                            Note
+                          </p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                            {history.note}
+                          </p>
+                        </div>
+                      )}
                     </div>
-
-                    {history.note && (
-                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">
-                          Note
-                        </p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {history.note}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Returned Items */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
