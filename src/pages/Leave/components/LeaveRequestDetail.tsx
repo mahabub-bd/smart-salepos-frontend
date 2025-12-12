@@ -287,8 +287,15 @@ export default function LeaveRequestDetail() {
                 Leave Balance ({leaveRequest.leave_balance.year})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(leaveRequest.leave_balance.entitlements).map(
-                  ([type, entitlement]) => {
+                {Object.entries(leaveRequest.leave_balance.entitlements)
+                  .filter(([type]) => {
+                    // Hide maternity leave for male employees
+                    if (leaveRequest.employee?.gender === 'male' && type === 'maternity') {
+                      return false;
+                    }
+                    return true;
+                  })
+                  .map(([type, entitlement]) => {
                     const used =
                       Number(
                         leaveRequest.leave_balance.used[
@@ -329,7 +336,7 @@ export default function LeaveRequestDetail() {
                             </span>
                           </div>
                           <div className="flex justify-between pt-1 border-t border-gray-200 dark:border-white/5">
-                            <span className="text-gray-600 dark:text-gray-400">
+                            <span className="text-gray-600 dark:text-400">
                               Available:
                             </span>
                             <span className="font-medium text-green-600">
@@ -339,8 +346,7 @@ export default function LeaveRequestDetail() {
                         </div>
                       </div>
                     );
-                  }
-                )}
+                  })}
               </div>
             </div>
           )}

@@ -1,4 +1,14 @@
-import { Calendar, CalendarDays, CheckCircle, Clock, Eye, Filter, PenTool, Search, Trash2 } from "lucide-react";
+import {
+  Calendar,
+  CalendarDays,
+  CheckCircle,
+  Clock,
+  Eye,
+  Filter,
+  PenTool,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -29,6 +39,7 @@ import {
   getLeaveTypeColor,
   getStatusColorLeave,
 } from "../../../utlis";
+import LeaveRequestModal from "./LeaveRequestModal";
 
 const leaveTypeOptions = [
   { id: "annual", name: "Annual Leave" },
@@ -55,6 +66,7 @@ export default function LeaveRequestList() {
   const [selectedLeaveType, setSelectedLeaveType] = useState<string>("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data, isLoading, isError } = useGetLeaveRequestsQuery({
     employee_id: selectedEmployee ? Number(selectedEmployee) : undefined,
@@ -82,8 +94,8 @@ export default function LeaveRequestList() {
   const branches = branchesData?.data || [];
   const summary = summaryData?.data;
 
-  const canUpdate = useHasPermission("leave_requests.update");
-  const canDelete = useHasPermission("leave_requests.delete");
+  const canUpdate = useHasPermission("hrm.leave_requests.update");
+  const canDelete = useHasPermission("hrm.leave_requests.delete");
 
   // Filter leave requests based on search input
   const filteredLeaveRequests = leaveRequests.filter((request) => {
@@ -121,10 +133,9 @@ export default function LeaveRequestList() {
         icon={<Calendar size={16} />}
         addLabel="New Leave Request"
         onAdd={() => {
-          // TODO: Open leave request modal
-          toast.info("Leave request form will be implemented");
+          setIsModalOpen(true);
         }}
-        permission="leaverequests.create"
+        permission="leave.create"
       />
 
       {/* Summary Cards */}
@@ -141,7 +152,10 @@ export default function LeaveRequestList() {
               </p>
             </div>
             <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <Calendar className="text-blue-600 dark:text-blue-400" size={24} />
+              <Calendar
+                className="text-blue-600 dark:text-blue-400"
+                size={24}
+              />
             </div>
           </div>
         </div>
@@ -158,7 +172,10 @@ export default function LeaveRequestList() {
               </p>
             </div>
             <div className="p-3 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-              <Clock className="text-yellow-600 dark:text-yellow-400" size={24} />
+              <Clock
+                className="text-yellow-600 dark:text-yellow-400"
+                size={24}
+              />
             </div>
           </div>
         </div>
@@ -175,7 +192,10 @@ export default function LeaveRequestList() {
               </p>
             </div>
             <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <CheckCircle className="text-green-600 dark:text-green-400" size={24} />
+              <CheckCircle
+                className="text-green-600 dark:text-green-400"
+                size={24}
+              />
             </div>
           </div>
         </div>
@@ -192,7 +212,10 @@ export default function LeaveRequestList() {
               </p>
             </div>
             <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-              <CalendarDays className="text-purple-600 dark:text-purple-400" size={24} />
+              <CalendarDays
+                className="text-purple-600 dark:text-purple-400"
+                size={24}
+              />
             </div>
           </div>
         </div>
@@ -440,6 +463,12 @@ export default function LeaveRequestList() {
           </Table>
         </div>
       </div>
+
+      {/* Leave Request Modal */}
+      <LeaveRequestModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 }

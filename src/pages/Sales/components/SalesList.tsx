@@ -1,6 +1,4 @@
 import {
-  ChevronLeft,
-  ChevronRight,
   CreditCard,
   Eye,
   FileDown,
@@ -15,6 +13,7 @@ import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge";
+import Pagination from "../../../components/ui/pagination/Pagination";
 import {
   Table,
   TableBody,
@@ -50,8 +49,13 @@ export default function SaleList() {
   });
 
   const sales = data?.data || [];
-  const total = data?.meta?.total || 0;
-  const totalPages = Math.ceil(total / limit);
+
+  const meta = data?.meta;
+
+  // Handle pagination
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   // Only show full loading screen on initial load, not on pagination
   if (isLoading && !data) return <Loading message="Loading Sales..." />;
@@ -236,48 +240,18 @@ export default function SaleList() {
       </div>
 
       {/* Pagination */}
-      {totalPages > 0 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
-          {/* Showing count */}
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            {(page - 1) * limit + 1} - {Math.min(page * limit, total)} of{" "}
-            {total}
-          </div>
-
-          {/* Pagination Controls */}
-          <div className="flex items-center gap-3">
-            {/* Prev Button */}
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              aria-label="Previous Page"
-              className="flex items-center justify-center w-8 h-8 border rounded-full transition-all
-          hover:bg-gray-100 dark:hover:bg-white/10
-          disabled:opacity-50 disabled:cursor-not-allowed
-          dark:border-white/10 hover:scale-105"
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            {/* Current Page Indicator */}
-            <span className="text-sm px-3 py-1 rounded-md border bg-gray-50 dark:bg-white/10 dark:border-white/10">
-              Page <span className="font-medium">{page}</span> of {totalPages}
-            </span>
-
-            {/* Next Button */}
-            <button
-              onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
-              disabled={page === totalPages}
-              aria-label="Next Page"
-              className="flex items-center justify-center w-8 h-8 border rounded-full transition-all
-          hover:bg-gray-100 dark:hover:bg-white/10
-          disabled:opacity-50 disabled:cursor-not-allowed
-          dark:border-white/10 hover:scale-105"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
+      {meta && meta.totalPages > 1 && (
+        <Pagination
+          meta={{
+            currentPage: meta.page,
+            totalPages: meta.totalPages,
+            total: meta.total,
+          }}
+          currentPage={page}
+          onPageChange={handlePageChange}
+          currentPageItems={sales.length}
+          itemsPerPage={limit}
+        />
       )}
 
       {/* Sale Due Payment Modal */}

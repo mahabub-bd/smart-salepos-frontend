@@ -34,6 +34,7 @@ import { useHasPermission } from "../../../hooks/useHasPermission";
 import { EmployeeStatus } from "../../../types";
 import {
   formatDate,
+  formatDateTime,
   getDesignationLevelColor,
   getEmployeeTypeColor,
   getStatusColor,
@@ -273,9 +274,29 @@ export default function EmployeeProfile() {
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <User className="h-4 w-4 text-gray-400" />
-                <span className="font-medium">User ID:</span>
-                <span>{employee.userId}</span>
+                <span className="font-medium">User Account:</span>
+                <span>{employee.user?.username || "N/A"}</span>
               </div>
+              {employee.user?.roles && employee.user.roles.length > 0 && (
+                <div className="flex items-center gap-3 text-sm">
+                  <User className="h-4 w-4 text-gray-400" />
+                  <span className="font-medium">Roles:</span>
+                  <div className="flex gap-1 flex-wrap">
+                    {employee.user.roles.map((role) => (
+                      <Badge key={role.id} size="sm" variant="light" color="primary">
+                        {role.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {employee.user?.last_login_at && (
+                <div className="flex items-center gap-3 text-sm">
+                  <Calendar className="h-4 w-4 text-gray-400" />
+                  <span className="font-medium">Last Login:</span>
+                  <span>{formatDateTime(employee.user.last_login_at)}</span>
+                </div>
+              )}
               {employee.designation?.level && (
                 <div className="flex items-center gap-3 text-sm">
                   <Briefcase className="h-4 w-4 text-gray-400" />
@@ -290,6 +311,76 @@ export default function EmployeeProfile() {
               )}
             </div>
           </div>
+
+          {/* Reporting Manager Card */}
+          {employee.__reportingManager__ && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Reporting Manager
+                </h3>
+              </div>
+              <div className="px-6 py-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {employee.__reportingManager__.first_name[0]}
+                    {employee.__reportingManager__.last_name[0]}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {employee.__reportingManager__.first_name} {employee.__reportingManager__.last_name}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {employee.__reportingManager__.employee_code}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                      {employee.__reportingManager__.designation?.title}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                      {employee.__reportingManager__.department?.name}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Subordinates Card */}
+          {employee.__subordinates__ && employee.__subordinates__.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Direct Reports ({employee.__subordinates__.length})
+                </h3>
+              </div>
+              <div className="px-6 py-4">
+                <div className="space-y-3">
+                  {employee.__subordinates__.map((subordinate) => (
+                    <div key={subordinate.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        {subordinate.first_name[0]}
+                        {subordinate.last_name[0]}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-gray-900 dark:text-white">
+                          {subordinate.first_name} {subordinate.last_name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {subordinate.designation?.title} • {subordinate.department?.name}
+                        </p>
+                      </div>
+                      <Badge
+                        color={getStatusColor(subordinate.status)}
+                        size="sm"
+                      >
+                        {subordinate.status.replace("_", " ")}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Notes Card */}
           {employee.notes && (

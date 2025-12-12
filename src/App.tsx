@@ -31,6 +31,7 @@ import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import PurchasePage from "./pages/Purchase";
 
 import AccountBalancePage from "./pages/Accounts/AccountBalance";
+import AccountLedgerPage from "./pages/Accounts/AccountLedgerPage";
 import AccountListPage from "./pages/Accounts/AccountList";
 import CashandBank from "./pages/Accounts/CashandBank";
 import JournalPage from "./pages/Accounts/JournalPage";
@@ -38,6 +39,7 @@ import PaymentsPage from "./pages/Accounts/payments";
 import PaymentDetailsPage from "./pages/Accounts/payments/components/PaymentDetails";
 import TrialBalancePage from "./pages/Accounts/TrialBalance";
 import BranchPage from "./pages/Branch";
+
 import CustomerPage from "./pages/Customer";
 import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
 import CustomerFormPage from "./pages/Customer/components/CustomerFormPage";
@@ -48,6 +50,8 @@ import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
 import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
 import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
 import POSPage from "./pages/POS/POSPage";
+import PosSaleDetailPage from "./pages/POS/PosSaleDetailPage";
+import PosSalesListPage from "./pages/POS/PosSalesListPage";
 import PosSalesSummaryPage from "./pages/POS/PosSalesSummaryPage";
 import PosTransactionHistoryPage from "./pages/POS/PosTransactionHistoryPage";
 import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
@@ -60,6 +64,10 @@ import SaleFormPage from "./pages/Sales/components/SaleFormPage";
 
 import AttendanceListPage from "./pages/Attendance/AttendanceList";
 import AttendanceSummaryPage from "./pages/Attendance/AttendanceSummary";
+import CashRegisterManagementPage from "./pages/CashRegister/CashRegisterManagementPage";
+import CashRegisterOperationsPage from "./pages/CashRegister/CashRegisterOperationsPage";
+import CashRegisterTransactionsPage from "./pages/CashRegister/CashRegisterTransactionsPage";
+import CashRegisterVarianceReportPage from "./pages/CashRegister/CashRegisterVarianceReportPage";
 import DepartmentPage from "./pages/Departments";
 import DepartmentProfilePage from "./pages/Departments/DepartmentProfilePage";
 import DesignationPage from "./pages/Designations";
@@ -170,6 +178,7 @@ export default function App() {
           <Route path="/payments/:id" element={<PaymentDetailsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
+          <Route path="/accounts/ledger/:accountCode" element={<AccountLedgerPage />} />
           <Route
             path="/accounts/trial-balance"
             element={<TrialBalancePage />}
@@ -196,10 +205,29 @@ export default function App() {
           />
           {/* POS Routes */}
           <Route path="/pos" element={<POSPage />} />
+          <Route path="/pos/sales-list" element={<PosSalesListPage />} />
+          <Route path="/pos/sales/:id" element={<PosSaleDetailPage />} />
           <Route path="/pos/sales-summary" element={<PosSalesSummaryPage />} />
           <Route
             path="/pos/transactions"
             element={<PosTransactionHistoryPage />}
+          />
+          {/* Cash Register Routes */}
+          <Route
+            path="/cash-register"
+            element={<CashRegisterManagementPage />}
+          />
+          <Route
+            path="/cash-register/operations"
+            element={<CashRegisterOperationsPage />}
+          />
+          <Route
+            path="/cash-register/transactions"
+            element={<CashRegisterTransactionsPage />}
+          />
+          <Route
+            path="/cash-register/variance-reports"
+            element={<CashRegisterVarianceReportPage />}
           />
           {/* HRM */}
           <Route path="/hrm/departments" element={<DepartmentPage />} />
@@ -212,9 +240,15 @@ export default function App() {
           <Route path="/hrm/designations" element={<DesignationPage />} />
           <Route path="/hrm/employees" element={<EmployeePage />} />
           <Route path="/hrm/attendance" element={<AttendanceListPage />} />
-          <Route path="/hrm/attendance/summary-report" element={<AttendanceSummaryPage />} />
+          <Route
+            path="/hrm/attendance/summary-report"
+            element={<AttendanceSummaryPage />}
+          />
           <Route path="/hrm/leave-requests" element={<LeaveRequestPage />} />
-          <Route path="/hrm/leave-requests/:id" element={<LeaveRequestDetail />} />
+          <Route
+            path="/hrm/leave-requests/:id"
+            element={<LeaveRequestDetail />}
+          />
           <Route path="/hrm/leave-approvals" element={<LeaveApprovalsPage />} />
           <Route path="/employees" element={<EmployeePage />} />
           <Route path="/employees/:id" element={<EmployeeProfilePage />} />

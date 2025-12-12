@@ -14,6 +14,7 @@ import {
   UserCircle,
   Users,
   UsersRound,
+  Wallet,
   Warehouse,
 } from "lucide-react";
 import { NavItem } from "../layout/AppSidebar";
@@ -36,6 +37,11 @@ const navItems: NavItem[] = [
         requiredPermission: "pos.view",
       },
       {
+        name: "Sales List",
+        path: "/pos/sales-list",
+        requiredPermission: "pos.view",
+      },
+      {
         name: "Today's Sales",
         path: "/pos/sales-summary",
         requiredPermission: "pos.view",
@@ -44,6 +50,28 @@ const navItems: NavItem[] = [
         name: "Transaction History",
         path: "/pos/transactions",
         requiredPermission: "pos.view",
+      },
+    ],
+  },
+  {
+    icon: <Wallet />,
+    name: "Cash Register",
+    requiredPermission: "cashregister.view",
+    subItems: [
+      {
+        name: "Cash Register Management",
+        path: "/cash-register",
+        requiredPermission: "cashregister.view",
+      },
+      {
+        name: "Transactions",
+        path: "/cash-register/transactions",
+        requiredPermission: "cashregister.view",
+      },
+      {
+        name: "Operations",
+        path: "/cash-register/operations",
+        requiredPermission: "cashregister.view",
       },
     ],
   },
@@ -345,3 +373,4 @@ const othersItems: NavItem[] = [
 ];
 
 export { navItems, othersItems };
+

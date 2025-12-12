@@ -1,5 +1,6 @@
-import { ArrowRightLeft, DollarSign, PlusCircle, Shuffle } from "lucide-react";
+import { ArrowRightLeft, DollarSign, Eye, PlusCircle, Shuffle } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AccountBadge from "../../../../components/common/AccountBadge";
 import IconButton from "../../../../components/common/IconButton";
 import Loading from "../../../../components/common/Loading";
@@ -25,6 +26,7 @@ interface AccountListPageProps {
 export default function AccountListPage({
   isCashBank = false,
 }: AccountListPageProps) {
+  const navigate = useNavigate();
   const {
     data: accountsData,
     isLoading,
@@ -57,6 +59,10 @@ export default function AccountListPage({
     setModalType(type);
   };
 
+  const viewLedger = (accountCode: string) => {
+    navigate(`/accounts/ledger/${accountCode}`);
+  };
+
   return (
     <div>
       <div className="rounded-xl border border-gray-200 p-5 dark:border-gray-800 dark:bg-white/5">
@@ -65,38 +71,13 @@ export default function AccountListPage({
         </h2>
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader >
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  isHeader
-
-                >
-                  Account Number
-                </TableCell>
-                <TableCell
-                  isHeader
-
-                >
-                  Code
-                </TableCell>
-                <TableCell
-                  isHeader
-
-                >
-                  Name
-                </TableCell>
-                <TableCell
-                  isHeader
-
-                >
-                  Action
-                </TableCell>
-                <TableCell
-                  isHeader
-
-                >
-                  Type
-                </TableCell>
+                <TableCell isHeader>Account Number</TableCell>
+                <TableCell isHeader>Code</TableCell>
+                <TableCell isHeader>Name</TableCell>
+                <TableCell isHeader>Action</TableCell>
+                <TableCell isHeader>Type</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -106,15 +87,20 @@ export default function AccountListPage({
                   <TableCell className="px-4 py-2">
                     {acc.account_number}
                   </TableCell>
-                  <TableCell >
-                    {acc.code}
-                  </TableCell>
-                  <TableCell >
-                    {acc.name}
-                  </TableCell>
+                  <TableCell>{acc.code}</TableCell>
+                  <TableCell>{acc.name}</TableCell>
 
                   {/* Action Buttons */}
                   <TableCell className="px-4 py-2 flex justify-start gap-2">
+                    {(acc.isCash || acc.isBank) && (
+                      <IconButton
+                        icon={Eye}
+                        color="gray"
+                        size={16}
+                        tooltip="View Ledger"
+                        onClick={() => viewLedger(acc.code)}
+                      />
+                    )}
                     {acc.isCash && (
                       <>
                         <IconButton
@@ -161,12 +147,12 @@ export default function AccountListPage({
                         acc.type === "asset"
                           ? "blue"
                           : acc.type === "liability"
-                            ? "orange"
-                            : acc.type === "equity"
-                              ? "purple"
-                              : acc.type === "income"
-                                ? "green"
-                                : "red"
+                          ? "orange"
+                          : acc.type === "equity"
+                          ? "purple"
+                          : acc.type === "income"
+                          ? "green"
+                          : "red"
                       }
                     >
                       {acc.type}

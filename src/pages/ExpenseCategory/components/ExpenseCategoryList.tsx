@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
@@ -6,6 +6,7 @@ import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge";
+import Pagination from "../../../components/ui/pagination/Pagination";
 import {
   Table,
   TableBody,
@@ -14,6 +15,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
+import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import {
   useDeleteExpenseCategoryMutation,
   useGetExpenseCategoriesQuery,
@@ -22,8 +24,22 @@ import { useHasPermission } from "../../../hooks/useHasPermission";
 import { ExpenseCategory } from "../../../types";
 import ExpenseCategoryFormModal from "./ExpenseCategoryFormModal";
 
+type StatusFilter = "active" | "inactive" | "all";
+
 export default function ExpenseCategoryList() {
-  const { data, isLoading, isError } = useGetExpenseCategoriesQuery();
+  // Pagination and search state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const limit = 10;
+
+  const { data, isLoading, isError } = useGetExpenseCategoriesQuery({
+    page: currentPage,
+    limit,
+    search: searchTerm || undefined,
+    status: statusFilter === "all" ? undefined : statusFilter,
+  });
+
   const [deleteExpenseCategory] = useDeleteExpenseCategoryMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,22 +50,29 @@ export default function ExpenseCategoryList() {
   const [categoryToDelete, setCategoryToDelete] =
     useState<ExpenseCategory | null>(null);
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
   const canCreate = useHasPermission("expensecategory.create");
   const canUpdate = useHasPermission("expensecategory.update");
   const canDelete = useHasPermission("expensecategory.delete");
 
   const categories = data?.data || [];
+  const meta = data?.meta;
 
-  // Pagination calculations
-  const totalItems = categories.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentCategories = categories.slice(startIndex, endIndex);
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Handle search
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Handle status filter
+  const handleStatusFilter = (status: StatusFilter) => {
+    setStatusFilter(status);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
 
   const openCreateModal = () => {
     setEditCategory(null);
@@ -72,25 +95,12 @@ export default function ExpenseCategoryList() {
       await deleteExpenseCategory(categoryToDelete.id).unwrap();
       toast.success("Expense category deleted successfully");
 
-      // Adjust current page if necessary after deletion
-      const newTotalPages = Math.ceil((totalItems - 1) / itemsPerPage);
-      if (currentPage > newTotalPages && newTotalPages > 0) {
-        setCurrentPage(newTotalPages);
-      }
+      // Stay on current page after deletion (server will handle pagination)
     } catch {
       toast.error("Failed to delete expense category");
     } finally {
       setIsDeleteModalOpen(false);
     }
-  };
-
-  const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-  };
-
-  const handleItemsPerPageChange = (value: number) => {
-    setItemsPerPage(value);
-    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   if (isLoading) return <Loading message="Loading Expense Categories" />;
@@ -109,6 +119,35 @@ export default function ExpenseCategoryList() {
         onAdd={openCreateModal}
         permission="expensecategory.create"
       />
+
+      {/* Search and Filters */}
+      <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="h-10 w-80 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          />
+        </div>
+
+        {/* Status Filter */}
+        <div className="flex items-center gap-2">
+          <SelectField
+            label=""
+            value={statusFilter}
+            onChange={(value) => handleStatusFilter(value as StatusFilter)}
+            data={[
+              { id: "all", name: "All" },
+              { id: "active", name: "Active" },
+              { id: "inactive", name: "Inactive" },
+            ]}
+          />
+        </div>
+      </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
@@ -131,8 +170,8 @@ export default function ExpenseCategoryList() {
             </TableHeader>
 
             <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-              {currentCategories.length > 0 ? (
-                currentCategories.map((category) => (
+              {categories.length > 0 ? (
+                categories.map((category) => (
                   <TableRow key={category.id}>
                     <TableCell className="table-body font-medium">
                       {category.name}
@@ -187,67 +226,20 @@ export default function ExpenseCategoryList() {
           </Table>
         </div>
 
-        {/* Pagination Controls */}
-        {totalItems > 0 && (
-          <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-white/5">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                Show
-              </span>
-              <select
-                value={itemsPerPage}
-                onChange={(e) =>
-                  handleItemsPerPageChange(Number(e.target.value))
-                }
-                className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                per page
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                {startIndex + 1} - {Math.min(endIndex, totalItems)} of{" "}
-                {totalItems}
-              </span>
-
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="rounded p-1 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft
-                    size={20}
-                    className="text-gray-600 dark:text-gray-400"
-                  />
-                </button>
-
-                <span className="px-3 text-sm text-gray-700 dark:text-gray-300">
-                  Page {currentPage} of {totalPages}
-                </span>
-
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="rounded p-1 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
-                  aria-label="Next page"
-                >
-                  <ChevronRight
-                    size={20}
-                    className="text-gray-600 dark:text-gray-400"
-                  />
-                </button>
-              </div>
-            </div>
+        {/* Pagination */}
+        {meta && meta.totalPages > 1 && (
+          <div className="px-4 py-3">
+            <Pagination
+              meta={{
+                currentPage: meta.page,
+                totalPages: meta.totalPages,
+                total: meta.total,
+              }}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              currentPageItems={categories.length}
+              itemsPerPage={limit}
+            />
           </div>
         )}
       </div>

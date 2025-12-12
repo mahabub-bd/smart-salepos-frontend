@@ -74,6 +74,18 @@ export const formatDate = (dateString: string) => {
   });
 };
 
+export const formatDateTime = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 export const getEmployeeStatusColor = (status: EmployeeStatus) => {
   switch (status) {
     case EmployeeStatus.ACTIVE:
@@ -229,4 +241,52 @@ export const getOvertimeBadgeColor = (
     default:
       return "light";
   }
+};
+
+export const getStatusBadge = (status: string) => {
+  switch (status) {
+    case "completed":
+      return { color: "success" as const, text: "Completed" };
+    case "held":
+      return { color: "warning" as const, text: "Held" };
+    case "refunded":
+      return { color: "error" as const, text: "Refunded" };
+    case "pending":
+      return { color: "info" as const, text: "Pending" };
+    case "cancelled":
+      return { color: "light" as const, text: "Cancelled" };
+    default:
+      return { color: "light" as const, text: status };
+  }
+};
+
+// Get payment method badge properties
+export const getPaymentMethodBadge = (method: string) => {
+  switch (method) {
+    case "cash":
+      return { color: "success" as const, text: "Cash" };
+    case "card":
+      return { color: "primary" as const, text: "Card" };
+    case "mobile":
+      return { color: "info" as const, text: "Mobile" };
+    default:
+      return { color: "light" as const, text: method };
+  }
+};
+
+// Calculate business days between two dates (excluding weekends)
+export const calculateBusinessDays = (startDate: Date, endDate: Date): number => {
+  let businessDays = 0;
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= endDate) {
+    const dayOfWeek = currentDate.getDay();
+    // Sunday is 0, Saturday is 6
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      businessDays++;
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return businessDays;
 };

@@ -41,8 +41,8 @@ export default function PermissionGrid({
     return acc;
   }, {} as Record<string, Permission[]>);
 
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  const toggle = (m: string) => setCollapsed((p) => ({ ...p, [m]: !p[m] }));
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const toggle = (m: string) => setExpanded((p) => ({ ...p, [m]: !p[m] }));
 
   const selectModule = (module: string) => {
     grouped[module].forEach((p) => {
@@ -77,7 +77,7 @@ export default function PermissionGrid({
       <div className="space-y-4">
         {Object.entries(grouped).map(([module, perms]) => {
           const total = perms.length;
-          const collapsedState = collapsed[module];
+          const isExpanded = expanded[module];
 
           return (
             <div key={module} className="border rounded-md">
@@ -88,10 +88,10 @@ export default function PermissionGrid({
               >
                 {/* Left Side */}
                 <div className="flex items-center gap-2">
-                  {collapsedState ? (
-                    <ChevronRight size={18} className="text-gray-600" />
-                  ) : (
+                  {isExpanded ? (
                     <ChevronDown size={18} className="text-gray-600" />
+                  ) : (
+                    <ChevronRight size={18} className="text-gray-600" />
                   )}
 
                   <h4 className="font-semibold text-gray-800">
@@ -103,30 +103,36 @@ export default function PermissionGrid({
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       selectModule(module);
                     }}
-                    className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-blue-600 text-white"
+                    size="sm"
+                    variant="success"
+                    startIcon={<Check size={14} />}
+                    className="h-6 text-xs px-2"
                   >
-                    <Check size={14} /> Select All
-                  </button>
+                    Select All
+                  </Button>
 
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       unselectModule(module);
                     }}
-                    className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-300"
+                    size="sm"
+                    variant="secondary"
+                    startIcon={<X size={14} />}
+                    className="h-6 text-xs px-2"
                   >
-                    <X size={14} /> Unselect
-                  </button>
+                    Unselect
+                  </Button>
                 </div>
               </div>
 
               {/* Module Permissions */}
-              {!collapsedState && (
+              {isExpanded && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3">
                   {perms.map((perm) => (
                     <PermissionCard

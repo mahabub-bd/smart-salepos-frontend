@@ -1,4 +1,5 @@
 import { apiSlice } from "../apiSlice";
+import { PosSalesResponse } from "../../types/pos";
 
 export const posApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -13,8 +14,8 @@ export const posApi = apiSlice.injectEndpoints({
     }),
 
     // 🔹 GET POS SALES (PAGINATION)
-    getPosSales: builder.query({
-      query: ({ page = 1, limit = 10 }: { page?: number; limit?: number }) =>
+    getPosSales: builder.query<PosSalesResponse, { page?: number; limit?: number }>({
+      query: ({ page = 1, limit = 10 }) =>
         `/pos/sales?page=${page}&limit=${limit}`,
       providesTags: ["Sales"],
     }),
@@ -32,7 +33,7 @@ export const posApi = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Sales"],
+      invalidatesTags: ["Sales", "CashRegister"],
     }),
     getPosTransactionHistory: builder.query({
       query: ({ page = 1, limit = 10 }: { page?: number; limit?: number }) =>

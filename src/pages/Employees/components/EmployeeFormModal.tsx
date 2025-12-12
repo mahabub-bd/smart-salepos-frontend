@@ -1,14 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import DatePicker from "../../../components/form/date-picker";
 import {
   FormField,
   SelectField,
 } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
-import DatePicker from "../../../components/form/date-picker";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useGetBranchesQuery } from "../../../features/branch/branchApi";
@@ -16,8 +16,14 @@ import { useGetDepartmentsQuery } from "../../../features/department/departmentA
 import { useGetDesignationsQuery } from "../../../features/designation/designationApi";
 import {
   useCreateEmployeeMutation,
+  useGetEmployeesQuery,
   useUpdateEmployeeMutation,
 } from "../../../features/employee/employeeApi";
+import {
+  CreateUserPayload,
+  useCreateUserMutation,
+  useGetUsersQuery,
+} from "../../../features/user/userApi";
 import {
   CreateEmployeePayload,
   Employee,
@@ -26,22 +32,51 @@ import {
 } from "../../../types";
 
 // Zod schema for employee validation
-const employeeSchema = z.object({
-  employee_code: z.string().optional(),
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(1, "Phone number is required"),
-  address: z.string().min(1, "Address is required"),
-  status: z.nativeEnum(EmployeeStatus),
-  employee_type: z.nativeEnum(EmployeeType),
-  designationId: z.string().min(1, "Designation is required"),
-  departmentId: z.string().min(1, "Department is required"),
-  base_salary: z.string().min(1, "Base salary is required"),
-  branch_id: z.string().min(1, "Branch is required"),
-  userId: z.string().min(1, "User ID is required"),
-  notes: z.string().optional(),
-});
+const employeeSchema = z
+  .object({
+    employee_code: z.string().optional(),
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(1, "Phone number is required"),
+    address: z.string().min(1, "Address is required"),
+    status: z.nativeEnum(EmployeeStatus),
+    employee_type: z.nativeEnum(EmployeeType),
+    designationId: z.string().min(1, "Designation is required"),
+    departmentId: z.string().min(1, "Department is required"),
+    base_salary: z.string().min(1, "Base salary is required"),
+    branch_id: z.string().min(1, "Branch is required"),
+    userId: z.string().optional(),
+    notes: z.string().optional(),
+    create_user: z.boolean().default(false),
+    username: z.string().optional(),
+    password: z.string().optional(),
+    reportingManagerId: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.create_user && !data.userId) {
+        return data.username && data.username.length >= 3;
+      }
+      return true;
+    },
+    {
+      message: "Username is required (minimum 3 characters)",
+      path: ["username"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.create_user && !data.userId) {
+        return data.password && data.password.length >= 6;
+      }
+      return true;
+    },
+    {
+      message: "Password is required (minimum 6 characters)",
+      path: ["password"],
+    }
+  );
 
 type EmployeeFormData = z.infer<typeof employeeSchema>;
 
@@ -60,21 +95,26 @@ export default function EmployeeFormModal({
     useCreateEmployeeMutation();
   const [updateEmployee, { isLoading: isUpdating }] =
     useUpdateEmployeeMutation();
+  const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
 
   // State for date pickers
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [hireDate, setHireDate] = useState<Date | null>(null);
 
-  // Fetch departments, designations, and branches
+  // Fetch departments, designations, branches, users, and employees
   const { data: departmentsData } = useGetDepartmentsQuery();
   const { data: designationsData } = useGetDesignationsQuery();
   const { data: branchesData } = useGetBranchesQuery();
+  const { data: usersData } = useGetUsersQuery();
+  const { data: employeesData } = useGetEmployeesQuery({ status: "active" });
 
   const isEdit = !!employee;
   const departments = departmentsData?.data || [];
-  // designations API returns PaginatedResponse, so we need to access the items
+
   const designations = designationsData?.data?.items || [];
   const branches = branchesData?.data || [];
+  const users = usersData?.data || [];
+  const allEmployees = employeesData?.data || [];
 
   const {
     register,
@@ -84,7 +124,7 @@ export default function EmployeeFormModal({
     setValue,
     formState: { errors },
   } = useForm<EmployeeFormData>({
-    resolver: zodResolver(employeeSchema),
+    resolver: zodResolver(employeeSchema) as Resolver<EmployeeFormData>,
     defaultValues: {
       employee_code: employee?.employee_code || "",
       first_name: employee?.first_name || "",
@@ -100,6 +140,10 @@ export default function EmployeeFormModal({
       branch_id: employee?.branch?.id?.toString() || "",
       userId: employee?.userId?.toString() || "",
       notes: employee?.notes || "",
+      create_user: false,
+      username: "",
+      password: "",
+      reportingManagerId: employee?.reportingManagerId?.toString() || "",
     },
   });
 
@@ -121,6 +165,10 @@ export default function EmployeeFormModal({
         branch_id: employee?.branch?.id?.toString() || "",
         userId: employee?.userId?.toString() || "",
         notes: employee?.notes || "",
+        create_user: false,
+        username: "",
+        password: "",
+        reportingManagerId: employee?.reportingManagerId?.toString() || "",
       });
 
       // Set date picker values with robust date parsing
@@ -144,6 +192,9 @@ export default function EmployeeFormModal({
     }
   }, [isOpen, employee, reset]);
 
+  const createUserCheckbox = watch("create_user");
+  const hasExistingUserId = watch("userId");
+
   const onSubmit = async (data: EmployeeFormData) => {
     // Validate date pickers
     if (!dateOfBirth) {
@@ -155,26 +206,48 @@ export default function EmployeeFormModal({
       return;
     }
 
-    const payload: CreateEmployeePayload = {
-      first_name: data.first_name,
-      last_name: data.last_name,
-      email: data.email,
-      phone: data.phone,
-      address: data.address,
-      date_of_birth: dateOfBirth.toISOString().split('T')[0],
-      hire_date: hireDate.toISOString().split('T')[0],
-      status: data.status,
-      employee_type: data.employee_type,
-      designationId: parseInt(data.designationId),
-      departmentId: parseInt(data.departmentId),
-      base_salary: parseFloat(data.base_salary) || 0,
-      branch_id: parseInt(data.branch_id),
-      userId: parseInt(data.userId),
-      notes: data.notes,
-      employee_code: data.employee_code || undefined,
-    };
+    let userId = data.userId;
 
     try {
+      // If creating a new user and no existing user ID
+      if (data.create_user && !hasExistingUserId) {
+        const userPayload: CreateUserPayload = {
+          username: data.username!,
+          email: data.email,
+          full_name: `${data.first_name} ${data.last_name}`,
+          phone: data.phone,
+          password: data.password!,
+          roles: ["employee"], // Default role
+          branch_ids: [parseInt(data.branch_id)],
+        };
+
+        const userResponse = await createUser(userPayload).unwrap();
+        userId = userResponse.data.id.toString();
+        toast.success("User created successfully!");
+      }
+
+      const payload: CreateEmployeePayload = {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        date_of_birth: dateOfBirth.toISOString().split("T")[0],
+        hire_date: hireDate.toISOString().split("T")[0],
+        status: data.status,
+        employee_type: data.employee_type,
+        designationId: parseInt(data.designationId),
+        departmentId: parseInt(data.departmentId),
+        base_salary: parseFloat(data.base_salary) || 0,
+        branch_id: parseInt(data.branch_id),
+        userId: userId && userId !== "" ? parseInt(userId) : undefined,
+        notes: data.notes,
+        employee_code: data.employee_code || undefined,
+        reportingManagerId: data.reportingManagerId
+          ? parseInt(data.reportingManagerId)
+          : undefined,
+      };
+
       if (isEdit && employee) {
         await updateEmployee({ id: employee.id, ...payload }).unwrap();
         toast.success("Employee updated successfully!");
@@ -258,9 +331,11 @@ export default function EmployeeFormModal({
           <div>
             <DatePicker
               id="date_of_birth"
-              label="Date of Birth *"
+              label="Date of Birth "
               value={dateOfBirth}
-              onChange={(dates) => setDateOfBirth(Array.isArray(dates) ? dates[0] : dates)}
+              onChange={(dates) =>
+                setDateOfBirth(Array.isArray(dates) ? dates[0] : dates)
+              }
               placeholder="Select date of birth"
               disableFuture={true}
               isRequired={true}
@@ -273,9 +348,11 @@ export default function EmployeeFormModal({
           <div>
             <DatePicker
               id="hire_date"
-              label="Hire Date *"
+              label="Hire Date "
               value={hireDate}
-              onChange={(dates) => setHireDate(Array.isArray(dates) ? dates[0] : dates)}
+              onChange={(dates) =>
+                setHireDate(Array.isArray(dates) ? dates[0] : dates)
+              }
               placeholder="Select hire date"
               disableFuture={false}
               isRequired={true}
@@ -345,6 +422,23 @@ export default function EmployeeFormModal({
           />
         </div>
 
+        {/* Reporting Manager */}
+        <SelectField
+          label="Reporting Manager (Optional)"
+          data={[
+            { id: "", name: "No reporting manager" },
+            ...allEmployees
+              .filter((emp) => emp.id !== employee?.id) // Exclude current employee from the list
+              .map((emp) => ({
+                id: emp.id.toString(),
+                name: `${emp.first_name} ${emp.last_name} (${emp.employee_code})`,
+              })),
+          ]}
+          value={watch("reportingManagerId") || ""}
+          onChange={(value) => setValue("reportingManagerId", value)}
+          placeholder="Select reporting manager or leave empty"
+        />
+
         <div className="grid grid-cols-2 gap-4">
           {/* Employee Type */}
           <SelectField
@@ -375,19 +469,74 @@ export default function EmployeeFormModal({
           />
         </div>
 
-        {/* User ID */}
-        <FormField label="User ID *">
-          <Input
-            {...register("userId")}
-            type="number"
-            placeholder="Enter user ID"
+        {/* User Creation Section */}
+        {!isEdit && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="create_user"
+                {...register("create_user")}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label
+                htmlFor="create_user"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Create User Account
+              </label>
+            </div>
+
+            {createUserCheckbox && (
+              <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <FormField label="Username *">
+                  <Input
+                    {...register("username")}
+                    placeholder="Enter username"
+                  />
+                  {errors.username && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.username.message}
+                    </p>
+                  )}
+                </FormField>
+
+                <FormField label="Password *">
+                  <Input
+                    {...register("password")}
+                    type="password"
+                    placeholder="Enter password"
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </FormField>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* User Selection - Show only when not creating a new user or in edit mode */}
+        {(!createUserCheckbox || isEdit) && (
+          <SelectField
+            label={isEdit ? "User" : "Select Existing User (Optional)"}
+            data={[
+              { id: "", name: "No user selected" },
+              ...users.map((user) => ({
+                id: user.id.toString(),
+                name: `${user.full_name} (${user.username})`,
+              })),
+            ]}
+            value={watch("userId") || ""}
+            onChange={(value) => setValue("userId", value)}
+            placeholder={
+              isEdit ? "Select user" : "Choose an existing user or leave empty"
+            }
+            disabled={createUserCheckbox && !isEdit}
           />
-          {errors.userId && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.userId.message}
-            </p>
-          )}
-        </FormField>
+        )}
 
         {/* Notes */}
         <FormField label="Notes">
@@ -404,8 +553,19 @@ export default function EmployeeFormModal({
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isCreating || isUpdating}>
-            {isEdit ? "Update Employee" : "Create Employee"}
+          <Button
+            type="submit"
+            disabled={isCreating || isUpdating || isCreatingUser}
+          >
+            {isCreatingUser
+              ? "Creating User..."
+              : isCreating
+              ? "Creating Employee..."
+              : isUpdating
+              ? "Updating Employee..."
+              : isEdit
+              ? "Update Employee"
+              : "Create Employee"}
           </Button>
         </div>
       </form>

@@ -97,8 +97,20 @@ export const accountsApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Accounts"],
     }),
     // 🔹 Get account journal
-    getAccountJournal: builder.query<ApiResponse<JournalEntry[]>, string | void>({
-      query: (accountCode) => `/accounts/reports/journal${accountCode ? `?accountCode=${accountCode}` : ""}`,
+    getAccountJournal: builder.query<ApiResponse<JournalEntry[]>, { accountCode?: string; page?: number; limit?: number } | void>({
+      query: (params) => {
+        if (!params) return "/accounts/reports/journal";
+
+        const { accountCode, page = 1, limit = 10 } = params;
+        const queryParams = new URLSearchParams();
+
+        if (accountCode) queryParams.append("accountCode", accountCode);
+        queryParams.append("page", String(page));
+        queryParams.append("limit", String(limit));
+
+        const queryString = queryParams.toString();
+        return `/accounts/reports/journal${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["Accounts"],
     }),
     getTrialBalance: builder.query<ApiResponse<any>, string | void>({
@@ -132,10 +144,18 @@ export const accountsApi = apiSlice.injectEndpoints({
     }),
     getCashBankLedger: builder.query<
       ApiResponse<any>,
-      { code: string; date?: string }
+      { code: string; date?: string; page?: number; limit?: number }
     >({
-      query: ({ code, date }) =>
-        `/accounts/ledger/cash-bank/${code}${date ? `?date=${date}` : ""}`,
+      query: ({ code, date, page = 1, limit = 10 }) => {
+        const queryParams = new URLSearchParams();
+
+        if (date) queryParams.append("date", date);
+        queryParams.append("page", String(page));
+        queryParams.append("limit", String(limit));
+
+        const queryString = queryParams.toString();
+        return `/accounts/ledger/cash-bank/${code}${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["Accounts"],
     }),
 

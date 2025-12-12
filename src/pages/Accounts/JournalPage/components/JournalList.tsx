@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Loading from "../../../../components/common/Loading";
+import Pagination from "../../../../components/ui/pagination/Pagination";
 import {
   Table,
   TableBody,
@@ -12,16 +13,35 @@ import { SelectField } from "../../../../components/form/form-elements/SelectFil
 
 export default function JournalList() {
   const [selectedAccountCode, setSelectedAccountCode] = useState<string>("");
-  const { data, isLoading, isError } = useGetAccountJournalQuery(selectedAccountCode || undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
+
+  const { data, isLoading, isError } = useGetAccountJournalQuery({
+    accountCode: selectedAccountCode || undefined,
+    page: currentPage,
+    limit,
+  });
   const { data: accountsData } = useGetAccountsQuery();
   const journal = data?.data || [];
+  const meta = data?.meta;
   const accounts = accountsData?.data || [];
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   // Transform accounts data for SelectField
   const accountOptions = accounts.map((account: any) => ({
     id: account.code,
     name: `${account.name} (${account.code})`,
   }));
+
+  // Reset page when account code changes
+  const handleAccountChange = (value: string) => {
+    setSelectedAccountCode(value);
+    setCurrentPage(1);
+  };
 
   if (isLoading) return <Loading message="Loading journal entries..." />;
   if (isError)
@@ -33,7 +53,7 @@ export default function JournalList() {
           label="Filter by Account"
           data={accountOptions}
           value={selectedAccountCode}
-          onChange={setSelectedAccountCode}
+          onChange={handleAccountChange}
           allowEmpty={true}
           emptyLabel="All Accounts"
           placeholder="Select an account"
@@ -100,6 +120,21 @@ export default function JournalList() {
           </Table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {meta && meta.totalPages > 1 && (
+        <Pagination
+          meta={{
+            currentPage: meta.page,
+            totalPages: meta.totalPages,
+            total: meta.total,
+          }}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          currentPageItems={journal.length}
+          itemsPerPage={limit}
+        />
+      )}
     </>
   );
 }

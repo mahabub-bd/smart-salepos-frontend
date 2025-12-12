@@ -9,8 +9,8 @@ import { ExpenseFormValues, expenseSchema } from "./expenseSchema";
 import Select from "../../../components/form/Select";
 
 // API hooks
-import Input from "../../../components/form/input/InputField";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
@@ -32,7 +32,7 @@ export default function ExpenseFormModal({
   onClose,
   expense,
 }: ExpenseFormModalProps) {
-  const { data: categoryData } = useGetExpenseCategoriesQuery();
+  const { data: categoryData } = useGetExpenseCategoriesQuery({});
   const categories = categoryData?.data || [];
 
   const { data: branchData } = useGetBranchesQuery();

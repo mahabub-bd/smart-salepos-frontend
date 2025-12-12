@@ -7,14 +7,34 @@ export interface UpdateExpenseCategoryPayload {
     body: Partial<ExpenseCategory>;
 }
 
+// Pagination parameters for expense categories
+export interface ExpenseCategoriesParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: 'active' | 'inactive';
+}
+
 export const expenseCategoriesApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        // 🔹 GET ALL EXPENSE CATEGORIES
-        getExpenseCategories: builder.query<ApiResponse<ExpenseCategory[]>, void>({
-            query: () => ({
-                url: "/expense-categories",
-                method: "GET",
-            }),
+        // 🔹 GET ALL EXPENSE CATEGORIES (WITH PAGINATION)
+        getExpenseCategories: builder.query<
+            ApiResponse<ExpenseCategory[]>,
+            ExpenseCategoriesParams
+        >({
+            query: ({ page = 1, limit = 10, search, status }) => {
+                const params = new URLSearchParams();
+                params.append('page', page.toString());
+                params.append('limit', limit.toString());
+
+                if (search) params.append('search', search);
+                if (status) params.append('status', status);
+
+                return {
+                    url: `/expense-categories?${params.toString()}`,
+                    method: "GET",
+                };
+            },
             providesTags: (result) =>
                 result?.data
                     ? [

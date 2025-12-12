@@ -49,6 +49,8 @@ export const apiSlice = createApi({
     "LeaveApprovalHistory",
     "PendingApprovals",
     "LeaveApprovalDashboard",
+    "CashRegister",
+    "CashRegisterTransaction",
   ],
   endpoints: () => ({}),
 });
