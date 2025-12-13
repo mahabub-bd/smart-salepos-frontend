@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Loading from "../../../../components/common/Loading";
+import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
 import Pagination from "../../../../components/ui/pagination/Pagination";
 import {
   Table,
@@ -8,8 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../components/ui/table";
-import { useGetAccountJournalQuery, useGetAccountsQuery } from "../../../../features/accounts/accountsApi";
-import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
+import {
+  useGetAccountJournalQuery,
+  useGetAccountsQuery,
+} from "../../../../features/accounts/accountsApi";
 
 export default function JournalList() {
   const [selectedAccountCode, setSelectedAccountCode] = useState<string>("");
@@ -64,7 +67,6 @@ export default function JournalList() {
           <Table>
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell isHeader>Transaction ID</TableCell>
                 <TableCell isHeader>Reference</TableCell>
                 <TableCell isHeader>Date</TableCell>
                 <TableCell isHeader>Account</TableCell>
@@ -80,12 +82,6 @@ export default function JournalList() {
                   <TableRow key={`${tx.transaction_id}-${index}`}>
                     {index === 0 && (
                       <>
-                        <TableCell
-                          rowSpan={tx.entries.length}
-                          className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100"
-                        >
-                          {tx.transaction_id}
-                        </TableCell>
                         <TableCell
                           rowSpan={tx.entries.length}
                           className="px-4 py-3 text-sm capitalize text-left text-gray-800 dark:text-gray-100"
@@ -105,10 +101,14 @@ export default function JournalList() {
                       {entry.account_name}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-right font-semibold text-green-600 dark:text-green-400">
-                      {Number(entry.debit) > 0 ? Number(entry.debit).toLocaleString() : "-"}
+                      {Number(entry.debit) > 0
+                        ? Number(entry.debit).toLocaleString()
+                        : "-"}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-right font-semibold text-blue-600 dark:text-blue-400">
-                      {Number(entry.credit) > 0 ? Number(entry.credit).toLocaleString() : "-"}
+                      {Number(entry.credit) > 0
+                        ? Number(entry.credit).toLocaleString()
+                        : "-"}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-left text-gray-800 dark:text-gray-100">
                       {entry.narration || "-"}

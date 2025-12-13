@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  Building,
   Calendar,
   Hash,
   Mail,
@@ -7,7 +8,6 @@ import {
   TrendingDown,
   TrendingUp,
   User,
-  Building,
 } from "lucide-react";
 import Button from "../ui/button";
 
@@ -160,7 +160,7 @@ export default function SupplierSummaryCard({
         </div>
 
         {/* Current Balance - Highlighted */}
-        <div className="rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 p-5 border-2 border-orange-200 dark:from-orange-950/50 dark:to-amber-950/50 dark:border-orange-800">
+        <div className="rounded-xl bg-linear-to-br from-orange-50 to-amber-50 p-5 border-2 border-orange-200 dark:from-orange-950/50 dark:to-amber-950/50 dark:border-orange-800">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-medium uppercase tracking-wide text-orange-700 dark:text-orange-300">
               Current Balance

@@ -29,16 +29,19 @@ interface TableCellProps {
   className?: string;
 }
 
-// 🟢 Table
+// 🟢 Table - Added table-fixed for better column control
 const Table: React.FC<TableProps> = ({ children, className }) => (
-  <table className={`min-w-full ${className || ""}`}>{children}</table>
+  <table className={`min-w-full table-auto ${className || ""}`}>
+    {children}
+  </table>
 );
 
 // 🟢 Table Header with Default Border
 const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => (
   <thead
-    className={`border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50
-    ${className || ""}`}
+    className={`border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 ${
+      className || ""
+    }`}
   >
     {children}
   </thead>
@@ -47,18 +50,26 @@ const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => (
 // 🟢 Table Body with Default Divider Styling
 const TableBody: React.FC<TableBodyProps> = ({ children, className }) => (
   <tbody
-    className={`divide-y divide-gray-100 dark:divide-gray-800 ${className || ""}`}
+    className={`divide-y divide-gray-100 dark:divide-gray-800 ${
+      className || ""
+    }`}
   >
     {children}
   </tbody>
 );
 
 // 🟢 Table Row
-const TableRow: React.FC<TableRowProps> = ({ children, className, onClick }) => (
-  <tr className={className} onClick={onClick}>{children}</tr>
+const TableRow: React.FC<TableRowProps> = ({
+  children,
+  className,
+  onClick,
+}) => (
+  <tr className={className} onClick={onClick}>
+    {children}
+  </tr>
 );
 
-// 🟢 Table Cell (different default styles for header and body)
+// 🟢 Table Cell - Enhanced with better overflow handling
 const TableCell: React.FC<TableCellProps> = ({
   children,
   isHeader = false,

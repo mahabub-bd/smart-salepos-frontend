@@ -4,8 +4,8 @@ import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 import { useGetCustomerGroupsQuery } from "../../../features/customer-group/customerGroupApi";
 import {
   useCreateCustomerMutation,
@@ -158,141 +158,139 @@ export default function CustomerFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-3xl p-6 max-h-[90vh] flex flex-col"
+      className="max-w-4xl  max-h-[90vh] overflow-y-auto  scrollbar-hide"
       title={isEdit ? "Update Customer" : "Create New Customer"}
     >
-      <div className="overflow-y-auto flex-1 px-1">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          {/* Customer Name */}
-          <FormField label="Customer Name *" error={errors.name?.message}>
-            <Input placeholder="John Doe" {...register("name")} />
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        {/* Customer Name */}
+        <FormField label="Customer Name *" error={errors.name?.message}>
+          <Input placeholder="John Doe" {...register("name")} />
+        </FormField>
+
+        {/* Email & Phone */}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField label="Email *" error={errors.email?.message}>
+            <Input
+              type="email"
+              placeholder="email@example.com"
+              {...register("email")}
+            />
           </FormField>
 
-          {/* Email & Phone */}
+          <FormField label="Phone *" error={errors.phone?.message}>
+            <Input placeholder="01700000000" {...register("phone")} />
+          </FormField>
+        </div>
+
+        {/* Billing Address */}
+        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+          <h3 className="text-md font-medium mb-3 dark:text-white">
+            Billing Address
+          </h3>
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Email *" error={errors.email?.message}>
+            <FormField label="Contact Name">
               <Input
-                type="email"
-                placeholder="email@example.com"
-                {...register("email")}
+                placeholder="John Doe"
+                {...register("billing_address.contact_name")}
               />
             </FormField>
-
-            <FormField label="Phone *" error={errors.phone?.message}>
-              <Input placeholder="01700000000" {...register("phone")} />
+            <FormField label="Phone">
+              <Input
+                placeholder="01700000000"
+                {...register("billing_address.phone")}
+              />
             </FormField>
           </div>
-
-          {/* Billing Address */}
-          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
-            <h3 className="text-md font-medium mb-3 dark:text-white">
-              Billing Address
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="Contact Name">
-                <Input
-                  placeholder="John Doe"
-                  {...register("billing_address.contact_name")}
-                />
-              </FormField>
-              <FormField label="Phone">
-                <Input
-                  placeholder="01700000000"
-                  {...register("billing_address.phone")}
-                />
-              </FormField>
-            </div>
-            <div className="mt-3">
-              <FormField label="Street">
-                <Input
-                  placeholder="123 Main Street"
-                  {...register("billing_address.street")}
-                />
-              </FormField>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-3">
-              <FormField label="City">
-                <Input
-                  placeholder="Dhaka"
-                  {...register("billing_address.city")}
-                />
-              </FormField>
-              <FormField label="Country">
-                <Input
-                  placeholder="Bangladesh"
-                  {...register("billing_address.country")}
-                />
-              </FormField>
-            </div>
+          <div className="mt-3">
+            <FormField label="Street">
+              <Input
+                placeholder="123 Main Street"
+                {...register("billing_address.street")}
+              />
+            </FormField>
           </div>
-
-          {/* Shipping Address */}
-          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
-            <h3 className="text-md font-medium mb-3 dark:text-white">
-              Shipping Address
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="Contact Name">
-                <Input
-                  placeholder="John Doe"
-                  {...register("shipping_address.contact_name")}
-                />
-              </FormField>
-              <FormField label="Phone">
-                <Input
-                  placeholder="01700000000"
-                  {...register("shipping_address.phone")}
-                />
-              </FormField>
-            </div>
-            <div className="mt-3">
-              <FormField label="Street">
-                <Input
-                  placeholder="456 Shipping Lane"
-                  {...register("shipping_address.street")}
-                />
-              </FormField>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-3">
-              <FormField label="City">
-                <Input
-                  placeholder="Chattogram"
-                  {...register("shipping_address.city")}
-                />
-              </FormField>
-              <FormField label="Country">
-                <Input
-                  placeholder="Bangladesh"
-                  {...register("shipping_address.country")}
-                />
-              </FormField>
-            </div>
+          <div className="grid grid-cols-2 gap-4 mt-3">
+            <FormField label="City">
+              <Input
+                placeholder="Dhaka"
+                {...register("billing_address.city")}
+              />
+            </FormField>
+            <FormField label="Country">
+              <Input
+                placeholder="Bangladesh"
+                {...register("billing_address.country")}
+              />
+            </FormField>
           </div>
+        </div>
 
-          {/* Customer Group */}
-          <FormField label="Customer Group">
-            <Select
-              value={groupId || ""}
-              onChange={(value) => setValue("group_id", value)}
-              placeholder="Select Customer Group (Optional)"
-              options={customerGroups.map((group: any) => ({
-                value: String(group.id),
-                label: group.name,
-              }))}
-            />
-          </FormField>
-
-          {/* Status */}
-          <div className="flex items-center gap-2">
-            <Checkbox
-              label="Active"
-              checked={!!setValue} // To fix initial checkbox state
-              {...register("status")}
-              onChange={(checked) => setValue("status", checked)}
-            />
+        {/* Shipping Address */}
+        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+          <h3 className="text-md font-medium mb-3 dark:text-white">
+            Shipping Address
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="Contact Name">
+              <Input
+                placeholder="John Doe"
+                {...register("shipping_address.contact_name")}
+              />
+            </FormField>
+            <FormField label="Phone">
+              <Input
+                placeholder="01700000000"
+                {...register("shipping_address.phone")}
+              />
+            </FormField>
           </div>
-        </form>
-      </div>
+          <div className="mt-3">
+            <FormField label="Street">
+              <Input
+                placeholder="456 Shipping Lane"
+                {...register("shipping_address.street")}
+              />
+            </FormField>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-3">
+            <FormField label="City">
+              <Input
+                placeholder="Chattogram"
+                {...register("shipping_address.city")}
+              />
+            </FormField>
+            <FormField label="Country">
+              <Input
+                placeholder="Bangladesh"
+                {...register("shipping_address.country")}
+              />
+            </FormField>
+          </div>
+        </div>
+
+        {/* Customer Group */}
+        <FormField label="Customer Group">
+          <Select
+            value={groupId || ""}
+            onChange={(value) => setValue("group_id", value)}
+            placeholder="Select Customer Group (Optional)"
+            options={customerGroups.map((group: any) => ({
+              value: String(group.id),
+              label: group.name,
+            }))}
+          />
+        </FormField>
+
+        {/* Status */}
+        <div className="flex items-center gap-2">
+          <Checkbox
+            label="Active"
+            checked={!!setValue} // To fix initial checkbox state
+            {...register("status")}
+            onChange={(checked) => setValue("status", checked)}
+          />
+        </div>
+      </form>
 
       {/* Submit Buttons */}
       <div className="flex justify-end gap-3 mt-4 shrink-0">

@@ -449,6 +449,7 @@ const CashRegisterManagementPage: React.FC = () => {
       {/* Create Modal - TODO */}
       <Modal
         isOpen={showCreateModal}
+        className="max-w-xl"
         onClose={() => setShowCreateModal(false)}
         title="Create Cash Register"
       >

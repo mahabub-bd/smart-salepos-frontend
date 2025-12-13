@@ -21,7 +21,7 @@ export default function SupplierLedgerPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
+    new Date().toISOString().split("T")[0]
   );
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
@@ -34,8 +34,13 @@ export default function SupplierLedgerPage() {
     );
   }
 
-  const { data: supplierData, isLoading: supplierLoading } = useGetSupplierByIdQuery(id);
-  const { data: ledgerData, isLoading: ledgerLoading, isError } = useGetSupplierLedgerQuery({
+  const { data: supplierData, isLoading: supplierLoading } =
+    useGetSupplierByIdQuery(id);
+  const {
+    data: ledgerData,
+    isLoading: ledgerLoading,
+    isError,
+  } = useGetSupplierLedgerQuery({
     supplierId: parseInt(id),
     date: selectedDate,
     page: currentPage,
@@ -89,139 +94,142 @@ export default function SupplierLedgerPage() {
 
         {/* Transactions Table Container */}
         <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/5">
-
-        {/* Transactions Table */}
-        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell isHeader>Date & Time</TableCell>
-                <TableCell isHeader>Reference Type</TableCell>
-                <TableCell isHeader>Reference ID</TableCell>
-                <TableCell isHeader>Debit</TableCell>
-                <TableCell isHeader>Credit</TableCell>
-                <TableCell isHeader>Running Balance</TableCell>
-                <TableCell isHeader>Narration</TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.length === 0 ? (
+          {/* Transactions Table */}
+          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12">
-                    <div className="text-gray-500 dark:text-gray-400">
-                      <p className="text-lg font-medium mb-1">
-                        No transactions found
-                      </p>
-                      <p className="text-sm">
-                        No transactions recorded for this supplier
-                      </p>
-                    </div>
-                  </TableCell>
+                  <TableCell isHeader>Date & Time</TableCell>
+                  <TableCell isHeader>Reference Type</TableCell>
+                  <TableCell isHeader>Reference ID</TableCell>
+                  <TableCell isHeader>Debit</TableCell>
+                  <TableCell isHeader>Credit</TableCell>
+                  <TableCell isHeader>Running Balance</TableCell>
+                  <TableCell isHeader>Narration</TableCell>
                 </TableRow>
-              ) : (
-                entries.map((entry: any, index: number) => (
-                  <TableRow
-                    key={index}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  >
-                    <TableCell>
-                      <div>
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          {formatDateTime(entry.date)}
+              </TableHeader>
+              <TableBody>
+                {entries.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-12">
+                      <div className="text-gray-500 dark:text-gray-400">
+                        <p className="text-lg font-medium mb-1">
+                          No transactions found
+                        </p>
+                        <p className="text-sm">
+                          No transactions recorded for this supplier
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        size="sm"
-                        variant="light"
-                        color={
-                          entry.reference_type === 'purchase' ? 'success' :
-                          entry.reference_type === 'payment' ? 'primary' :
-                          entry.reference_type === 'purchase_return' ? 'warning' :
-                          entry.reference_type === 'supplier_refund' ? 'info' :
-                          'primary'
-                        }
-                        className="capitalize"
-                      >
-                        {entry.reference_type?.replace(/_/g, " ")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-medium text-gray-900 dark:text-white">
-                      {entry.reference_id ? (
-                        entry.reference_type === 'purchase' ? (
-                          <span className="text-blue-600 hover:text-blue-800 cursor-pointer">
-                            #{entry.reference_id}
-                          </span>
-                        ) : entry.reference_type === 'payment' ? (
-                          <span className="text-green-600 hover:text-green-800 cursor-pointer">
-                            #{entry.reference_id}
-                          </span>
-                        ) : (
-                          `#${entry.reference_id}`
-                        )
-                      ) : (
-                        "N/A"
-                      )}
-                    </TableCell>
-                    <TableCell
-                      className={`font-medium ${
-                        entry.debit > 0
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {entry.debit > 0
-                        ? formatCurrencyEnglish(entry.debit)
-                        : "-"}
-                    </TableCell>
-                    <TableCell
-                      className={`font-medium ${
-                        entry.credit > 0
-                          ? "text-red-600 dark:text-red-400"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {entry.credit > 0
-                        ? formatCurrencyEnglish(entry.credit)
-                        : "-"}
-                    </TableCell>
-                    <TableCell
-                      className={`font-medium ${
-                        entry.running_balance >= 0
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {formatCurrencyEnglish(Math.abs(entry.running_balance))}
-                      {entry.running_balance < 0 && " (Payable)"}
-                    </TableCell>
-                    <TableCell>
-                      <p className="text-sm text-gray-900 dark:text-white">
-                        {entry.narration || "No narration"}
-                      </p>
-                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ) : (
+                  entries.map((entry: any, index: number) => (
+                    <TableRow
+                      key={index}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    >
+                      <TableCell>
+                        <div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {formatDateTime(entry.date)}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          size="sm"
+                          variant="light"
+                          color={
+                            entry.reference_type === "purchase"
+                              ? "success"
+                              : entry.reference_type === "payment"
+                              ? "primary"
+                              : entry.reference_type === "purchase_return"
+                              ? "warning"
+                              : entry.reference_type === "supplier_refund"
+                              ? "info"
+                              : "primary"
+                          }
+                          className="capitalize"
+                        >
+                          {entry.reference_type?.replace(/_/g, " ")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900 dark:text-white">
+                        {entry.reference_id ? (
+                          entry.reference_type === "purchase" ? (
+                            <span className="text-blue-600 hover:text-blue-800 cursor-pointer">
+                              #{entry.reference_id}
+                            </span>
+                          ) : entry.reference_type === "payment" ? (
+                            <span className="text-green-600 hover:text-green-800 cursor-pointer">
+                              #{entry.reference_id}
+                            </span>
+                          ) : (
+                            `#${entry.reference_id}`
+                          )
+                        ) : (
+                          "N/A"
+                        )}
+                      </TableCell>
+                      <TableCell
+                        className={`font-medium ${
+                          entry.debit > 0
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {entry.debit > 0
+                          ? formatCurrencyEnglish(entry.debit)
+                          : "-"}
+                      </TableCell>
+                      <TableCell
+                        className={`font-medium ${
+                          entry.credit > 0
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {entry.credit > 0
+                          ? formatCurrencyEnglish(entry.credit)
+                          : "-"}
+                      </TableCell>
+                      <TableCell
+                        className={`font-medium ${
+                          entry.running_balance >= 0
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-red-600 dark:text-red-400"
+                        }`}
+                      >
+                        {formatCurrencyEnglish(Math.abs(entry.running_balance))}
+                        {entry.running_balance < 0 && " (Payable)"}
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-sm text-gray-900 dark:text-white">
+                          {entry.narration || "No narration"}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-        {/* Pagination */}
-        {meta && meta.totalPages > 1 && (
-          <Pagination
-            meta={{
-              currentPage: meta.page,
-              totalPages: meta.totalPages,
-              total: meta.total,
-            }}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-            currentPageItems={entries.length}
-            itemsPerPage={limit}
-          />
-        )}
+          {/* Pagination */}
+          {meta && meta.totalPages > 1 && (
+            <Pagination
+              meta={{
+                currentPage: meta.page,
+                totalPages: meta.totalPages,
+                total: meta.total,
+              }}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              currentPageItems={entries.length}
+              itemsPerPage={limit}
+            />
+          )}
         </div>
       </div>
     </div>

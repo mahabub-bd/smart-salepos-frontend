@@ -266,7 +266,7 @@ export default function EmployeeFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-4xl p-6 max-h-[90vh] overflow-y-auto  scrollbar-hide"
+      className="max-w-4xl  max-h-[90vh] overflow-y-auto  scrollbar-hide"
       title={isEdit ? "Update Employee" : "Create New Employee"}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
