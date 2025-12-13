@@ -11,12 +11,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import Loading from "../../../components/common/Loading";
+import TextArea from "../../../components/form/input/TextArea";
 import Badge from "../../../components/ui/badge/Badge";
 import Button from "../../../components/ui/button";
 import { Modal } from "../../../components/ui/modal";
-import TextArea from "../../../components/form/input/TextArea";
 import {
   useApproveLeaveRequestMutation,
+  useGetLeaveRequestApprovalStatusQuery,
   useGetLeaveRequestByIdQuery,
   useRejectLeaveRequestMutation,
 } from "../../../features/leave/leaveApi";
@@ -55,6 +56,13 @@ export default function LeaveRequestDetail() {
   const { data, isLoading, isError } = useGetLeaveRequestByIdQuery(id || "", {
     skip: !id,
   });
+
+  const { data: approvalStatusData } = useGetLeaveRequestApprovalStatusQuery(
+    id || "",
+    {
+      skip: !id,
+    }
+  );
 
   const [approveLeaveRequest, { isLoading: isApproving }] =
     useApproveLeaveRequestMutation();
@@ -290,7 +298,10 @@ export default function LeaveRequestDetail() {
                 {Object.entries(leaveRequest.leave_balance.entitlements)
                   .filter(([type]) => {
                     // Hide maternity leave for male employees
-                    if (leaveRequest.employee?.gender === 'male' && type === 'maternity') {
+                    if (
+                      leaveRequest.employee?.gender === "male" &&
+                      type === "maternity"
+                    ) {
                       return false;
                     }
                     return true;
@@ -471,6 +482,102 @@ export default function LeaveRequestDetail() {
             </div>
           )}
 
+          {/* Approval Status */}
+          {approvalStatusData?.data && (
+            <div className="bg-white rounded-xl p-6 dark:bg-[#1e1e1e] border border-gray-200 dark:border-white/5">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Approval Status
+              </h2>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Status:
+                  </span>
+                  <Badge
+                    color={
+                      approvalStatusData.data.status === "approved"
+                        ? "success"
+                        : approvalStatusData.data.status === "rejected"
+                        ? "error"
+                        : "warning"
+                    }
+                    size="sm"
+                  >
+                    {approvalStatusData.data.status.charAt(0).toUpperCase() +
+                      approvalStatusData.data.status.slice(1)}
+                  </Badge>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Approval Level:
+                  </span>
+                  <span className="text-gray-900 dark:text-white">
+                    {approvalStatusData.data.currentApprovalLevel} of{" "}
+                    {approvalStatusData.data.totalApprovalLevels}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Fully Approved:
+                  </span>
+                  <span
+                    className={`font-medium ${
+                      approvalStatusData.data.isFullyApproved
+                        ? "text-green-600"
+                        : "text-orange-600"
+                    }`}
+                  >
+                    {approvalStatusData.data.isFullyApproved ? "Yes" : "No"}
+                  </span>
+                </div>
+
+                {approvalStatusData.data.currentApproverName && (
+                  <div className="pt-3 border-t border-gray-200 dark:border-white/5">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      Current Approver:
+                    </p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {approvalStatusData.data.currentApproverName}
+                    </p>
+                  </div>
+                )}
+
+                <div className="pt-3 border-t border-gray-200 dark:border-white/5 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Leave Type:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {leaveTypeLabels[
+                        approvalStatusData.data
+                          .leaveType as keyof typeof leaveTypeLabels
+                      ] || approvalStatusData.data.leaveType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Duration:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {formatDate(approvalStatusData.data.startDate)} -{" "}
+                      {formatDate(approvalStatusData.data.endDate)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Days:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {approvalStatusData.data.daysCount} days
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Workflow Status */}
           {(leaveRequest.currentApprovalLevel !== null ||
             leaveRequest.totalApprovalLevels !== null) && (
@@ -576,7 +683,11 @@ export default function LeaveRequestDetail() {
               rows={4}
               placeholder="Please provide a reason for rejection..."
               error={!rejectionReason.trim()}
-              hint={rejectionReason.trim() === "" ? "Rejection reason is required" : ""}
+              hint={
+                rejectionReason.trim() === ""
+                  ? "Rejection reason is required"
+                  : ""
+              }
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">

@@ -165,6 +165,12 @@ export const leaveApi = apiSlice.injectEndpoints({
       query: () => "/hrm/leave-approvals/dashboard/stats",
       providesTags: ["LeaveApprovalDashboard"],
     }),
+
+    // GET LEAVE REQUEST APPROVAL STATUS
+    getLeaveRequestApprovalStatus: builder.query<ApiResponse<any>, number | string>({
+      query: (id) => `/hrm/leave-requests/${id}/approval-status/minimal`,
+      providesTags: (_result, _error, id) => [{ type: "LeaveRequests", id }],
+    }),
   }),
 });
 
@@ -184,4 +190,5 @@ export const {
   useGetPendingLeaveApprovalsQuery,
   useInitializeLeaveApprovalWorkflowMutation,
   useGetLeaveApprovalDashboardStatsQuery,
+  useGetLeaveRequestApprovalStatusQuery,
 } = leaveApi;

@@ -43,6 +43,7 @@ import BranchPage from "./pages/Branch";
 import CustomerPage from "./pages/Customer";
 import CustomerDetailPage from "./pages/Customer/components/CustomerDetailPage";
 import CustomerFormPage from "./pages/Customer/components/CustomerFormPage";
+import CustomerLedgerPage from "./pages/Customer/components/CustomerLedgerPage";
 import CustomerGroupPage from "./pages/CustomerGroup";
 import ExpenseCategoryPage from "./pages/ExpenseCategory";
 import ExpensesPage from "./pages/Expenses";
@@ -82,6 +83,7 @@ import ReceiptSettingsPage from "./pages/Settings";
 import BusinessSettingsPage from "./pages/Settings/Business";
 import SuppliersPage from "./pages/Supplier";
 import SupplierDetailPage from "./pages/Supplier/components/SupplierDetailPage";
+import SupplierLedgerPage from "./pages/Supplier/components/SupplierLedgerPage";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
@@ -154,6 +156,7 @@ export default function App() {
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
+          <Route path="/suppliers/:id/ledger" element={<SupplierLedgerPage />} />
           {/* Purchase List */}
           <Route path="/purchase" element={<PurchasePage />} />
           <Route path="/purchases/create" element={<PurchaseCreate />} />
@@ -178,7 +181,10 @@ export default function App() {
           <Route path="/payments/:id" element={<PaymentDetailsPage />} />
           <Route path="/accounts/list" element={<AccountListPage />} />
           <Route path="/accounts/cash-bank" element={<CashandBank />} />
-          <Route path="/accounts/ledger/:accountCode" element={<AccountLedgerPage />} />
+          <Route
+            path="/accounts/ledger/:accountCode"
+            element={<AccountLedgerPage />}
+          />
           <Route
             path="/accounts/trial-balance"
             element={<TrialBalancePage />}
@@ -188,6 +194,7 @@ export default function App() {
           <Route path="/customers/new" element={<CustomerFormPage />} />
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
           <Route path="/customers/:id/edit" element={<CustomerFormPage />} />
+          <Route path="/customers/:id/ledger" element={<CustomerLedgerPage />} />
           <Route path="customers-groups" element={<CustomerGroupPage />} />
           <Route path="/expenses/category" element={<ExpenseCategoryPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />

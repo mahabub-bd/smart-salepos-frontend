@@ -7,7 +7,7 @@ import {
   Search,
   ShoppingCart,
   Trash2,
-  UserPlus
+  UserPlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -24,10 +24,7 @@ import {
 } from "../../features/cash-register";
 import { useGetCustomersQuery } from "../../features/customer/customerApi";
 
-import z from "zod";
-import {
-  FormField
-} from "../../components/form/form-elements/SelectFiled";
+import { FormField } from "../../components/form/form-elements/SelectFiled";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import ThermalReceipt58mm from "../../components/receipt/ThermalReceipt58mm";
@@ -42,71 +39,21 @@ import {
   CashRegister,
   Customer,
   ReceiptPreviewData,
-  Warehouse
+  Warehouse,
 } from "../../types";
+import {
+  CartItem,
+  CloseCounterFormData,
+  DiscountType,
+  ExtendedProduct,
+  OpenCashRegisterFormValues,
+  openCashRegisterSchema,
+  PaymentMethod,
+  Product,
+  SaleReceiptData,
+  WarehouseReport,
+} from "../../types/posPage";
 import CustomerFormModal from "../Customer/components/CustomerFormModal";
-
-interface CartItem {
-  product_id: number;
-  product_name: string;
-  warehouse_id: number;
-  warehouse_name: string;
-  quantity: number;
-  unit_price: number;
-  available_stock: number;
-  batch_no: string;
-}
-
-interface ProductData {
-  id: number;
-  name: string;
-  sku: string;
-  barcode: string;
-  selling_price: string;
-  purchase_price: string;
-  description?: string;
-  discount_price?: string;
-  status?: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface Product {
-  product: ProductData;
-  purchased_quantity: number;
-  sold_quantity: number;
-  remaining_quantity: number;
-  batch_no: string;
-  purchase_value: number;
-  sale_value: number;
-}
-
-interface WarehouseReport {
-  warehouse_id: number;
-  warehouse: Warehouse;
-  total_stock: number;
-  total_sold_quantity: number;
-  remaining_stock: number;
-  purchase_value: number;
-  sale_value: number;
-  products: Product[];
-}
-
-interface ExtendedProduct extends Product {
-  warehouse_id: number;
-  warehouse_name: string;
-}
-
-
-const openCashRegisterSchema = z.object({
-  cash_register_id: z.number({
-    message: "Please select a cash register",
-  }).min(1, "Please select a valid cash register"),
-  opening_balance: z.number().min(0, "Opening balance cannot be negative").optional(),
-  notes: z.string().optional(),
-});
-
-type OpenCashRegisterFormValues = z.infer<typeof openCashRegisterSchema>;
 
 export default function POSPage() {
   const [searchProduct, setSearchProduct] = useState("");
@@ -114,19 +61,16 @@ export default function POSPage() {
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [selectedWarehouse, setSelectedWarehouse] = useState<number>(0);
   const [selectedCashRegister, setSelectedCashRegister] = useState<number>(0);
-  const [discountType, setDiscountType] = useState<"fixed" | "percentage">(
-    "fixed"
-  );
+  const [discountType, setDiscountType] = useState<DiscountType>("fixed");
   const [discountValue, setDiscountValue] = useState(0);
   const [taxPercentage, setTaxPercentage] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "bank" | "bkash">(
-    "cash"
-  );
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [paymentAccountCode, setPaymentAccountCode] = useState("");
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
-  const [completedSaleData, setCompletedSaleData] = useState<any>(null);
+  const [completedSaleData, setCompletedSaleData] =
+    useState<SaleReceiptData | null>(null);
   const [showOpenRegisterModal, setShowOpenRegisterModal] = useState(false);
   const [showCloseCounterModal, setShowCloseCounterModal] = useState(false);
 
@@ -137,7 +81,6 @@ export default function POSPage() {
     handleSubmit: handleFormSubmit,
     formState: { errors },
     reset: resetForm,
-
   } = useForm<OpenCashRegisterFormValues>({
     resolver: zodResolver(openCashRegisterSchema),
     defaultValues: {
@@ -236,8 +179,8 @@ export default function POSPage() {
     paymentMethod === "cash"
       ? acc.isCash
       : paymentMethod === "bank"
-        ? acc.isBank
-        : false
+      ? acc.isBank
+      : false
   );
 
   // Get selected customer's group discount
@@ -315,6 +258,10 @@ export default function POSPage() {
           unit_price: Number(product.selling_price),
           available_stock: productData.remaining_quantity,
           batch_no: productData.batch_no,
+          product_image:
+            product.images && product.images.length > 0
+              ? product.images[0].url
+              : undefined,
         },
       ]);
       toast.success(`${product.name} added to cart`);
@@ -383,7 +330,7 @@ export default function POSPage() {
     }
   };
 
-  const handleCloseCounter = async (data: { actual_amount: number; notes?: string }) => {
+  const handleCloseCounter = async (data: CloseCounterFormData) => {
     if (!selectedCashRegister) {
       return toast.error("Please select a cash register first");
     }
@@ -552,10 +499,28 @@ export default function POSPage() {
                     onClick={() => addToCart(productData)}
                     className="group border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:border-brand-500 dark:hover:border-brand-600 hover:shadow-md transition-all bg-white dark:bg-gray-900 flex flex-col items-center"
                   >
-                    <div className="w-16 h-16 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg mb-3 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/20 transition-colors">
+                    <div className="w-16 h-16 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg mb-3 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/20 transition-colors overflow-hidden">
+                      {product.images && product.images.length > 0 ? (
+                        <img
+                          src={product.images[0].url}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = "none";
+                            target.nextElementSibling?.classList.remove(
+                              "hidden"
+                            );
+                          }}
+                        />
+                      ) : null}
                       <ShoppingCart
                         size={32}
-                        className="text-gray-400 dark:text-gray-500 group-hover:text-brand-600 dark:group-hover:text-brand-400"
+                        className={`${
+                          product.images && product.images.length > 0
+                            ? "hidden"
+                            : ""
+                        } text-gray-400 dark:text-gray-500 group-hover:text-brand-600 dark:group-hover:text-brand-400`}
                       />
                     </div>
                     <h3 className="font-medium text-sm text-center text-gray-900 dark:text-white line-clamp-2 mb-1">
@@ -605,7 +570,15 @@ export default function POSPage() {
                 <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                      <span className="text-gray-600 dark:text-gray-400">Current Balance:</span> ৳<span>{parseFloat(cashRegisters[0].current_balance).toFixed(2)}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Current Balance:
+                      </span>{" "}
+                      ৳
+                      <span>
+                        {parseFloat(cashRegisters[0].current_balance).toFixed(
+                          2
+                        )}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -663,8 +636,19 @@ export default function POSPage() {
                   key={`${item.product_id}-${item.warehouse_id}`}
                   className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-sm transition-shadow"
                 >
-                  {/* Product Name and Warehouse */}
-                  <div className="flex items-start justify-between mb-2">
+                  {/* Product Image, Name and Warehouse */}
+                  <div className="flex items-start gap-3 mb-2">
+                    {item.product_image && (
+                      <img
+                        src={item.product_image}
+                        alt={item.product_name}
+                        className="w-12 h-12 rounded-lg object-cover shrink-0"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                        }}
+                      />
+                    )}
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold text-sm text-gray-900 dark:text-white mb-1">
                         {item.product_name}
@@ -682,7 +666,7 @@ export default function POSPage() {
                       onClick={() =>
                         removeFromCart(item.product_id, item.warehouse_id)
                       }
-                      className="ml-2 p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                      className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors shrink-0"
                       title="Remove from cart"
                     >
                       <Trash2 size={16} />
@@ -829,19 +813,19 @@ export default function POSPage() {
               {(paymentMethod === "cash" ||
                 paymentMethod === "bank" ||
                 paymentMethod === "bkash") && (
-                  <FormField label="Account">
-                    <Select
-                      className="h-8"
-                      value={paymentAccountCode}
-                      onChange={setPaymentAccountCode}
-                      placeholder="Select Account"
-                      options={filteredAccounts.map((acc) => ({
-                        value: acc.code,
-                        label: `${acc.name} - ${acc.code}`,
-                      }))}
-                    />
-                  </FormField>
-                )}
+                <FormField label="Account">
+                  <Select
+                    className="h-8"
+                    value={paymentAccountCode}
+                    onChange={setPaymentAccountCode}
+                    placeholder="Select Account"
+                    options={filteredAccounts.map((acc) => ({
+                      value: acc.code,
+                      label: `${acc.name} - ${acc.code}`,
+                    }))}
+                  />
+                </FormField>
+              )}
             </div>
 
             <FormField label="Paid Amount">
@@ -1043,7 +1027,8 @@ export default function POSPage() {
       </Modal>
 
       {/* Close Counter Modal */}
-      <Modal className="max-w-xl"
+      <Modal
+        className="max-w-xl"
         isOpen={showCloseCounterModal}
         onClose={() => setShowCloseCounterModal(false)}
         title="Close Cash Register"
@@ -1053,7 +1038,9 @@ export default function POSPage() {
             e.preventDefault();
             const formData = new FormData(e.target as HTMLFormElement);
             handleCloseCounter({
-              actual_amount: parseFloat(formData.get("actual_amount") as string),
+              actual_amount: parseFloat(
+                formData.get("actual_amount") as string
+              ),
               notes: formData.get("notes") as string,
             });
           }}
@@ -1065,7 +1052,8 @@ export default function POSPage() {
                 Expected Balance:
               </span>
               <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                ৳{cashRegisters.length > 0
+                ৳
+                {cashRegisters.length > 0
                   ? parseFloat(cashRegisters[0].current_balance).toFixed(2)
                   : "0.00"}
               </span>

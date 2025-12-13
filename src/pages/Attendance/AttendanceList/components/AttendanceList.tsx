@@ -1,14 +1,28 @@
-import { Pencil, Plus, Search, Trash2, Upload } from "lucide-react";
-import { useState } from "react";
+import {
+  CalendarDays,
+  Clock,
+  Pencil,
+  Percent,
+  Plus,
+  Search,
+  Timer,
+  Trash2,
+  TrendingUp,
+  Upload,
+  Users,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
+
 import ConfirmDialog from "../../../../components/common/ConfirmDialog";
 import IconButton from "../../../../components/common/IconButton";
 import Loading from "../../../../components/common/Loading";
 import PageHeader from "../../../../components/common/PageHeader";
 import DatePicker from "../../../../components/form/date-picker";
-import Input from "../../../../components/form/input/InputField";
 import { SelectField } from "../../../../components/form/form-elements/SelectFiled";
+import Input from "../../../../components/form/input/InputField";
 import Badge from "../../../../components/ui/badge/Badge";
+
 import {
   Table,
   TableBody,
@@ -16,28 +30,34 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../components/ui/table";
+
 import {
   useDeleteAttendanceMutation,
   useGetAttendanceByIdQuery,
   useGetAttendanceListQuery,
+  useGetAttendanceSummaryQuery,
 } from "../../../../features/attendance/attendanceApi";
 import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
 import { useGetEmployeesQuery } from "../../../../features/employee/employeeApi";
 import { useHasPermission } from "../../../../hooks/useHasPermission";
 import { AttendanceRecord } from "../../../../types";
 import { getStatusColorAttendence } from "../../../../utlis";
+
+import StatCard from "../../../../components/common/stat-card";
 import AttendanceFormModal from "./AttendanceFormModal";
 import BulkAttendanceModal from "./BulkAttendanceModal";
 import CheckInOutModal from "./CheckInOutModal";
 
 export default function AttendanceList() {
+  /* ================= FILTER STATES ================= */
   const [searchInput, setSearchInput] = useState("");
-  const [selectedEmployee, setSelectedEmployee] = useState<string>("");
-  const [selectedBranch, setSelectedBranch] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
+  /* ================= MODAL STATES ================= */
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCheckInOutModalOpen, setIsCheckInOutModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -46,55 +66,76 @@ export default function AttendanceList() {
   const [attendanceToDelete, setAttendanceToDelete] =
     useState<AttendanceRecord | null>(null);
 
-  const { data, isLoading, isError } = useGetAttendanceListQuery({
+  /* ================= API ================= */
+  const queryParams = {
     employee_id: selectedEmployee ? Number(selectedEmployee) : undefined,
     branch_id: selectedBranch ? Number(selectedBranch) : undefined,
     status: selectedStatus as any,
-    start_date: startDate ? startDate.toISOString().split("T")[0] : undefined,
-    end_date: endDate ? endDate.toISOString().split("T")[0] : undefined,
-  });
+    start_date: startDate?.toISOString().split("T")[0],
+    end_date: endDate?.toISOString().split("T")[0],
+  };
+
+  const { data, isLoading, isError } = useGetAttendanceListQuery(queryParams);
+
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const summaryParams = {
+    start_date:
+      startDate?.toISOString().split("T")[0] ||
+      thirtyDaysAgo.toISOString().split("T")[0],
+    end_date:
+      endDate?.toISOString().split("T")[0] || today.toISOString().split("T")[0],
+    branch_id: selectedBranch ? Number(selectedBranch) : undefined,
+    department: undefined,
+  };
+
+  const { data: summaryData } = useGetAttendanceSummaryQuery(summaryParams);
 
   const { data: employeesData } = useGetEmployeesQuery();
   const { data: branchesData } = useGetBranchesQuery();
-  const { data: editAttendanceData, isFetching: isEditAttendanceFetching } =
-    useGetAttendanceByIdQuery(editAttendanceId ?? "", {
+
+  const { data: editAttendanceData, isFetching } = useGetAttendanceByIdQuery(
+    editAttendanceId ?? "",
+    {
       skip: !editAttendanceId,
-      refetchOnMountOrArgChange: true,
-    });
+    }
+  );
+
   const [deleteAttendance] = useDeleteAttendanceMutation();
 
+  /* ================= PERMISSIONS ================= */
   const canCreate = useHasPermission("attendance.create");
   const canUpdate = useHasPermission("attendance.update");
   const canDelete = useHasPermission("attendance.delete");
 
+  /* ================= DATA ================= */
   const attendanceRecords = data?.data || [];
+  const summary = summaryData?.data;
   const employees = employeesData?.data || [];
   const branches = branchesData?.data || [];
-  
 
-  // Filter attendance based on search input
+  /* ================= DERIVED ================= */
   const filteredAttendance = attendanceRecords.filter((record) => {
-    const searchLower = searchInput.toLowerCase();
-    const employeeName = record.employee
+    const search = searchInput.toLowerCase();
+    const name = record.employee
       ? `${record.employee.first_name} ${record.employee.last_name}`.toLowerCase()
       : "";
     return (
-      employeeName.includes(searchLower) ||
-      record.date?.toLowerCase().includes(searchLower) ||
-      record.status?.toLowerCase().includes(searchLower)
+      name.includes(search) ||
+      record.date?.toLowerCase().includes(search) ||
+      record.status?.toLowerCase().includes(search)
     );
   });
 
-  const openEditModal = (attendance: AttendanceRecord) => {
-    setEditAttendanceId(attendance.id);
-    setIsEditModalOpen(true);
-  };
+  const attendanceRate = useMemo(() => {
+    if (!summary) return "0";
+    const { present, absent, late, half_day } = summary.status_breakdown;
+    const total = present + absent + late + half_day;
+    return total ? ((present / total) * 100).toFixed(1) : "0";
+  }, [summary]);
 
-  const openDeleteDialog = (attendance: AttendanceRecord) => {
-    setAttendanceToDelete(attendance);
-    setIsDeleteModalOpen(true);
-  };
-
+  /* ================= HANDLERS ================= */
   const confirmDelete = async () => {
     if (!attendanceToDelete) return;
     try {
@@ -108,44 +149,106 @@ export default function AttendanceList() {
   };
 
   if (isLoading) return <Loading message="Loading Attendance Records" />;
-
   if (isError)
-    return (
-      <p className="p-6 text-red-500">Failed to fetch attendance records.</p>
-    );
+    return <p className="p-6 text-red-500">Failed to load attendance.</p>;
 
   return (
     <>
       <PageHeader
         title="Attendance Management"
         icon={<Plus size={16} />}
-        addLabel="Check In/Out"
+        addLabel="Check In / Out"
         onAdd={() => setIsCheckInOutModalOpen(true)}
         permission="attendance.create"
       />
 
-      {/* Filters */}
+      {/* ================= SUMMARY ================= */}
+      {summary && (
+        <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <StatCard
+            icon={CalendarDays}
+            title="Total Days"
+            value={summary.total_records}
+            bgColor="blue"
+          />
+          <StatCard
+            icon={Users}
+            title="Employees"
+            value={summary.total_employees}
+            bgColor="indigo"
+          />
+          <StatCard
+            icon={Clock}
+            title="Regular Hours"
+            value={summary.total_regular_hours}
+            bgColor="green"
+            badge={{ icon: TrendingUp, text: "Normal", color: "success" }}
+          />
+          <StatCard
+            icon={Timer}
+            title="Overtime"
+            value={summary.total_overtime_hours}
+            bgColor="orange"
+            badge={{ text: "Extra", color: "warning" }}
+          />
+          <StatCard
+            icon={Percent}
+            title="Attendance Rate"
+            value={`${attendanceRate}%`}
+            bgColor="purple"
+            badge={{
+              text:
+                Number(attendanceRate) >= 90
+                  ? "Excellent"
+                  : Number(attendanceRate) >= 75
+                  ? "Good"
+                  : "Low",
+              color:
+                Number(attendanceRate) >= 90
+                  ? "success"
+                  : Number(attendanceRate) >= 75
+                  ? "info"
+                  : "danger",
+            }}
+          />
+        </div>
+      )}
+
+      {/* ================= FILTERS ================= */}
       <div className="mb-4 space-y-4">
-        {/* Search Bar */}
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 max-w-md">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               size={20}
             />
             <Input
-              type="text"
-              placeholder="Search by employee name or date..."
+              placeholder="Search employee or date..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10"
             />
           </div>
 
+          <div className="flex items-center gap-3">
+            <DatePicker
+              id="startdate"
+              value={startDate}
+              onChange={(d) => setStartDate(d as Date)}
+              placeholder="Start Date"
+            />
+            <DatePicker
+              id="enddate"
+              value={endDate}
+              onChange={(d) => setEndDate(d as Date)}
+              placeholder="End Date"
+            />
+          </div>
+
           {canCreate && (
             <button
               onClick={() => setIsBulkModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg"
             >
               <Upload size={16} />
               Bulk Upload
@@ -153,38 +256,35 @@ export default function AttendanceList() {
           )}
         </div>
 
-        {/* Filter Dropdowns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <SelectField
             label=""
+            placeholder="Select Employee"
             value={selectedEmployee}
-            onChange={(value) => setSelectedEmployee(value)}
+            onChange={setSelectedEmployee}
             data={[
               { id: "", name: "All Employees" },
-              ...employees.map((emp) => ({
-                id: emp.id,
-                name: `${emp.first_name} ${emp.last_name}`,
+              ...employees.map((e) => ({
+                id: e.id,
+                name: `${e.first_name} ${e.last_name}`,
               })),
             ]}
           />
-
           <SelectField
             label=""
+            placeholder="Select Branch"
             value={selectedBranch}
-            onChange={(value) => setSelectedBranch(value)}
+            onChange={setSelectedBranch}
             data={[
               { id: "", name: "All Branches" },
-              ...branches.map((branch) => ({
-                id: branch.id,
-                name: branch.name,
-              })),
+              ...branches.map((b) => ({ id: b.id, name: b.name })),
             ]}
           />
-
           <SelectField
             label=""
+            placeholder="Select Status"
             value={selectedStatus}
-            onChange={(value) => setSelectedStatus(value)}
+            onChange={setSelectedStatus}
             data={[
               { id: "", name: "All Status" },
               { id: "present", name: "Present" },
@@ -194,184 +294,108 @@ export default function AttendanceList() {
               { id: "leave", name: "Leave" },
             ]}
           />
-
-          <DatePicker
-            id="attendance-start-date"
-            mode="single"
-            value={startDate}
-            onChange={(date) => setStartDate(date as Date | null)}
-            placeholder="Start Date"
-            disableFuture={false}
-          />
-
-          <DatePicker
-            id="attendance-end-date"
-            mode="single"
-            value={endDate}
-            onChange={(date) => setEndDate(date as Date | null)}
-            placeholder="End Date"
-            disableFuture={false}
-          />
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
-        <div className="max-w-full overflow-x-auto">
-          <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-white/5">
-              <TableRow>
-                <TableCell isHeader>Employee</TableCell>
-                <TableCell isHeader className="hidden sm:table-cell">
-                  Date
-                </TableCell>
-                <TableCell isHeader className="hidden md:table-cell">
-                  Check In
-                </TableCell>
-                <TableCell isHeader className="hidden md:table-cell">
-                  Check Out
-                </TableCell>
-                <TableCell isHeader className="hidden lg:table-cell">
-                  Regular Hours
-                </TableCell>
-                <TableCell isHeader className="hidden xl:table-cell">
-                  Overtime
-                </TableCell>
-                <TableCell isHeader>Status</TableCell>
-                <TableCell isHeader className="text-right">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHeader>
+      {/* ================= TABLE ================= */}
+      <div className="overflow-hidden rounded-xl border bg-white dark:bg-[#1e1e1e] dark:border-white/5">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableCell isHeader>Employee ID</TableCell>
+              <TableCell isHeader>Employee</TableCell>
+              <TableCell isHeader>Department</TableCell>
+              <TableCell isHeader>Designation</TableCell>
+              <TableCell isHeader>Date</TableCell>
+              <TableCell isHeader>Status</TableCell>
+              <TableCell isHeader>Actions</TableCell>
+            </TableRow>
+          </TableHeader>
 
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/5">
-              {filteredAttendance.length > 0 ? (
-                filteredAttendance.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell className="table-body font-medium">
-                      <div>
-                        <div>
-                          {record.employee
-                            ? `${record.employee.first_name} ${record.employee.last_name}`
-                            : "N/A"}
-                        </div>
-                        {/* Show date on mobile */}
-                        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {new Date(record.date).toLocaleDateString()}
-                        </div>
-                        {/* Show check-in/out on mobile */}
-                        <div className="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          In: {record.check_in} | Out: {record.check_out}
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="table-body hidden sm:table-cell">
-                      {new Date(record.date).toLocaleDateString()}
-                    </TableCell>
-
-                    <TableCell className="table-body hidden md:table-cell">
-                      {record.check_in}
-                    </TableCell>
-
-                    <TableCell className="table-body hidden md:table-cell">
-                      {record.check_out}
-                    </TableCell>
-
-                    <TableCell className="table-body hidden lg:table-cell">
-                      {record.regular_hours || "0.00"} hrs
-                    </TableCell>
-
-                    <TableCell className="table-body hidden xl:table-cell">
-                      {record.overtime_hours || "0.00"} hrs
-                    </TableCell>
-
-                    <TableCell className="table-body">
-                      <Badge
-                        color={getStatusColorAttendence(record.status)}
-                        size="sm"
-                      >
-                        {record.status.charAt(0).toUpperCase() +
-                          record.status.slice(1)}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell className="px-2 py-3 sm:px-4">
-                      <div className="flex justify-end gap-1">
-                        {canUpdate && (
-                          <IconButton
-                            icon={Pencil}
-                            tooltip="Edit"
-                            onClick={() => openEditModal(record)}
-                            color="blue"
-                          />
-                        )}
-                        {canDelete && (
-                          <IconButton
-                            tooltip="Delete"
-                            icon={Trash2}
-                            onClick={() => openDeleteDialog(record)}
-                            color="red"
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="py-6 text-center text-gray-500 dark:text-gray-400"
-                  >
-                    {searchInput
-                      ? "No attendance records match your search"
-                      : "No attendance records found"}
+          <TableBody>
+            {filteredAttendance.length ? (
+              filteredAttendance.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{r.employee?.employee_code || "N/A"}</TableCell>
+                  <TableCell>
+                    {r.employee
+                      ? `${r.employee.first_name} ${r.employee.last_name}`
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>{r.employee?.department?.name || "N/A"}</TableCell>
+                  <TableCell>
+                    {r.employee?.designation?.title || "N/A"}
+                  </TableCell>
+                  <TableCell>{new Date(r.date).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Badge color={getStatusColorAttendence(r.status)} size="sm">
+                      {r.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right ">
+                    <div className="flex gap-4">
+                      {canUpdate && (
+                        <IconButton
+                          icon={Pencil}
+                          onClick={() => {
+                            setEditAttendanceId(r.id);
+                            setIsEditModalOpen(true);
+                          }}
+                        />
+                      )}
+                      {canDelete && (
+                        <IconButton
+                          icon={Trash2}
+                          color="red"
+                          onClick={() => {
+                            setAttendanceToDelete(r);
+                            setIsDeleteModalOpen(true);
+                          }}
+                        />
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="text-center py-6 text-gray-500"
+                >
+                  No attendance records found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
+      {/* ================= MODALS ================= */}
       {canCreate && (
         <CheckInOutModal
           isOpen={isCheckInOutModalOpen}
           onClose={() => setIsCheckInOutModalOpen(false)}
         />
       )}
-
       {canCreate && (
         <BulkAttendanceModal
           isOpen={isBulkModalOpen}
           onClose={() => setIsBulkModalOpen(false)}
         />
       )}
-
       {canUpdate && (
         <AttendanceFormModal
           isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setEditAttendanceId(null);
-          }}
-          attendance={
-            isEditAttendanceFetching ? null : editAttendanceData?.data || null
-          }
-          onSuccess={() => {
-            setIsEditModalOpen(false);
-            setEditAttendanceId(null);
-          }}
+          onClose={() => setIsEditModalOpen(false)}
+          attendance={isFetching ? null : editAttendanceData?.data || null}
         />
       )}
-
       {canDelete && (
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
           title="Delete Attendance"
-          message={`Are you sure you want to delete this attendance record?`}
-          confirmLabel="Yes, Delete"
-          cancelLabel="Cancel"
+          message="Are you sure you want to delete this record?"
           onConfirm={confirmDelete}
           onCancel={() => setIsDeleteModalOpen(false)}
         />

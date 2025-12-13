@@ -18,6 +18,7 @@ import {
 } from "../../../components/ui/table";
 import { Purchase } from "../../../types";
 import PurchaseStatusBadge from "../../Purchase/components/PurchaseStatusBadge";
+import { Info } from "../../Customer/components/ReuseableComponent";
 
 export default function SupplierDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -164,10 +165,4 @@ export default function SupplierDetailPage() {
   );
 }
 
-// Info component
-const Info = ({ label, value }: { label: string; value: any }) => (
-  <div>
-    <p className="text-gray-500 text-xs">{label}</p>
-    <p className="font-medium">{value}</p>
-  </div>
-);
+

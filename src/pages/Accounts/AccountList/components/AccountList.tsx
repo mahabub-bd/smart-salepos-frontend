@@ -1,4 +1,10 @@
-import { ArrowRightLeft, DollarSign, Eye, PlusCircle, Shuffle } from "lucide-react";
+import {
+  ArrowRightLeft,
+  BookOpen,
+  DollarSign,
+  PlusCircle,
+  Shuffle,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AccountBadge from "../../../../components/common/AccountBadge";
@@ -94,8 +100,8 @@ export default function AccountListPage({
                   <TableCell className="px-4 py-2 flex justify-start gap-2">
                     {(acc.isCash || acc.isBank) && (
                       <IconButton
-                        icon={Eye}
-                        color="gray"
+                        icon={BookOpen}
+                        color="green"
                         size={16}
                         tooltip="View Ledger"
                         onClick={() => viewLedger(acc.code)}
@@ -124,7 +130,7 @@ export default function AccountListPage({
                       <>
                         <IconButton
                           icon={PlusCircle}
-                          color="green"
+                          color="blue"
                           size={16}
                           tooltip="Add Balance"
                           onClick={() => openModal(acc, "bank")}

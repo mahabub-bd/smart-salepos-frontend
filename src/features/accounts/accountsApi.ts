@@ -135,18 +135,39 @@ export const accountsApi = apiSlice.injectEndpoints({
 
     getSupplierLedger: builder.query<
       ApiResponse<any>,
-      { supplierId: number; date?: string }
+      { supplierId: number; date?: string; page?: number; limit?: number }
     >({
-      query: ({ supplierId, date }) =>
-        `/accounts/ledger/supplier/${supplierId}${date ? `?date=${date}` : ""
-        }`,
+      query: ({ supplierId, date, page = 1, limit = 20 }) => {
+        const queryParams = new URLSearchParams();
+        if (date) queryParams.append("date", date);
+        queryParams.append("page", String(page));
+        queryParams.append("limit", String(limit));
+
+        const queryString = queryParams.toString();
+        return `/accounts/ledger/supplier/${supplierId}${queryString ? `?${queryString}` : ""}`;
+      },
+      providesTags: ["Accounts"],
+    }),
+    getCustomerLedger: builder.query<
+      ApiResponse<any>,
+      { customerId: number; date?: string; page?: number; limit?: number }
+    >({
+      query: ({ customerId, date, page = 1, limit = 20 }) => {
+        const queryParams = new URLSearchParams();
+        if (date) queryParams.append("date", date);
+        queryParams.append("page", String(page));
+        queryParams.append("limit", String(limit));
+
+        const queryString = queryParams.toString();
+        return `/accounts/ledger/customer/${customerId}${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["Accounts"],
     }),
     getCashBankLedger: builder.query<
       ApiResponse<any>,
       { code: string; date?: string; page?: number; limit?: number }
     >({
-      query: ({ code, date, page = 1, limit = 10 }) => {
+      query: ({ code, date, page = 1, limit = 20 }) => {
         const queryParams = new URLSearchParams();
 
         if (date) queryParams.append("date", date);
@@ -176,6 +197,7 @@ export const {
   useGetBalanceSheetQuery,
   useGetProfitLossQuery,
   useGetSupplierLedgerQuery,
+  useGetCustomerLedgerQuery,
   useGetCashBankLedgerQuery,
 
 } = accountsApi;

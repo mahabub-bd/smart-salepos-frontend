@@ -2,6 +2,13 @@ import { FileCheck, Wallet } from "lucide-react";
 import { useState } from "react";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/common/Table";
 import { useGetPurchaseByIdQuery } from "../../../features/purchases/purchasesApi";
 import { PaymentHistory, PurchaseItem } from "../../../types";
 import PurchasePaymentModal from "./PurchasePaymentModal";
@@ -91,7 +98,7 @@ const ErrorMessage = () => (
 );
 
 const HeaderSection = ({ purchase, openReceive, openPayment }: any) => (
-  <div className="flex flex-wrap justify-between items-center mb-4">
+  <div className="flex flex-wrap justify-between items-center mb-2">
     <h1 className="text-xl font-semibold">Purchase Details</h1>
     <div className="flex gap-3">
       {purchase.status === "ordered" && (
@@ -119,7 +126,7 @@ const HeaderSection = ({ purchase, openReceive, openPayment }: any) => (
 );
 
 const DetailCard = ({ title, children }: any) => (
-  <div className="bg-white shadow-sm rounded-xl border p-4 mb-4">
+  <div className="bg-white shadow-sm rounded-xl border p-3 mb-3">
     <SectionHeader title={title} />
     {children}
   </div>
@@ -138,7 +145,7 @@ const SectionHeader = ({ title }: { title: string }) => (
 const Info = ({ label, value }: { label: string; value: any }) => (
   <div>
     <p className="text-gray-500 text-xs uppercase">{label}</p>
-    <p className="mt-1 font-medium">{value}</p>
+    <p className="font-medium">{value}</p>
   </div>
 );
 
@@ -150,7 +157,7 @@ const Amount = ({ children }: any) => (
 
 /* Metrics Summary */
 const MetricsCard = ({ paid, due, total }: any) => (
-  <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4 flex justify-around text-center">
+  <div className="bg-gray-50 p-2 rounded-lg shadow-sm mb-3 flex justify-around text-center">
     <Metric label="Paid" value={paid} color="text-green-600" />
     <Metric label="Due" value={due} color="text-red-500" />
     <Metric label="Total" value={total} color="text-gray-800" />
@@ -169,73 +176,69 @@ const Metric = ({ label, value, color }: any) => (
 /* Tables */
 
 const ItemTable = ({ items, total }: any) => (
-  <table className="w-full text-sm">
-    <thead className="border-b bg-gray-50">
-      <tr>
-        <th className="table-header">Product</th>
-        <th className="table-header">SKU</th>
-        <th className="table-header">Qty</th>
-        <th className="table-header">Price</th>
-        <th className="table-header">Subtotal</th>
-      </tr>
-    </thead>
-    <tbody>
+  <Table className="text-sm">
+    <TableHeader className="bg-gray-50">
+      <TableRow>
+        <TableCell isHeader className="py-2">Product</TableCell>
+        <TableCell isHeader className="py-2">SKU</TableCell>
+        <TableCell isHeader className="py-2">Qty</TableCell>
+        <TableCell isHeader className="py-2">Price</TableCell>
+        <TableCell isHeader className="py-2">Subtotal</TableCell>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
       {items.map((item: PurchaseItem) => (
-        <tr key={item.id} className="border-b">
-          <td className="table-body">{item.product?.name || "-"}</td>
-          <td className="table-body">{item.product?.sku || "-"}</td>
-          <td className="table-body">{item.quantity}</td>
-          <td className="table-body">{item.price}</td>
-          <td className="table-body">
+        <TableRow key={item.id} className="border-b">
+          <TableCell className="py-1">{item.product?.name || "-"}</TableCell>
+          <TableCell className="py-1">{item.product?.sku || "-"}</TableCell>
+          <TableCell className="py-1">{item.quantity}</TableCell>
+          <TableCell className="py-1">{item.price}</TableCell>
+          <TableCell className="py-1">
             {(Number(item.price) * item.quantity).toLocaleString()}
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       ))}
-    </tbody>
-    <tfoot>
-      <tr className="font-semibold">
-        <td colSpan={4} className="px-4 py-3">
+      <TableRow className="font-semibold bg-gray-50/50">
+        <TableCell colSpan={4} className="py-2">
           Total
-        </td>
-        <td className="px-4 py-3">{Number(total).toLocaleString()}</td>
-      </tr>
-    </tfoot>
-  </table>
+        </TableCell>
+        <TableCell className="py-2">{Number(total).toLocaleString()}</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
 );
 
 const PaymentTable = ({ history, totalPaid }: any) => (
-  <table className="w-full text-sm">
-    <thead className="border-b bg-gray-50">
-      <tr>
-        <th className="table-header">Date</th>
-        <th className="table-header">Amount</th>
-        <th className="table-header">Method</th>
-        <th className="table-header">Note</th>
-      </tr>
-    </thead>
-    <tbody>
+  <Table className="text-sm">
+    <TableHeader className="bg-gray-50">
+      <TableRow>
+        <TableCell isHeader className="py-2">Date</TableCell>
+        <TableCell isHeader className="py-2">Amount</TableCell>
+        <TableCell isHeader className="py-2">Method</TableCell>
+        <TableCell isHeader className="py-2">Note</TableCell>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
       {history.map((p: PaymentHistory) => (
-        <tr key={p.id} className="border-b">
-          <td className="table-body">
+        <TableRow key={p.id} className="border-b">
+          <TableCell className="py-1">
             {new Date(p.created_at).toLocaleDateString()}
-          </td>
-          <td className="table-body text-green-600 font-medium">
+          </TableCell>
+          <TableCell className="py-1 text-green-600 font-medium">
             {Number(p.amount).toLocaleString()}
-          </td>
-          <td className="table-body capitalize">{p.method}</td>
-          <td className="table-body">{p.note || "-"}</td>
-        </tr>
+          </TableCell>
+          <TableCell className="capitalize py-1">{p.method}</TableCell>
+          <TableCell className="py-1">{p.note || "-"}</TableCell>
+        </TableRow>
       ))}
-    </tbody>
-    <tfoot>
-      <tr className="font-semibold">
-        <td colSpan={3} className="px-4 py-3">
+      <TableRow className="font-semibold bg-gray-50/50">
+        <TableCell colSpan={3} className="py-2">
           Total Paid
-        </td>
-        <td className="px-4 py-3 text-green-600">
+        </TableCell>
+        <TableCell className="text-green-600 py-2">
           {totalPaid.toLocaleString()}
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+        </TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
 );

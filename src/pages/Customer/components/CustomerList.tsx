@@ -6,6 +6,7 @@ import {
   Plus,
   Search,
   Trash2,
+  BookOpen,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
@@ -177,6 +178,13 @@ export default function CustomerList() {
                           <IconButton icon={Eye} tooltip="View" color="green" />
                         </Link>
                       )}
+                      <Link to={`/customers/${customer.id}/ledger`}>
+                        <IconButton
+                          icon={BookOpen}
+                          tooltip="View Ledger"
+                          color="purple"
+                        />
+                      </Link>
                       {canUpdate && (
                         <Link to={`/customers/${customer.id}/edit`}>
                           <IconButton

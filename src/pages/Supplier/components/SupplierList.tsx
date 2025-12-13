@@ -1,4 +1,4 @@
-import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -115,6 +115,14 @@ export default function SupplierList() {
                           />
                         </Link>
 
+                        <Link to={`/suppliers/${s.id}/ledger`}>
+                          <IconButton
+                            icon={BookOpen}
+                            tooltip="View Ledger"
+                            color="green"
+                          />
+                        </Link>
+
                         <IconButton
                           icon={Pencil}
                           tooltip="Edit"
@@ -135,7 +143,7 @@ export default function SupplierList() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="py-6 text-center text-gray-500 dark:text-gray-400"
                   >
                     No suppliers found
