@@ -76,7 +76,7 @@ export default function AccountBalancePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <StatCard
             icon={Wallet}
-            title="Total Assets"
+            title="Assets"
             value={`৳${totals.asset.toFixed(2)}`}
             bgColor="blue"
             badge={{
@@ -87,7 +87,7 @@ export default function AccountBalancePage() {
 
           <StatCard
             icon={CreditCard}
-            title="Total Liabilities"
+            title="Liabilities"
             value={`৳${totals.liability.toFixed(2)}`}
             bgColor="orange"
             badge={{
@@ -98,7 +98,7 @@ export default function AccountBalancePage() {
 
           <StatCard
             icon={Scale}
-            title="Total Equity"
+            title="Equity"
             value={`৳${totals.equity.toFixed(2)}`}
             bgColor="purple"
             badge={{
@@ -120,7 +120,7 @@ export default function AccountBalancePage() {
 
           <StatCard
             icon={TrendingDown}
-            title="Total Expenses"
+            title="Expenses"
             value={`৳${totals.expense.toFixed(2)}`}
             bgColor="pink"
             badge={{
@@ -131,7 +131,7 @@ export default function AccountBalancePage() {
 
           <StatCard
             icon={DollarSign}
-            title="Total Profit"
+            title="Profit/Loss"
             value={`৳${profit.toFixed(2)}`}
             bgColor={profit >= 0 ? "green" : "pink"}
             badge={{
