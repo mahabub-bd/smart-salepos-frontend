@@ -1,16 +1,13 @@
 import {
   Banknote,
-  BookOpenText,
   CalendarDays,
+  CircleDollarSign,
   FileText,
   GitBranch,
   LayoutDashboard,
-  MonitorSmartphone,
   Package2Icon,
-  PieChart,
   Settings,
-  ShieldCheck,
-  Truck,
+  ShoppingCart,
   UserCircle,
   Users,
   UsersRound,
@@ -19,27 +16,39 @@ import {
 } from "lucide-react";
 import { NavItem } from "../layout/AppSidebar";
 
+// ============================================================================
+// MAIN NAVIGATION - Organized by ERP Module
+// ============================================================================
+
 const navItems: NavItem[] = [
+  // ========== DASHBOARD ==========
   {
     icon: <LayoutDashboard />,
     name: "Dashboard",
     path: "/",
     requiredPermission: "dashboard.view",
   },
+
+  // ========== SALES MODULE ==========
   {
-    icon: <MonitorSmartphone />,
-    name: "POS",
-    requiredPermission: "pos.view",
+    icon: <ShoppingCart />,
+    name: "Sales",
+    requiredPermission: "sales.view",
     subItems: [
       {
-        name: "New Sale",
+        name: "POS / New Sale",
         path: "/pos",
         requiredPermission: "pos.view",
       },
       {
-        name: "Sales List",
-        path: "/pos/sales-list",
-        requiredPermission: "pos.view",
+        name: "Sales Orders",
+        path: "/sales",
+        requiredPermission: "sales.view",
+      },
+      {
+        name: "Sales Returns",
+        path: "/sales-return",
+        requiredPermission: "sale_return.view",
       },
       {
         name: "Today's Sales",
@@ -47,37 +56,80 @@ const navItems: NavItem[] = [
         requiredPermission: "pos.view",
       },
       {
-        name: "Transaction History",
+        name: "POS Sales History",
+        path: "/pos/sales-list",
+        requiredPermission: "pos.view",
+      },
+      {
+        name: "POS Transactions",
         path: "/pos/transactions",
         requiredPermission: "pos.view",
       },
     ],
   },
+
+  // ========== PURCHASE MODULE ==========
   {
-    icon: <Wallet />,
-    name: "Cash Register",
-    requiredPermission: "cashregister.view",
+    icon: <CalendarDays />,
+    name: "Purchases",
+    requiredPermission: "purchase.view",
     subItems: [
       {
-        name: "Cash Register Management",
-        path: "/cash-register",
-        requiredPermission: "cashregister.view",
+        name: "Purchase Orders",
+        path: "/purchase",
+        requiredPermission: "purchase.view",
       },
       {
-        name: "Transactions",
-        path: "/cash-register/transactions",
-        requiredPermission: "cashregister.view",
+        name: "Purchase Returns",
+        path: "/purchase-returns",
+        requiredPermission: "purchase_return.view",
       },
       {
-        name: "Operations",
-        path: "/cash-register/operations",
-        requiredPermission: "cashregister.view",
+        name: "Suppliers",
+        path: "/suppliers",
+        requiredPermission: "suppliers.view",
       },
     ],
   },
+
+  // ========== INVENTORY MODULE ==========
+  {
+    icon: <Warehouse />,
+    name: "Inventory",
+    requiredPermission: "inventory.view",
+    subItems: [
+      {
+        name: "Inventory Movement",
+        path: "/inventory",
+        requiredPermission: "inventory.view",
+      },
+      {
+        name: "Stock - Product Wise",
+        path: "/inventory/stock-product-wise",
+        requiredPermission: "inventory.view",
+      },
+      {
+        name: "Stock - Batch Wise",
+        path: "/inventory/stock-batch-wise",
+        requiredPermission: "inventory.view",
+      },
+      {
+        name: "Stock - Warehouse Wise",
+        path: "/inventory/stock-warehouse-wise",
+        requiredPermission: "inventory.view",
+      },
+      {
+        name: "Warehouses",
+        path: "/warehouses",
+        requiredPermission: "warehouse.view",
+      },
+    ],
+  },
+
+  // ========== PRODUCT CATALOG ==========
   {
     icon: <Package2Icon />,
-    name: "Products",
+    name: "Product Catalog",
     requiredPermission: "product.view",
     subItems: [
       {
@@ -85,155 +137,115 @@ const navItems: NavItem[] = [
         path: "/products",
         requiredPermission: "product.view",
       },
-      { name: "Brands", path: "/brands", requiredPermission: "brand.view" },
       {
         name: "Categories",
         path: "/categories",
         requiredPermission: "category.view",
       },
-      { name: "Units", path: "/units", requiredPermission: "unit.view" },
-      { name: "Tags", path: "/tags", requiredPermission: "tag.view" },
-    ],
-  },
-  {
-    icon: <CalendarDays />,
-    name: "Purchase",
-    requiredPermission: "purchase.view",
-    subItems: [
       {
-        name: "Purchase List",
-        path: "/purchase",
-        requiredPermission: "purchase.view",
+        name: "Brands",
+        path: "/brands",
+        requiredPermission: "brand.view",
       },
       {
-        name: "Purchase Return",
-        path: "/purchase-returns",
-        requiredPermission: "purchase_return.view",
-      },
-    ],
-  },
-  {
-    icon: <Warehouse />,
-    name: "Inventory",
-    requiredPermission: "inventory.view",
-    subItems: [
-      {
-        name: "Warehouses",
-        path: "/warehouses",
-        requiredPermission: "warehouse.view",
+        name: "Units",
+        path: "/units",
+        requiredPermission: "unit.view",
       },
       {
-        name: "Stock Batch Wise",
-        path: "/inventory/stock-batch-wise",
-        requiredPermission: "inventory.view",
-      },
-
-      {
-        name: "Stock Product Wise",
-        path: "/inventory/stock-product-wise",
-        requiredPermission: "inventory.view",
-      },
-
-      {
-        name: "Stock Warehouse Wise",
-        path: "/inventory/stock-warehouse-wise",
-        requiredPermission: "inventory.view",
-      },
-
-      {
-        name: "Inventory Movement",
-        path: "/inventory",
-        requiredPermission: "inventory.view",
-      },
-    ],
-  },
-  {
-    icon: <GitBranch />,
-    name: "Branch",
-    requiredPermission: "branch.view",
-    subItems: [
-      {
-        name: "Branch List",
-        path: "/branches",
-        requiredPermission: "branch.view",
+        name: "Tags",
+        path: "/tags",
+        requiredPermission: "tag.view",
       },
     ],
   },
 
+  // ========== ACCOUNTING & FINANCE ==========
   {
-    name: "Accounts",
-    icon: <LayoutDashboard size={18} />,
-    path: "/accounts",
+    icon: <CircleDollarSign />,
+    name: "Accounting",
+    requiredPermission: "account.view",
     subItems: [
+      {
+        name: "Chart of Accounts",
+        path: "/accounts/list",
+        requiredPermission: "account.view",
+      },
       {
         name: "Cash & Bank Accounts",
         path: "/accounts/cash-bank",
+        requiredPermission: "account.view",
       },
-      { name: "Account List", path: "/accounts/list" },
-      { name: "Balance Sheet", path: "/accounts/balances" },
-      { name: "Trial Balance", path: "/accounts/trial-balance" },
-    ],
-  },
-
-  {
-    name: "Journal",
-    icon: <BookOpenText size={18} />,
-    subItems: [
       {
-        name: "All Journals",
+        name: "Journal Entries",
         path: "/accounts/journal",
+        requiredPermission: "account.view",
       },
       {
         name: "Payments",
         path: "/accounts/payment",
+        requiredPermission: "account.view",
+      },
+      {
+        name: "Balance Sheet",
+        path: "/accounts/balances",
+        requiredPermission: "account.view",
+      },
+      {
+        name: "Trial Balance",
+        path: "/accounts/trial-balance",
+        requiredPermission: "account.view",
       },
     ],
   },
+
+  // ========== CASH MANAGEMENT ==========
   {
-    icon: <Truck />,
-    name: "Supplier",
-    path: "/suppliers",
-    requiredPermission: "suppliers.view",
-  },
-  {
-    icon: <PieChart />,
-    name: "Sale",
-    requiredPermission: "sales.view",
+    icon: <Wallet />,
+    name: "Cash Register",
+    requiredPermission: "cashregister.view",
     subItems: [
       {
-        name: "Sale List",
-        path: "/sales",
-        requiredPermission: "sales.view",
+        name: "Register Management",
+        path: "/cash-register",
+        requiredPermission: "cashregister.view",
       },
       {
-        name: "Sales Return",
-        path: "/sales-return",
-        requiredPermission: "sale_return.view",
+        name: "Operations",
+        path: "/cash-register/operations",
+        requiredPermission: "cashregister.view",
+      },
+      {
+        name: "Transactions",
+        path: "/cash-register/transactions",
+        requiredPermission: "cashregister.view",
       },
     ],
   },
 
+  // ========== EXPENSES ==========
   {
     icon: <Banknote />,
-    name: "Expense",
-
+    name: "Expenses",
     requiredPermission: "expense.view",
     subItems: [
       {
         name: "All Expenses",
         path: "/expenses",
+        requiredPermission: "expense.view",
       },
-
       {
-        name: "Expense Category",
+        name: "Expense Categories",
         path: "/expenses/category",
+        requiredPermission: "expense.view",
       },
     ],
   },
+
+  // ========== CRM - CUSTOMER MANAGEMENT ==========
   {
     icon: <UserCircle />,
-    name: "Customer",
-
+    name: "Customers",
     requiredPermission: "customer.view",
     subItems: [
       {
@@ -242,21 +254,17 @@ const navItems: NavItem[] = [
         requiredPermission: "customer.view",
       },
       {
-        name: "Customer Group",
+        name: "Customer Groups",
         path: "/customers-groups",
         requiredPermission: "customergroup.view",
       },
     ],
   },
-  {
-    icon: <Users />,
-    name: "Users",
-    path: "/users",
-    requiredPermission: "user.view",
-  },
+
+  // ========== HRM - HUMAN RESOURCES ==========
   {
     icon: <UsersRound />,
-    name: "HRM",
+    name: "Human Resources",
     requiredPermission: "hrm.view",
     subItems: [
       {
@@ -270,44 +278,89 @@ const navItems: NavItem[] = [
         requiredPermission: "department.view",
       },
       {
-        name: "Payroll",
-        path: "/hrm/payroll",
-        requiredPermission: "payroll.view",
+        name: "Designations",
+        path: "/hrm/designations",
+        requiredPermission: "designation.view",
       },
       {
         name: "Attendance",
         path: "/hrm/attendance",
         requiredPermission: "attendance.view",
       },
-
       {
         name: "Leave Requests",
         path: "/hrm/leave-requests",
         requiredPermission: "leave.view",
       },
       {
-        name: "Designations",
-        path: "/hrm/designations",
-        requiredPermission: "designation.view",
+        name: "Leave Approvals",
+        path: "/hrm/leave-approvals",
+        requiredPermission: "hrm.leave_approvals.view",
+      },
+      {
+        name: "Payroll",
+        path: "/hrm/payroll",
+        requiredPermission: "payroll.view",
       },
       {
         name: "Approval Delegations",
         path: "/hrm/approval-delegations",
         requiredPermission: "hrm.approval_delegations.view",
       },
+    ],
+  },
+
+  // ========== ORGANIZATION SETUP ==========
+  {
+    icon: <GitBranch />,
+    name: "Organization",
+    requiredPermission: "branch.view",
+    subItems: [
       {
-        name: "Leave Approvals",
-        path: "/hrm/leave-approvals",
-        requiredPermission: "hrm.leave_approvals.view",
+        name: "Branches",
+        path: "/branches",
+        requiredPermission: "branch.view",
       },
     ],
   },
+
+  // ========== USER MANAGEMENT & SECURITY ==========
+  {
+    icon: <Users />,
+    name: "User Management",
+    requiredPermission: "user.view",
+    subItems: [
+      {
+        name: "Users",
+        path: "/users",
+        requiredPermission: "user.view",
+      },
+      {
+        name: "Roles",
+        path: "/roles",
+        requiredPermission: "role.view",
+      },
+      {
+        name: "Permissions",
+        path: "/permissions",
+        requiredPermission: "permission.view",
+      },
+      {
+        name: "Assign Permissions",
+        path: "/permissions/assign-role",
+        requiredPermission: "permissionassign.view",
+      },
+    ],
+  },
+
+  // ========== SYSTEM SETTINGS ==========
   {
     icon: <Settings />,
     name: "Settings",
+    requiredPermission: "settings.view",
     subItems: [
       {
-        name: "Business Setting",
+        name: "Business Settings",
         path: "/settings/business",
         requiredPermission: "settings.view",
       },
@@ -318,30 +371,16 @@ const navItems: NavItem[] = [
       },
     ],
   },
-  {
-    icon: <ShieldCheck />,
-    name: "Roles & Permissions",
-    requiredPermission: "role.view",
-    subItems: [
-      { name: "Roles", path: "/roles", requiredPermission: "role.view" },
-      {
-        name: "Permissions",
-        path: "/permissions",
-        requiredPermission: "permission.view",
-      },
-      {
-        name: "Permission Assign",
-        path: "/permissions/assign-role",
-        requiredPermission: "permissionassign.view",
-      },
-    ],
-  },
 ];
+
+// ============================================================================
+// REPORTS & ANALYTICS
+// ============================================================================
 
 const othersItems: NavItem[] = [
   {
     icon: <FileText />,
-    name: "Reports",
+    name: "Reports & Analytics",
     requiredPermission: "report.view",
     subItems: [
       {

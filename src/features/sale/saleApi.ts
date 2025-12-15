@@ -1,8 +1,9 @@
-import { ApiResponse, Last30DaysAnalytics, MonthWiseAnalytics } from "../../types";
+import {
+  ApiResponse,
+  Last30DaysAnalytics,
+  MonthWiseAnalytics,
+} from "../../types";
 import { apiSlice } from "../apiSlice";
-
-
-
 
 export const salesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -15,10 +16,13 @@ export const salesApi = apiSlice.injectEndpoints({
       providesTags: (result) =>
         result?.data
           ? [
-            ...result.data.map(({ id }: any) => ({ type: 'Sales' as const, id })),
-            { type: 'Sales', id: 'LIST' },
-          ]
-          : [{ type: 'Sales', id: 'LIST' }],
+              ...result.data.map(({ id }: any) => ({
+                type: "Sales" as const,
+                id,
+              })),
+              { type: "Sales", id: "LIST" },
+            ]
+          : [{ type: "Sales", id: "LIST" }],
     }),
 
     // 🔹 GET SALE BY ID

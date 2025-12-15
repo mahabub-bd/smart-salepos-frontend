@@ -1,12 +1,13 @@
 import Label from "../Label";
 import Select from "../Select";
+
 // FormField helper
 export function FormField({
   label,
   error,
   children,
 }: {
-  label: string;
+  label: React.ReactNode;
   error?: string;
   children: React.ReactNode;
 }) {
@@ -14,7 +15,7 @@ export function FormField({
     <div>
       <Label>{label}</Label>
       {children}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 }

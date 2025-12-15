@@ -1,4 +1,3 @@
-
 import { ApiResponse } from "../../types";
 import { Role } from "../../types/role";
 import { apiSlice } from "../apiSlice";

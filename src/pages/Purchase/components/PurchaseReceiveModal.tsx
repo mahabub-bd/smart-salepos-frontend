@@ -3,12 +3,20 @@ import { toast } from "react-toastify";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useReceivePurchaseMutation } from "../../../features/purchases/purchasesApi";
-import { Purchase } from "../../../types";
+import { Purchase, ReceivePurchaseItemPayload } from "../../../types";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   purchase: Purchase;
+}
+
+interface ReceiveItemState {
+  purchase_item_id: number;
+  product_id: number;
+  received_quantity: number;
+  batch_no?: string;
+  expiry_date?: string;
 }
 
 export default function PurchaseReceiveModal({
@@ -17,25 +25,33 @@ export default function PurchaseReceiveModal({
   purchase,
 }: Props) {
   const [receivePurchase] = useReceivePurchaseMutation();
-  const [items, setItems] = useState(
+  const [items, setItems] = useState<ReceiveItemState[]>(
     purchase.items.map((i) => ({
-      id: i.id,
+      purchase_item_id: i.id,
       product_id: i.product_id,
-      received_qty: i.quantity,
+      received_quantity: i.quantity,
     }))
   );
 
   const handleQtyChange = (index: number, qty: number) => {
     const updated = [...items];
-    updated[index].received_qty = qty;
+    updated[index].received_quantity = qty;
     setItems(updated);
   };
 
   const handleSubmit = async () => {
     try {
+      // Map to the correct payload shape
+      const payload: ReceivePurchaseItemPayload[] = items.map(item => ({
+        purchase_item_id: item.purchase_item_id,
+        received_quantity: item.received_quantity,
+        batch_no: item.batch_no,
+        expiry_date: item.expiry_date,
+      }));
+
       await receivePurchase({
         id: purchase.id,
-        body: { items },
+        body: { items: payload },
       }).unwrap();
 
       toast.success("Purchase items received successfully!");
@@ -61,7 +77,7 @@ export default function PurchaseReceiveModal({
             <input
               type="number"
               className="w-24 border px-2 py-1 rounded"
-              value={items[idx].received_qty}
+              value={items[idx].received_quantity}
               onChange={(e) => handleQtyChange(idx, Number(e.target.value))}
             />
           </div>

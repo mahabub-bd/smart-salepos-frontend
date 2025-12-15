@@ -1,37 +1,11 @@
-import { ApiResponse, Purchase, PurchaseStatus } from "../../types";
+import {
+  ApiResponse,
+  Purchase,
+  PurchasePaymentPayload,
+  ReceivePurchasePayload,
+  UpdatePurchasePayload,
+} from "../../types";
 import { apiSlice } from "../apiSlice";
-
-export interface ReceivePurchasePayload {
-  id: string | number;
-  body: any;
-}
-export interface PurchasePaymentPayload {
-  id: string | number;
-  body: {
-    type: "supplier";
-    supplier_id: number;
-    purchase_id: number;
-    payment_amount: number;
-    
-    method: string;
-    note?: string;
-  };
-}
-export interface UpdatePurchasePayload {
-  id: string | number;
-  body: {
-    po_no?: string;
-    supplier_id?: number;
-    warehouse_id?: number;
-    total?: number;
-    status?: PurchaseStatus;
-    items?: {
-      product_id: number;
-      quantity: number;
-      price: number;
-    }[];
-  };
-}
 
 export const purchasesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -44,19 +18,20 @@ export const purchasesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Purchases"],
     }),
 
-    purchasePayment: builder.mutation<ApiResponse<any>, PurchasePaymentPayload>(
-      {
-        query: ({ id, body }) => ({
-          url: `/purchases/${id}/payment`,
-          method: "PATCH",
-          body,
-        }),
-        invalidatesTags: (_result, _error, { id }) => [
-          "Purchases",
-          { type: "Purchases", id },
-        ],
-      }
-    ),
+    purchasePayment: builder.mutation<
+      ApiResponse<Purchase>,
+      PurchasePaymentPayload
+    >({
+      query: ({ id, body }) => ({
+        url: `/purchases/${id}/payment`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Purchases",
+        { type: "Purchases", id },
+      ],
+    }),
 
     // 🔹 UPDATE PURCHASE
     updatePurchase: builder.mutation<
@@ -93,19 +68,21 @@ export const purchasesApi = apiSlice.injectEndpoints({
     }),
 
     // 🔹 RECEIVE PURCHASE ITEMS
-    receivePurchase: builder.mutation<ApiResponse<any>, ReceivePurchasePayload>(
-      {
-        query: ({ id, body }) => ({
-          url: `/purchases/${id}/receive`,
-          method: "PATCH",
-          body,
-        }),
-        invalidatesTags: (_result, _error, { id }) => [
-          "Purchases",
-          { type: "Purchases", id },
-        ],
-      }
-    ),
+    receivePurchase: builder.mutation<
+      ApiResponse<Purchase>,
+      ReceivePurchasePayload
+    >({
+      query: ({ id, body }) => ({
+        url: `/purchases/${id}/receive`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Purchases",
+        { type: "Purchases", id },
+        "Inventory",
+      ],
+    }),
   }),
 });
 
