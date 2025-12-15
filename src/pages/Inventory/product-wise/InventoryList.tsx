@@ -1,15 +1,17 @@
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Loading from "../../../../components/common/Loading";
+
 import {
   Table,
   TableBody,
   TableCell,
   TableHeader,
   TableRow,
-} from "../../../../components/ui/table";
-import { useGetProductWiseReportQuery } from "../../../../features/inventory/inventoryApi";
-import { ProductWiseInventoryItem } from "../../../../types";
+} from "../../../components/ui/table";
+import { useGetProductWiseReportQuery } from "../../../features/inventory/inventoryApi";
+import { ProductWiseInventoryItem } from "../../../types";
+import Loading from "../../../components/common/Loading";
+
 
 export default function InventoryListProductWise() {
   const navigate = useNavigate();

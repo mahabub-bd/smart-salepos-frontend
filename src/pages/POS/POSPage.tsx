@@ -83,6 +83,7 @@ export default function POSPage() {
     reset: resetForm,
   } = useForm<OpenCashRegisterFormValues>({
     resolver: zodResolver(openCashRegisterSchema),
+    mode: "onSubmit", // Only validate on submit
     defaultValues: {
       cash_register_id: 0,
       opening_balance: 0,
@@ -810,9 +811,7 @@ export default function POSPage() {
                 />
               </FormField>
 
-              {(paymentMethod === "cash" ||
-                paymentMethod === "bank" ||
-                paymentMethod === "bkash") && (
+              {(paymentMethod === "cash" || paymentMethod === "bank") && (
                 <FormField label="Account">
                   <Select
                     className="h-8"
@@ -942,18 +941,22 @@ export default function POSPage() {
           onSubmit={handleFormSubmit(handleOpenRegister)}
           className="space-y-4"
         >
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Select Register <span className="text-red-500">*</span>
-            </label>
+          <FormField
+            label={
+              <>
+                Select Register <span className="text-red-500">*</span>
+              </>
+            }
+            error={errors.cash_register_id?.message}
+          >
             <Controller
               name="cash_register_id"
               control={control}
               render={({ field }) => (
                 <Select
-                  value={String(field.value || 0)}
+                  value={field.value > 0 ? String(field.value) : ""}
                   onChange={(value) => {
-                    const numValue = Number(value);
+                    const numValue = value ? Number(value) : 0;
                     field.onChange(numValue);
                     setSelectedCashRegister(numValue);
                   }}
@@ -967,17 +970,12 @@ export default function POSPage() {
                 />
               )}
             />
-            {errors.cash_register_id && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.cash_register_id.message}
-              </p>
-            )}
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Opening Balance (Optional)
-            </label>
+          <FormField
+            label="Opening Balance (Optional)"
+            error={errors.opening_balance?.message}
+          >
             <Input
               type="number"
               step="0.01"
@@ -985,43 +983,32 @@ export default function POSPage() {
               placeholder="0.00"
               {...register("opening_balance", { valueAsNumber: true })}
             />
-            {errors.opening_balance && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.opening_balance.message}
-              </p>
-            )}
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Notes (Optional)
-            </label>
+          <FormField label="Notes (Optional)" error={errors.notes?.message}>
             <Input placeholder="Opening notes..." {...register("notes")} />
-            {errors.notes && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.notes.message}
-              </p>
-            )}
-          </div>
+          </FormField>
 
           <div className="flex justify-end gap-3">
-            <button
+            <Button
               type="button"
               onClick={() => {
                 setShowOpenRegisterModal(false);
                 resetForm();
               }}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm transition-all"
+              variant="outline"
+              size="sm"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isOpeningRegister}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              variant="success"
+              size="sm"
             >
               {isOpeningRegister ? "Opening..." : "Open Register"}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
@@ -1063,10 +1050,13 @@ export default function POSPage() {
             </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Actual Amount Counted *
-            </label>
+          <FormField
+            label={
+              <>
+                Actual Amount Counted <span className="text-red-500">*</span>
+              </>
+            }
+          >
             <Input
               name="actual_amount"
               type="number"
@@ -1078,34 +1068,33 @@ export default function POSPage() {
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Count all cash in the register and enter the total amount
             </p>
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Notes (Optional)
-            </label>
+          <FormField label="Notes (Optional)">
             <Input
               name="notes"
               placeholder="e.g., Shortage due to cash refund..."
             />
-          </div>
+          </FormField>
 
           <div className="flex justify-end gap-3 pt-2">
-            <button
+            <Button
               type="button"
               onClick={() => setShowCloseCounterModal(false)}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm transition-all"
+              variant="outline"
+              size="sm"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isClosingRegister}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+              variant="warning"
+              size="sm"
+              startIcon={<Lock size={16} />}
             >
-              <Lock size={16} />
               {isClosingRegister ? "Closing..." : "Close Register"}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>

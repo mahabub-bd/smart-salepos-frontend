@@ -1,14 +1,14 @@
 import { Eye } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-import Loading from "../../../../components/common/Loading";
+import Loading from "../../../components/common/Loading";
 import {
   Table,
   TableCell,
   TableHeader,
   TableRow,
-} from "../../../../components/ui/table";
-import { useGetInventoryQuery } from "../../../../features/inventory/inventoryApi";
+} from "../../../components/ui/table";
+import { useGetInventoryQuery } from "../../../features/inventory/inventoryApi";
 
 export default function InventoryListBatchWise() {
   const navigate = useNavigate();

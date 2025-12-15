@@ -47,9 +47,7 @@ import CustomerLedgerPage from "./pages/Customer/components/CustomerLedgerPage";
 import CustomerGroupPage from "./pages/CustomerGroup";
 import ExpenseCategoryPage from "./pages/ExpenseCategory";
 import ExpensesPage from "./pages/Expenses";
-import InventoryPageBatchWise from "./pages/Inventory/components/batch-wise";
-import InventoryProductWisePage from "./pages/Inventory/components/product-wise";
-import InventoryProductWarehouseWise from "./pages/Inventory/components/warehouse-wise";
+
 import POSPage from "./pages/POS/POSPage";
 import PosSaleDetailPage from "./pages/POS/PosSaleDetailPage";
 import PosSalesListPage from "./pages/POS/PosSalesListPage";
@@ -90,6 +88,9 @@ import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
+import InventoryProductWisePage from "./pages/Inventory/product-wise";
+import InventoryProductWarehouseWise from "./pages/Inventory/warehouse-wise";
+import InventoryPageBatchWise from "./pages/Inventory/batch-wise";
 
 export default function App() {
   return (
@@ -156,7 +157,10 @@ export default function App() {
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
-          <Route path="/suppliers/:id/ledger" element={<SupplierLedgerPage />} />
+          <Route
+            path="/suppliers/:id/ledger"
+            element={<SupplierLedgerPage />}
+          />
           {/* Purchase List */}
           <Route path="/purchase" element={<PurchasePage />} />
           <Route path="/purchases/create" element={<PurchaseCreate />} />
@@ -194,7 +198,10 @@ export default function App() {
           <Route path="/customers/new" element={<CustomerFormPage />} />
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
           <Route path="/customers/:id/edit" element={<CustomerFormPage />} />
-          <Route path="/customers/:id/ledger" element={<CustomerLedgerPage />} />
+          <Route
+            path="/customers/:id/ledger"
+            element={<CustomerLedgerPage />}
+          />
           <Route path="customers-groups" element={<CustomerGroupPage />} />
           <Route path="/expenses/category" element={<ExpenseCategoryPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />

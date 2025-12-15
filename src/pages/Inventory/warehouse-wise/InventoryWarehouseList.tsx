@@ -1,14 +1,10 @@
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Loading from "../../../../components/common/Loading";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../../../components/ui/table";
-import { useGetWarehouseWiseReportQuery } from "../../../../features/inventory/inventoryApi";
+import { useGetWarehouseWiseReportQuery } from "../../../features/inventory/inventoryApi";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../../components/ui/table";
+import Loading from "../../../components/common/Loading";
+
+
 
 export default function InventoryWarehouseList() {
   const navigate = useNavigate();
