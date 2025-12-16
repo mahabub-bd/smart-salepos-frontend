@@ -15,7 +15,7 @@ export default function PurchaseList() {
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
-  const purchases = data?.data || [];
+  const purchases = data?.data?.purchases || [];
 
   if (isLoading) return <Loading message="Loading Purchases..." />;
   if (isError)
@@ -82,9 +82,8 @@ export default function PurchaseList() {
 
                       {/* Due */}
                       <td
-                        className={`table-body font-medium ${
-                          due > 0 ? "text-red-500" : "text-gray-500"
-                        }`}
+                        className={`table-body font-medium ${due > 0 ? "text-red-500" : "text-gray-500"
+                          }`}
                       >
                         {due.toLocaleString()}
                       </td>

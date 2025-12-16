@@ -2,8 +2,10 @@ import {
   ApiResponse,
   Purchase,
   PurchasePaymentPayload,
+  PurchaseResponseData,
   ReceivePurchasePayload,
   UpdatePurchasePayload,
+  UpdatePurchaseStatusPayload,
 } from "../../types";
 import { apiSlice } from "../apiSlice";
 
@@ -11,7 +13,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createPurchase: builder.mutation({
       query: (body) => ({
-        url: "/purchases",
+        url: "/purchase",
         method: "POST",
         body,
       }),
@@ -23,7 +25,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
       PurchasePaymentPayload
     >({
       query: ({ id, body }) => ({
-        url: `/purchases/${id}/payment`,
+        url: `/purchase/${id}/payment`,
         method: "PATCH",
         body,
       }),
@@ -39,7 +41,23 @@ export const purchasesApi = apiSlice.injectEndpoints({
       UpdatePurchasePayload
     >({
       query: ({ id, body }) => ({
-        url: `/purchases/${id}`,
+        url: `/purchase/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        "Purchases",
+        { type: "Purchases", id },
+      ],
+    }),
+
+    // 🔹 UPDATE PURCHASE STATUS
+    updatePurchaseStatus: builder.mutation<
+      ApiResponse<Purchase>,
+      UpdatePurchaseStatusPayload
+    >({
+      query: ({ id, body }) => ({
+        url: `/purchase/${id}/status`,
         method: "PATCH",
         body,
       }),
@@ -50,9 +68,9 @@ export const purchasesApi = apiSlice.injectEndpoints({
     }),
 
     // 🔹 GET ALL PURCHASES
-    getPurchases: builder.query<ApiResponse<Purchase[]>, void>({
+    getPurchases: builder.query<ApiResponse<PurchaseResponseData>, void>({
       query: () => ({
-        url: "/purchases",
+        url: "/purchase",
         method: "GET",
       }),
       providesTags: ["Purchases"],
@@ -61,7 +79,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
     // 🔹 GET PURCHASE BY ID
     getPurchaseById: builder.query<ApiResponse<Purchase>, string | number>({
       query: (id) => ({
-        url: `/purchases/${id}`,
+        url: `/purchase/${id}`,
         method: "GET",
       }),
       providesTags: (_result, _error, id) => [{ type: "Purchases", id }],
@@ -73,7 +91,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
       ReceivePurchasePayload
     >({
       query: ({ id, body }) => ({
-        url: `/purchases/${id}/receive`,
+        url: `/purchase/${id}/receive`,
         method: "PATCH",
         body,
       }),
@@ -93,4 +111,5 @@ export const {
   useGetPurchaseByIdQuery,
   useReceivePurchaseMutation,
   usePurchasePaymentMutation,
+  useUpdatePurchaseStatusMutation,
 } = purchasesApi;

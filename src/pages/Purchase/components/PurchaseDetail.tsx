@@ -1,5 +1,5 @@
 import { FileCheck, Wallet } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import {
@@ -9,11 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/common/Table";
+import Button from "../../../components/ui/button/Button";
 import { useGetPurchaseByIdQuery } from "../../../features/purchases/purchasesApi";
 import { PaymentHistory, PurchaseItem } from "../../../types";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import PurchaseReceiveModal from "./PurchaseReceiveModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
+import PurchaseStatusModal from "./PurchaseStatusModal";
 
 interface Props {
   purchaseId: string;
@@ -25,6 +27,16 @@ export default function PurchaseDetail({ purchaseId }: Props) {
 
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
+
+  // Auto-open receive modal when status is "approved"
+  useEffect(() => {
+    if (purchase && purchase.status === "approved" && !hasAutoOpened) {
+      setIsReceiveModalOpen(true);
+      setHasAutoOpened(true);
+    }
+  }, [purchase, hasAutoOpened]);
 
   if (isLoading) return <Loading message="Loading Purchase..." />;
   if (isError || !purchase) return <ErrorMessage />;
@@ -39,6 +51,7 @@ export default function PurchaseDetail({ purchaseId }: Props) {
         purchase={purchase}
         openReceive={() => setIsReceiveModalOpen(true)}
         openPayment={() => setIsPaymentModalOpen(true)}
+        openStatus={() => setIsStatusModalOpen(true)}
       />
 
       <DetailCard title="Purchase Information">
@@ -53,6 +66,18 @@ export default function PurchaseDetail({ purchaseId }: Props) {
           <Info
             label="Created At"
             value={new Date(purchase.created_at).toLocaleDateString()}
+          />
+          <Info
+            label="Expected Delivery"
+            value={
+              purchase.expected_delivery_date
+                ? new Date(purchase.expected_delivery_date).toLocaleDateString()
+                : "-"
+            }
+          />
+          <Info
+            label="Created By"
+            value={purchase.created_by?.full_name || "-"}
           />
           <Info label="Total" value={<Amount>{purchase.total}</Amount>} />
         </div>
@@ -87,6 +112,11 @@ export default function PurchaseDetail({ purchaseId }: Props) {
         onClose={() => setIsPaymentModalOpen(false)}
         purchase={purchase}
       />
+      <PurchaseStatusModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        purchase={purchase}
+      />
     </>
   );
 }
@@ -97,11 +127,11 @@ const ErrorMessage = () => (
   <p className="p-6 text-red-500">Failed to load purchase details.</p>
 );
 
-const HeaderSection = ({ purchase, openReceive, openPayment }: any) => (
+const HeaderSection = ({ purchase, openReceive, openPayment, openStatus }: any) => (
   <div className="flex flex-wrap justify-between items-center mb-2">
     <h1 className="text-xl font-semibold">Purchase Details</h1>
     <div className="flex gap-3">
-      {purchase.status === "ordered" && (
+      {(purchase.status === "ordered" || purchase.status === "approved") && (
         <IconButton
           icon={FileCheck}
           color="green"
@@ -121,6 +151,9 @@ const HeaderSection = ({ purchase, openReceive, openPayment }: any) => (
           Pay
         </IconButton>
       )}
+      <Button variant="outline" size="sm" onClick={openStatus}>
+        Change Status
+      </Button>
     </div>
   </div>
 );
@@ -179,11 +212,21 @@ const ItemTable = ({ items, total }: any) => (
   <Table className="text-sm">
     <TableHeader className="bg-gray-50">
       <TableRow>
-        <TableCell isHeader className="py-2">Product</TableCell>
-        <TableCell isHeader className="py-2">SKU</TableCell>
-        <TableCell isHeader className="py-2">Qty</TableCell>
-        <TableCell isHeader className="py-2">Price</TableCell>
-        <TableCell isHeader className="py-2">Subtotal</TableCell>
+        <TableCell isHeader className="py-2">
+          Product
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          SKU
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Qty
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Unit Price
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Subtotal
+        </TableCell>
       </TableRow>
     </TableHeader>
     <TableBody>
@@ -192,9 +235,9 @@ const ItemTable = ({ items, total }: any) => (
           <TableCell className="py-1">{item.product?.name || "-"}</TableCell>
           <TableCell className="py-1">{item.product?.sku || "-"}</TableCell>
           <TableCell className="py-1">{item.quantity}</TableCell>
-          <TableCell className="py-1">{item.price}</TableCell>
+          <TableCell className="py-1">{item.unit_price}</TableCell>
           <TableCell className="py-1">
-            {(Number(item.price) * item.quantity).toLocaleString()}
+            {Number(item.total_price || 0).toLocaleString()}
           </TableCell>
         </TableRow>
       ))}

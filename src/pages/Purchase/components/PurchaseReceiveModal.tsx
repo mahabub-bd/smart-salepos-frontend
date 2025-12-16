@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useReceivePurchaseMutation } from "../../../features/purchases/purchasesApi";
-import { Purchase, ReceivePurchaseItemPayload } from "../../../types";
+import { Purchase } from "../../../types";
 
 interface Props {
   isOpen: boolean;
@@ -12,11 +13,9 @@ interface Props {
 }
 
 interface ReceiveItemState {
-  purchase_item_id: number;
-  product_id: number;
-  received_quantity: number;
-  batch_no?: string;
-  expiry_date?: string;
+  item_id: number;
+  quantity: number;
+  warehouse_id: number;
 }
 
 export default function PurchaseReceiveModal({
@@ -24,34 +23,30 @@ export default function PurchaseReceiveModal({
   onClose,
   purchase,
 }: Props) {
-  const [receivePurchase] = useReceivePurchaseMutation();
+  const [receivePurchase, { isLoading }] = useReceivePurchaseMutation();
   const [items, setItems] = useState<ReceiveItemState[]>(
     purchase.items.map((i) => ({
-      purchase_item_id: i.id,
-      product_id: i.product_id,
-      received_quantity: i.quantity,
+      item_id: i.id,
+      quantity: i.quantity,
+      warehouse_id: purchase.warehouse_id,
     }))
   );
+  const [notes, setNotes] = useState("");
 
   const handleQtyChange = (index: number, qty: number) => {
     const updated = [...items];
-    updated[index].received_quantity = qty;
+    updated[index].quantity = qty;
     setItems(updated);
   };
 
   const handleSubmit = async () => {
     try {
-      // Map to the correct payload shape
-      const payload: ReceivePurchaseItemPayload[] = items.map(item => ({
-        purchase_item_id: item.purchase_item_id,
-        received_quantity: item.received_quantity,
-        batch_no: item.batch_no,
-        expiry_date: item.expiry_date,
-      }));
-
       await receivePurchase({
         id: purchase.id,
-        body: { items: payload },
+        body: {
+          items: items,
+          notes: notes || undefined,
+        },
       }).unwrap();
 
       toast.success("Purchase items received successfully!");
@@ -65,28 +60,68 @@ export default function PurchaseReceiveModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Purchase Receive Items"
+      title="Receive Purchase Items"
       description="Review and enter the received quantities for this purchase order."
-      className="max-w-lg p-6 min-h-[400px] max-h-screen overflow-y-auto"
+      className="max-w-2xl p-6 max-h-screen overflow-y-auto"
     >
       <div className="space-y-4">
-        {purchase.items.map((item, idx) => (
-          <div key={item.id} className="flex justify-between items-center">
-            <p>{item.product?.name}</p>
+        <div className="border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="p-3 text-left font-medium">Product</th>
+                <th className="p-3 text-left font-medium">Ordered Qty</th>
+                <th className="p-3 text-left font-medium">Receive Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {purchase.items.map((item, idx) => (
+                <tr key={item.id} className="border-b">
+                  <td className="p-3">
+                    <div>
+                      <p className="font-medium">{item.product?.name}</p>
+                      <p className="text-xs text-gray-500">{item.product?.sku}</p>
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    <span className="text-gray-600">{item.quantity}</span>
+                  </td>
+                  <td className="p-3">
+                    <Input
+                      type="number"
+                      min="0"
+                      max={item.quantity}
+                      value={items[idx].quantity}
+                      onChange={(e) => handleQtyChange(idx, Number(e.target.value))}
+                      className="w-24"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-            <input
-              type="number"
-              className="w-24 border px-2 py-1 rounded"
-              value={items[idx].received_quantity}
-              onChange={(e) => handleQtyChange(idx, Number(e.target.value))}
-            />
-          </div>
-        ))}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Notes (Optional)
+          </label>
+          <textarea
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Add any notes about this receipt..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="mt-4">
-        <Button onClick={handleSubmit} variant="primary" className="w-full">
-          Confirm Receive
+      <div className="mt-6 flex gap-3 justify-end">
+        <Button onClick={onClose} variant="outline" disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} variant="primary" disabled={isLoading}>
+          {isLoading ? "Processing..." : "Confirm Receive"}
         </Button>
       </div>
     </Modal>

@@ -44,6 +44,7 @@ import { AttendanceRecord } from "../../../../types";
 import { getStatusColorAttendence } from "../../../../utlis";
 
 import StatCard from "../../../../components/common/stat-card";
+import Button from "../../../../components/ui/button/Button";
 import AttendanceFormModal from "./AttendanceFormModal";
 import BulkAttendanceModal from "./BulkAttendanceModal";
 import CheckInOutModal from "./CheckInOutModal";
@@ -246,13 +247,10 @@ export default function AttendanceList() {
           </div>
 
           {canCreate && (
-            <button
-              onClick={() => setIsBulkModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg"
-            >
+            <Button onClick={() => setIsBulkModalOpen(true)}>
               <Upload size={16} />
               Bulk Upload
-            </button>
+            </Button>
           )}
         </div>
 
@@ -302,12 +300,10 @@ export default function AttendanceList() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell isHeader>Employee ID</TableCell>
               <TableCell isHeader>Employee</TableCell>
-              <TableCell isHeader>Department</TableCell>
-              <TableCell isHeader>Designation</TableCell>
-              <TableCell isHeader>Date</TableCell>
-              <TableCell isHeader>Status</TableCell>
+              <TableCell isHeader>Attendance Details</TableCell>
+              <TableCell isHeader>Hours</TableCell>
+              <TableCell isHeader>Date & Status</TableCell>
               <TableCell isHeader>Actions</TableCell>
             </TableRow>
           </TableHeader>
@@ -316,24 +312,55 @@ export default function AttendanceList() {
             {filteredAttendance.length ? (
               filteredAttendance.map((r) => (
                 <TableRow key={r.id}>
-                  <TableCell>{r.employee?.employee_code || "N/A"}</TableCell>
                   <TableCell>
-                    {r.employee
-                      ? `${r.employee.first_name} ${r.employee.last_name}`
-                      : "N/A"}
+                    <div className="space-y-1">
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        {r.employee
+                          ? `${r.employee.first_name} ${r.employee.last_name}`
+                          : "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        ID: {r.employee?.employee_code || "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {r.employee?.department?.name || "N/A"} • {r.employee?.designation?.title || "N/A"}
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell>{r.employee?.department?.name || "N/A"}</TableCell>
                   <TableCell>
-                    {r.employee?.designation?.title || "N/A"}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3 h-3 text-green-500" />
+                        <span className="text-sm">{r.check_in || "-"}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3 h-3 text-red-500" />
+                        <span className="text-sm">{r.check_out || "-"}</span>
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell>{new Date(r.date).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <Badge color={getStatusColorAttendence(r.status)} size="sm">
-                      {r.status}
-                    </Badge>
+                    <div className="space-y-1">
+                      <div className="text-sm">
+                        <span className="text-gray-500">Regular:</span> {r.regular_hours || "-"}
+                      </div>
+                      <div className="text-sm">
+                        <span className="text-gray-500">Overtime:</span> {r.overtime_hours || "-"}
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-right ">
-                    <div className="flex gap-4">
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="text-sm">
+                        {new Date(r.date).toLocaleDateString()}
+                      </div>
+                      <Badge color={getStatusColorAttendence(r.status)} size="sm">
+                        {r.status}
+                      </Badge>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-2">
                       {canUpdate && (
                         <IconButton
                           icon={Pencil}
@@ -360,7 +387,7 @@ export default function AttendanceList() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={5}
                   className="text-center py-6 text-gray-500"
                 >
                   No attendance records found

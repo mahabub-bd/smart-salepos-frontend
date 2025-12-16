@@ -1,4 +1,3 @@
-import { JSX } from "react/jsx-runtime";
 import { Role } from "./role";
 
 // ============================================================================
@@ -46,6 +45,102 @@ export type AccountTypeEnum = "asset" | "liability" | "equity" | "income" | "exp
 export type SaleStatus = "held" | "completed" | "refunded" | "partial_refund" | "draft" | "pending" | "cancelled";
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
 export type PurchaseReturnStatus = "draft" | "approved" | "processed" | "cancelled";
+
+export enum PurchaseOrderStatus {
+  DRAFT = 'draft',
+  SENT = 'sent',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  PARTIAL_RECEIVED = 'partial_received',
+  FULLY_RECEIVED = 'fully_received',
+  CANCELLED = 'cancelled',
+  CLOSED = 'closed',
+}
+
+export const PurchaseOrderStatusDescription = {
+  [PurchaseOrderStatus.DRAFT]: {
+    description: 'Draft - Purchase Order is being prepared',
+    color: '#gray',
+    allowedTransitions: [PurchaseOrderStatus.SENT, PurchaseOrderStatus.CANCELLED],
+  },
+  [PurchaseOrderStatus.SENT]: {
+    description: 'Sent - Purchase Order sent to supplier',
+    color: '#blue',
+    allowedTransitions: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.REJECTED, PurchaseOrderStatus.CANCELLED],
+  },
+  [PurchaseOrderStatus.APPROVED]: {
+    description: 'Approved - Purchase Order approved by supplier',
+    color: '#green',
+    allowedTransitions: [PurchaseOrderStatus.PARTIAL_RECEIVED, PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CANCELLED],
+  },
+  [PurchaseOrderStatus.REJECTED]: {
+    description: 'Rejected - Purchase Order rejected by supplier',
+    color: '#red',
+    allowedTransitions: [PurchaseOrderStatus.DRAFT, PurchaseOrderStatus.CANCELLED],
+  },
+  [PurchaseOrderStatus.PARTIAL_RECEIVED]: {
+    description: 'Partial Received - Some items have been received',
+    color: '#orange',
+    allowedTransitions: [PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CLOSED],
+  },
+  [PurchaseOrderStatus.FULLY_RECEIVED]: {
+    description: 'Fully Received - All items have been received',
+    color: '#green',
+    allowedTransitions: [PurchaseOrderStatus.CLOSED],
+  },
+  [PurchaseOrderStatus.CANCELLED]: {
+    description: 'Cancelled - Purchase Order has been cancelled',
+    color: '#red',
+    allowedTransitions: [], // Final state
+  },
+  [PurchaseOrderStatus.CLOSED]: {
+    description: 'Closed - Purchase Order completed and closed',
+    color: '#purple',
+    allowedTransitions: [], // Final state
+  },
+};
+
+export const isPurchaseOrderStatusTransitionValid = (
+  fromStatus: PurchaseOrderStatus,
+  toStatus: PurchaseOrderStatus,
+): boolean => {
+  if (fromStatus === toStatus) return false;
+
+  const transitionRules: Record<PurchaseOrderStatus, PurchaseOrderStatus[]> = {
+    [PurchaseOrderStatus.DRAFT]: [PurchaseOrderStatus.SENT, PurchaseOrderStatus.CANCELLED],
+    [PurchaseOrderStatus.SENT]: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.REJECTED, PurchaseOrderStatus.CANCELLED],
+    [PurchaseOrderStatus.APPROVED]: [PurchaseOrderStatus.PARTIAL_RECEIVED, PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CANCELLED],
+    [PurchaseOrderStatus.REJECTED]: [PurchaseOrderStatus.DRAFT, PurchaseOrderStatus.CANCELLED],
+    [PurchaseOrderStatus.PARTIAL_RECEIVED]: [PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CLOSED],
+    [PurchaseOrderStatus.FULLY_RECEIVED]: [PurchaseOrderStatus.CLOSED],
+    [PurchaseOrderStatus.CANCELLED]: [],
+    [PurchaseOrderStatus.CLOSED]: [],
+  };
+
+  return transitionRules[fromStatus].includes(toStatus);
+};
+
+export enum PaymentTerm {
+  IMMEDIATE = 'immediate',
+  NET_7 = 'net_7',
+  NET_15 = 'net_15',
+  NET_30 = 'net_30',
+  NET_45 = 'net_45',
+  NET_60 = 'net_60',
+  NET_90 = 'net_90',
+  CUSTOM = 'custom',
+}
+
+export const PaymentTermDescription = {
+  [PaymentTerm.IMMEDIATE]: 'Payment Due Immediately',
+  [PaymentTerm.NET_7]: 'Payment Due in 7 Days',
+  [PaymentTerm.NET_15]: 'Payment Due in 15 Days',
+  [PaymentTerm.NET_30]: 'Payment Due in 30 Days',
+  [PaymentTerm.NET_45]: 'Payment Due in 45 Days',
+  [PaymentTerm.NET_60]: 'Payment Due in 60 Days',
+  [PaymentTerm.NET_90]: 'Payment Due in 90 Days',
+  [PaymentTerm.CUSTOM]: 'Custom Payment Terms',
+};
 export type PayrollStatus = "pending" | "paid" | "failed";
 export type CashRegisterStatus = "active" | "inactive" | "closed" | "open" | "maintenance";
 export type TransactionType = "sale" | "cash_in" | "cash_out" | "opening_balance" | "closing_balance" | "adjustment";
@@ -385,7 +480,7 @@ export interface Supplier extends BaseEntity {
   status: boolean;
   totalPurchased: number;
   account: Account;
-  purchase_history: Purchase;
+  purchase_history: Purchase[];
   products: Product[];
 }
 
@@ -442,7 +537,12 @@ export interface PurchaseItem {
   purchase_id: number;
   product_id: number;
   quantity: number;
+  quantity_received?: number;
+  unit_price: string;
   price: string;
+  discount_per_unit?: string;
+  tax_rate?: string;
+  total_price?: string;
   product: ProductBasic | null;
 }
 
@@ -456,25 +556,47 @@ export interface PaymentHistory extends BaseEntity {
 }
 
 export interface Purchase extends BaseEntity {
-  map(arg0: (purchase: Purchase) => JSX.Element): import("react").ReactNode;
   po_no: string;
   supplier_id: number;
   supplier: Supplier;
   warehouse_id: number;
   warehouse: Warehouse;
-  items: PurchaseItem[];
-  payment_history: PaymentHistory[];
+  created_by?: UserBasic;
+  created_by_id?: number;
+  expected_delivery_date?: string | null;
+  terms_and_conditions?: string | null;
+  notes?: string | null;
+  payment_term?: string;
+  custom_payment_days?: number;
+  status: PurchaseStatus | PurchaseOrderStatus;
+  subtotal?: string;
+  tax_amount?: string;
+  discount_amount?: string;
+  total_amount?: string;
   total: string;
   paid_amount: string;
   due_amount: string;
-  status: PurchaseStatus;
+  sent_date?: string | null;
+  approved_date?: string | null;
+  received_date?: string | null;
+  items: PurchaseItem[];
+  payment_history: PaymentHistory[];
+  is_active?: boolean;
+}
+
+export interface PurchaseResponseData {
+  purchases: Purchase[];
+  total: number;
 }
 
 // Purchase API Payloads
 export interface PurchaseItemPayload {
   product_id: number;
   quantity: number;
-  price: number;
+  unit_price: number;
+  price?: number;
+  discount_per_unit?: number;
+  tax_rate?: number;
 }
 
 export interface CreatePurchasePayload {
@@ -498,21 +620,29 @@ export interface UpdatePurchasePayload {
   };
 }
 
+export interface UpdatePurchaseStatusPayload {
+  id: string | number;
+  body: {
+    status: PurchaseOrderStatus;
+    reason?: string;
+  };
+}
+
+
 export interface ReceivePurchaseItemPayload {
-  purchase_item_id: number;
-  received_quantity: number;
-  batch_no?: string;
-  expiry_date?: string;
+  item_id: number;
+  quantity: number;
+  warehouse_id: number;
 }
 
 export interface ReceivePurchasePayload {
   id: string | number;
   body: {
-    received_date?: string;
     notes?: string;
-    items?: ReceivePurchaseItemPayload[];
+    items: ReceivePurchaseItemPayload[];
   };
 }
+
 
 export interface PurchasePaymentPayload {
   id: string | number;
@@ -1241,7 +1371,7 @@ export interface UpdateAttendancePayload {
   notes?: string;
 }
 
-export interface GetAttendanceParams extends DateRangeParams {}
+export interface GetAttendanceParams extends DateRangeParams { }
 
 export interface GetAttendanceListParams extends PaginationParams {
   employee_id?: number;

@@ -86,6 +86,7 @@ import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
+import BackupPage from "./pages/Backup";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
 import InventoryProductWisePage from "./pages/Inventory/product-wise";
@@ -137,6 +138,7 @@ export default function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/settings/business" element={<BusinessSettingsPage />} />
           <Route path="/settings/receipt" element={<ReceiptSettingsPage />} />
+          <Route path="/backup" element={<BackupPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/units" element={<UnitPage />} />
           <Route path="/permissions" element={<PermissionsPage />} />

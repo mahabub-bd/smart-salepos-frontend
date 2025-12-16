@@ -17,8 +17,8 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { Purchase } from "../../../types";
-import PurchaseStatusBadge from "../../Purchase/components/PurchaseStatusBadge";
 import { Info } from "../../Customer/components/ReuseableComponent";
+import PurchaseStatusBadge from "../../Purchase/components/PurchaseStatusBadge";
 
 export default function SupplierDetailPage() {
   const { id } = useParams<{ id: string }>();

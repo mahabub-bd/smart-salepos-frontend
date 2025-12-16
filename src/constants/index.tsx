@@ -369,6 +369,11 @@ const navItems: NavItem[] = [
         path: "/settings/receipt",
         requiredPermission: "settings.view",
       },
+      {
+        name: "Database Backup",
+        path: "/backup",
+        // requiredPermission: "backup.view",
+      },
     ],
   },
 ];
