@@ -295,17 +295,25 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
 
               <SelectField
                 label="Status"
-                data={Object.values(PurchaseOrderStatus).map((statusValue) => ({
-                  id: statusValue,
-                  name: PurchaseOrderStatusDescription[
-                    statusValue
-                  ].description.split(" - ")[0],
-                }))}
+                data={
+                  isEdit
+                    ? Object.values(PurchaseOrderStatus).map((statusValue) => ({
+                        id: statusValue,
+                        name: PurchaseOrderStatusDescription[
+                          statusValue
+                        ].description.split(" - ")[0],
+                      }))
+                    : [{
+                        id: PurchaseOrderStatus.DRAFT,
+                        name: "Draft",
+                      }]
+                }
                 value={status}
                 error={errors.status?.message}
                 onChange={(val) =>
                   setValue("status", val as PurchaseOrderStatus)
                 }
+                disabled={!isEdit}
               />
             </div>
           </div>

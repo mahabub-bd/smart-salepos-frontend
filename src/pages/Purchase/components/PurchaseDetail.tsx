@@ -11,7 +11,7 @@ import {
 } from "../../../components/common/Table";
 import Button from "../../../components/ui/button/Button";
 import { useGetPurchaseByIdQuery } from "../../../features/purchases/purchasesApi";
-import { PaymentHistory, PurchaseItem } from "../../../types";
+import { PaymentHistory, PurchaseItem, PurchaseOrderStatus } from "../../../types";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import PurchaseReceiveModal from "./PurchaseReceiveModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
@@ -32,7 +32,7 @@ export default function PurchaseDetail({ purchaseId }: Props) {
 
   // Auto-open receive modal when status is "approved"
   useEffect(() => {
-    if (purchase && purchase.status === "approved" && !hasAutoOpened) {
+    if (purchase && purchase.status === PurchaseOrderStatus.APPROVED && !hasAutoOpened) {
       setIsReceiveModalOpen(true);
       setHasAutoOpened(true);
     }
@@ -56,7 +56,7 @@ export default function PurchaseDetail({ purchaseId }: Props) {
 
       <DetailCard title="Purchase Information">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-          <Info label="PO Number" value={purchase.po_no} />
+          <Info label="Purchase ID" value={`PO-${purchase.id}`} />
           <Info label="Supplier" value={purchase.supplier?.name || "-"} />
           <Info label="Warehouse" value={purchase.warehouse?.name || "-"} />
           <Info
@@ -131,7 +131,7 @@ const HeaderSection = ({ purchase, openReceive, openPayment, openStatus }: any) 
   <div className="flex flex-wrap justify-between items-center mb-2">
     <h1 className="text-xl font-semibold">Purchase Details</h1>
     <div className="flex gap-3">
-      {(purchase.status === "ordered" || purchase.status === "approved") && (
+      {(purchase.status === PurchaseOrderStatus.SENT || purchase.status === PurchaseOrderStatus.APPROVED) && (
         <IconButton
           icon={FileCheck}
           color="green"
@@ -216,13 +216,16 @@ const ItemTable = ({ items, total }: any) => (
           Product
         </TableCell>
         <TableCell isHeader className="py-2">
-          SKU
-        </TableCell>
-        <TableCell isHeader className="py-2">
-          Qty
+          Quantity
         </TableCell>
         <TableCell isHeader className="py-2">
           Unit Price
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Discount/Unit
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Tax Rate
         </TableCell>
         <TableCell isHeader className="py-2">
           Subtotal
@@ -230,22 +233,31 @@ const ItemTable = ({ items, total }: any) => (
       </TableRow>
     </TableHeader>
     <TableBody>
-      {items.map((item: PurchaseItem) => (
-        <TableRow key={item.id} className="border-b">
-          <TableCell className="py-1">{item.product?.name || "-"}</TableCell>
-          <TableCell className="py-1">{item.product?.sku || "-"}</TableCell>
-          <TableCell className="py-1">{item.quantity}</TableCell>
-          <TableCell className="py-1">{item.unit_price}</TableCell>
-          <TableCell className="py-1">
-            {Number(item.total_price || 0).toLocaleString()}
-          </TableCell>
-        </TableRow>
-      ))}
+      {items.map((item: PurchaseItem) => {
+        const quantity = Number(item.quantity) || 0;
+        const unitPrice = Number(item.unit_price) || 0;
+        const discountPerUnit = Number(item.discount_per_unit) || 0;
+        const taxRate = Number(item.tax_rate) || 0;
+        const subtotal = (unitPrice - discountPerUnit) * quantity * (1 + taxRate / 100);
+
+        return (
+          <TableRow key={item.id} className="border-b">
+            <TableCell className="py-1">{item.product?.name || "-"}</TableCell>
+            <TableCell className="py-1">{item.quantity}</TableCell>
+            <TableCell className="py-1">৳{unitPrice.toFixed(2)}</TableCell>
+            <TableCell className="py-1">৳{discountPerUnit.toFixed(2)}</TableCell>
+            <TableCell className="py-1">{taxRate}%</TableCell>
+            <TableCell className="py-1">
+              ৳{subtotal.toFixed(2)}
+            </TableCell>
+          </TableRow>
+        );
+      })}
       <TableRow className="font-semibold bg-gray-50/50">
-        <TableCell colSpan={4} className="py-2">
+        <TableCell colSpan={5} className="py-2">
           Total
         </TableCell>
-        <TableCell className="py-2">{Number(total).toLocaleString()}</TableCell>
+        <TableCell className="py-2">৳{Number(total).toFixed(2)}</TableCell>
       </TableRow>
     </TableBody>
   </Table>
