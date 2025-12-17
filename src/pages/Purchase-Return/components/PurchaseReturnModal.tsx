@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import {
@@ -21,7 +21,7 @@ interface PurchaseItem {
     id: number;
     name: string;
     sku: string;
-  };
+  } | null;
   product_id: number;
   quantity: number;
   price: string;
@@ -203,10 +203,11 @@ export default function PurchaseReturnModal({
                         <TableCell>
                           <div>
                             <p className="text-sm font-medium text-gray-900">
-                              {purchase.items[index].product.name}
+                              {purchase.items[index].product?.name ||
+                                "Product Not Found"}
                             </p>
                             <p className="text-xs text-gray-500">
-                              SKU: {purchase.items[index].product.sku}
+                              SKU: {purchase.items[index].product?.sku || "N/A"}
                             </p>
                           </div>
                         </TableCell>
@@ -225,7 +226,9 @@ export default function PurchaseReturnModal({
                         </TableCell>
                         <TableCell>{item.price.toLocaleString()}</TableCell>
                         <TableCell>
-                          {(item.returned_quantity * item.price).toLocaleString()}
+                          {(
+                            item.returned_quantity * item.price
+                          ).toLocaleString()}
                         </TableCell>
                       </TableRow>
                     ))}

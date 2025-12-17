@@ -1,5 +1,5 @@
-import { FileCheck, Wallet } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CreditCard, PackageCheck, RefreshCcw, RotateCcw } from "lucide-react";
+import { useState } from "react";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import {
@@ -9,11 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/common/Table";
-import Button from "../../../components/ui/button/Button";
 import { useGetPurchaseByIdQuery } from "../../../features/purchases/purchasesApi";
-import { PaymentHistory, PurchaseItem, PurchaseOrderStatus } from "../../../types";
+import {
+  PaymentHistory,
+  PurchaseItem,
+  PurchaseOrderStatus,
+} from "../../../types";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import PurchaseReceiveModal from "./PurchaseReceiveModal";
+import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
 import PurchaseStatusModal from "./PurchaseStatusModal";
 
@@ -28,15 +32,7 @@ export default function PurchaseDetail({ purchaseId }: Props) {
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [hasAutoOpened, setHasAutoOpened] = useState(false);
-
-  // Auto-open receive modal when status is "approved"
-  useEffect(() => {
-    if (purchase && purchase.status === PurchaseOrderStatus.APPROVED && !hasAutoOpened) {
-      setIsReceiveModalOpen(true);
-      setHasAutoOpened(true);
-    }
-  }, [purchase, hasAutoOpened]);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
   if (isLoading) return <Loading message="Loading Purchase..." />;
   if (isError || !purchase) return <ErrorMessage />;
@@ -52,13 +48,22 @@ export default function PurchaseDetail({ purchaseId }: Props) {
         openReceive={() => setIsReceiveModalOpen(true)}
         openPayment={() => setIsPaymentModalOpen(true)}
         openStatus={() => setIsStatusModalOpen(true)}
+        openReturn={() => setIsReturnModalOpen(true)}
       />
 
       <DetailCard title="Purchase Information">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-          <Info label="Purchase ID" value={`PO-${purchase.id}`} />
+          <Info
+            label="Purchase Order"
+            value={purchase.po_no || `PO-${purchase.id}`}
+          />
           <Info label="Supplier" value={purchase.supplier?.name || "-"} />
+          <Info
+            label="Contact Person"
+            value={purchase.supplier?.contact_person || "-"}
+          />
           <Info label="Warehouse" value={purchase.warehouse?.name || "-"} />
+          <Info label="Location" value={purchase.warehouse?.location || "-"} />
           <Info
             label="Status"
             value={<PurchaseStatusBadge status={purchase.status} />}
@@ -79,18 +84,43 @@ export default function PurchaseDetail({ purchaseId }: Props) {
             label="Created By"
             value={purchase.created_by?.full_name || "-"}
           />
-          <Info label="Total" value={<Amount>{purchase.total}</Amount>} />
+          <Info
+            label="Payment Terms"
+            value={purchase.supplier?.payment_terms || "-"}
+          />
+          <Info label="Subtotal" value={<Amount>{purchase.subtotal}</Amount>} />
+          <Info
+            label="Total"
+            value={<Amount>{purchase.total_amount || purchase.total}</Amount>}
+          />
+          {purchase.metadata?.status_changed_at && (
+            <Info
+              label="Status Changed At"
+              value={new Date(
+                purchase.metadata.status_changed_at
+              ).toLocaleString()}
+            />
+          )}
+          {purchase.metadata?.status_change_reason && (
+            <Info
+              label="Status Change Reason"
+              value={purchase.metadata.status_change_reason}
+            />
+          )}
         </div>
       </DetailCard>
 
       <MetricsCard
         paid={purchase.paid_amount}
         due={purchase.due_amount}
-        total={purchase.total}
+        total={purchase.total_amount || purchase.total}
       />
 
       <TableCard title="Purchased Items">
-        <ItemTable items={purchase.items} total={purchase.total} />
+        <ItemTable
+          items={purchase.items}
+          total={purchase.total_amount || purchase.total}
+        />
       </TableCard>
 
       {purchase.payment_history?.length > 0 && (
@@ -117,6 +147,11 @@ export default function PurchaseDetail({ purchaseId }: Props) {
         onClose={() => setIsStatusModalOpen(false)}
         purchase={purchase}
       />
+      <PurchaseReturnModal
+        isOpen={isReturnModalOpen}
+        onClose={() => setIsReturnModalOpen(false)}
+        purchase={purchase}
+      />
     </>
   );
 }
@@ -127,36 +162,74 @@ const ErrorMessage = () => (
   <p className="p-6 text-red-500">Failed to load purchase details.</p>
 );
 
-const HeaderSection = ({ purchase, openReceive, openPayment, openStatus }: any) => (
-  <div className="flex flex-wrap justify-between items-center mb-2">
-    <h1 className="text-xl font-semibold">Purchase Details</h1>
-    <div className="flex gap-3">
-      {(purchase.status === PurchaseOrderStatus.SENT || purchase.status === PurchaseOrderStatus.APPROVED) && (
+const HeaderSection = ({
+  purchase,
+  openReceive,
+  openPayment,
+  openStatus,
+  openReturn,
+}: any) => {
+  const isReceived =
+    purchase.status === PurchaseOrderStatus.FULLY_RECEIVED ||
+    purchase.status === PurchaseOrderStatus.PARTIAL_RECEIVED;
+  const isFullyPaid = Number(purchase.due_amount || 0) === 0;
+  const shouldHidePaymentButton = isFullyPaid && purchase.status === PurchaseOrderStatus.FULLY_RECEIVED;
+  const canReturn =
+    purchase.status === PurchaseOrderStatus.FULLY_RECEIVED ||
+    purchase.status === PurchaseOrderStatus.PARTIAL_RECEIVED;
+
+  return (
+    <div className="flex flex-wrap justify-between items-center mb-2">
+      <h1 className="text-xl font-semibold">Purchase Details</h1>
+      <div className="flex gap-3">
+        {/* Receive Items - Only show when not received */}
+        {!isReceived && (
+          <IconButton
+            icon={PackageCheck}
+            color="blue"
+            tooltip="Receive Items"
+            onClick={openReceive}
+          >
+            Receive
+          </IconButton>
+        )}
+
+        {/* Make Payment - Only show when due > 0 or not fully received */}
+        {!shouldHidePaymentButton && (
+          <IconButton
+            icon={CreditCard}
+            color="green"
+            tooltip="Make Payment"
+            onClick={openPayment}
+          >
+            Pay
+          </IconButton>
+        )}
+
+        {/* Purchase Return - Only show when received */}
+        {canReturn && (
+          <IconButton
+            icon={RotateCcw}
+            color="purple"
+            tooltip="Purchase Return"
+            onClick={openReturn}
+          >
+            Return
+          </IconButton>
+        )}
+
         <IconButton
-          icon={FileCheck}
-          color="green"
-          tooltip="Receive Items"
-          onClick={openReceive}
+          icon={RefreshCcw}
+          color="orange"
+          tooltip="Change Status"
+          onClick={openStatus}
         >
-          Receive
+          Change Status
         </IconButton>
-      )}
-      {Number(purchase.due_amount) > 0 && (
-        <IconButton
-          icon={Wallet}
-          color="purple"
-          tooltip="Make Payment"
-          onClick={openPayment}
-        >
-          Pay
-        </IconButton>
-      )}
-      <Button variant="outline" size="sm" onClick={openStatus}>
-        Change Status
-      </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const DetailCard = ({ title, children }: any) => (
   <div className="bg-white shadow-sm rounded-xl border p-3 mb-3">
@@ -184,7 +257,7 @@ const Info = ({ label, value }: { label: string; value: any }) => (
 
 const Amount = ({ children }: any) => (
   <span className="font-semibold text-gray-800">
-    {Number(children).toLocaleString()}
+    ৳{Number(children).toLocaleString()}
   </span>
 );
 
@@ -201,7 +274,7 @@ const Metric = ({ label, value, color }: any) => (
   <div>
     <p className="text-xs text-gray-500 uppercase">{label}</p>
     <p className={`text-lg font-bold ${color}`}>
-      {Number(value).toLocaleString()}
+      ৳{Number(value).toLocaleString()}
     </p>
   </div>
 );
@@ -216,7 +289,13 @@ const ItemTable = ({ items, total }: any) => (
           Product
         </TableCell>
         <TableCell isHeader className="py-2">
+          SKU
+        </TableCell>
+        <TableCell isHeader className="py-2">
           Quantity
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Received
         </TableCell>
         <TableCell isHeader className="py-2">
           Unit Price
@@ -238,23 +317,38 @@ const ItemTable = ({ items, total }: any) => (
         const unitPrice = Number(item.unit_price) || 0;
         const discountPerUnit = Number(item.discount_per_unit) || 0;
         const taxRate = Number(item.tax_rate) || 0;
-        const subtotal = (unitPrice - discountPerUnit) * quantity * (1 + taxRate / 100);
+        const subtotal =
+          (unitPrice - discountPerUnit) * quantity * (1 + taxRate / 100);
 
         return (
           <TableRow key={item.id} className="border-b">
             <TableCell className="py-1">{item.product?.name || "-"}</TableCell>
-            <TableCell className="py-1">{item.quantity}</TableCell>
-            <TableCell className="py-1">৳{unitPrice.toFixed(2)}</TableCell>
-            <TableCell className="py-1">৳{discountPerUnit.toFixed(2)}</TableCell>
-            <TableCell className="py-1">{taxRate}%</TableCell>
-            <TableCell className="py-1">
-              ৳{subtotal.toFixed(2)}
+            <TableCell className="py-1 text-gray-600 text-xs">
+              {item.product?.sku || "-"}
             </TableCell>
+            <TableCell className="py-1">{item.quantity}</TableCell>
+            <TableCell className="py-1">
+              <span
+                className={`${
+                  Number(item.quantity_received) === Number(item.quantity)
+                    ? "text-green-600"
+                    : "text-orange-500"
+                }`}
+              >
+                {item.quantity_received || 0}
+              </span>
+            </TableCell>
+            <TableCell className="py-1">৳{unitPrice.toFixed(2)}</TableCell>
+            <TableCell className="py-1">
+              ৳{discountPerUnit.toFixed(2)}
+            </TableCell>
+            <TableCell className="py-1">{taxRate}%</TableCell>
+            <TableCell className="py-1">৳{subtotal.toFixed(2)}</TableCell>
           </TableRow>
         );
       })}
       <TableRow className="font-semibold bg-gray-50/50">
-        <TableCell colSpan={5} className="py-2">
+        <TableCell colSpan={7} className="py-2">
           Total
         </TableCell>
         <TableCell className="py-2">৳{Number(total).toFixed(2)}</TableCell>
@@ -267,10 +361,18 @@ const PaymentTable = ({ history, totalPaid }: any) => (
   <Table className="text-sm">
     <TableHeader className="bg-gray-50">
       <TableRow>
-        <TableCell isHeader className="py-2">Date</TableCell>
-        <TableCell isHeader className="py-2">Amount</TableCell>
-        <TableCell isHeader className="py-2">Method</TableCell>
-        <TableCell isHeader className="py-2">Note</TableCell>
+        <TableCell isHeader className="py-2">
+          Date
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Amount
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Method
+        </TableCell>
+        <TableCell isHeader className="py-2">
+          Note
+        </TableCell>
       </TableRow>
     </TableHeader>
     <TableBody>
@@ -280,7 +382,7 @@ const PaymentTable = ({ history, totalPaid }: any) => (
             {new Date(p.created_at).toLocaleDateString()}
           </TableCell>
           <TableCell className="py-1 text-green-600 font-medium">
-            {Number(p.amount).toLocaleString()}
+            ৳{Number(p.amount).toLocaleString()}
           </TableCell>
           <TableCell className="capitalize py-1">{p.method}</TableCell>
           <TableCell className="py-1">{p.note || "-"}</TableCell>
@@ -291,7 +393,7 @@ const PaymentTable = ({ history, totalPaid }: any) => (
           Total Paid
         </TableCell>
         <TableCell className="text-green-600 py-2">
-          {totalPaid.toLocaleString()}
+          ৳{totalPaid.toLocaleString()}
         </TableCell>
       </TableRow>
     </TableBody>

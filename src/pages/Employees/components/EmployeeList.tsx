@@ -1,13 +1,14 @@
-import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
-import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import Input from "../../../components/form/input/InputField";
 import Badge from "../../../components/ui/badge/Badge";
+import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
+import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import {
   Table,
   TableBody,
@@ -36,6 +37,9 @@ export default function EmployeeList() {
     null
   );
   const [searchInput, setSearchInput] = useState("");
+  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(
+    null
+  );
 
   const canCreate = useHasPermission("employee.create");
   const canUpdate = useHasPermission("employee.update");
@@ -47,7 +51,8 @@ export default function EmployeeList() {
   // Filter employees based on search input
   const filteredEmployees = employees.filter((employee) => {
     const searchLower = searchInput.toLowerCase();
-    const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
+    const fullName =
+      `${employee.first_name} ${employee.last_name}`.toLowerCase();
     return (
       fullName.includes(searchLower) ||
       employee.email?.toLowerCase().includes(searchLower) ||
@@ -124,34 +129,22 @@ export default function EmployeeList() {
                   isHeader
                   className="table-header hidden sm:table-cell"
                 >
-                  Employee Code
+                  Code
                 </TableCell>
                 <TableCell isHeader className="table-header">
-                  Name
+                  Employee Details
                 </TableCell>
                 <TableCell
                   isHeader
                   className="table-header hidden md:table-cell"
                 >
-                  Email
+                  Contact
                 </TableCell>
                 <TableCell
                   isHeader
                   className="table-header hidden lg:table-cell"
                 >
-                  Phone
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="table-header hidden lg:table-cell"
-                >
-                  Department
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="table-header hidden xl:table-cell"
-                >
-                  Designation
+                  Department & Role
                 </TableCell>
                 <TableCell
                   isHeader
@@ -180,45 +173,27 @@ export default function EmployeeList() {
                     </TableCell>
 
                     <TableCell className="table-body">
-                      <div>
-                        <div className="font-medium">
-                          {employee.first_name} {employee.last_name}
-                        </div>
-                        {/* Show employee code on mobile */}
-                        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {employee.employee_code}
-                        </div>
-                        {/* Show email on mobile/tablet */}
-                        <div className="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {employee.email}
-                        </div>
-                        {/* Show status badge on mobile */}
-                        <div className="sm:hidden mt-1">
-                          <Badge
-                            size="sm"
-                            color={getStatusColor(employee.status)}
-                          >
-                            {employee.status.charAt(0).toUpperCase() +
-                              employee.status.slice(1)}
-                          </Badge>
-                        </div>
+                      <div className="font-medium">
+                        {employee.first_name} {employee.last_name}
                       </div>
                     </TableCell>
 
                     <TableCell className="table-body hidden md:table-cell">
-                      {employee.email}
+                      <div>
+                        <div>{employee.email}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {employee.phone}
+                        </div>
+                      </div>
                     </TableCell>
 
                     <TableCell className="table-body hidden lg:table-cell">
-                      {employee.phone}
-                    </TableCell>
-
-                    <TableCell className="table-body hidden lg:table-cell">
-                      {employee.department?.name || "-"}
-                    </TableCell>
-
-                    <TableCell className="table-body hidden xl:table-cell">
-                      {employee.designation?.title || "-"}
+                      <div>
+                        <div>{employee.department?.name || "-"}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {employee.designation?.title || "-"}
+                        </div>
+                      </div>
                     </TableCell>
 
                     <TableCell className="table-body hidden xl:table-cell">
@@ -237,34 +212,69 @@ export default function EmployeeList() {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="px-2 py-3 sm:px-4">
-                      <div className="flex justify-end gap-1">
-                        {canView && (
-                          <IconButton
-                            icon={Eye}
-                            tooltip="View"
-                            onClick={() =>
-                              navigate(`/employees/${employee.id}`)
-                            }
-                            color="green"
-                          />
-                        )}
-                        {canUpdate && (
-                          <IconButton
-                            icon={Pencil}
-                            tooltip="Edit"
-                            onClick={() => openEditModal(employee)}
-                            color="blue"
-                          />
-                        )}
-                        {canDelete && (
-                          <IconButton
-                            icon={Trash2}
-                            tooltip="Delete"
-                            onClick={() => openDeleteDialog(employee)}
-                            color="red"
-                          />
-                        )}
+                    {/* Actions */}
+                    <TableCell className="table-body">
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            setActiveDropdown(
+                              activeDropdown === employee.id
+                                ? null
+                                : employee.id
+                            )
+                          }
+                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <MoreVertical size={16} className="text-gray-600" />
+                        </button>
+
+                        <Dropdown
+                          isOpen={activeDropdown === employee.id}
+                          onClose={() => setActiveDropdown(null)}
+                          className="min-w-[140px]"
+                        >
+                          {/* View Details */}
+                          {canView && (
+                            <DropdownItem
+                              onClick={() => {
+                                navigate(`/employees/${employee.id}`);
+                                setActiveDropdown(null);
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye size={14} />
+                              View
+                            </DropdownItem>
+                          )}
+
+                          {/* Edit Employee */}
+                          {canUpdate && (
+                            <DropdownItem
+                              onClick={() => {
+                                openEditModal(employee);
+                                setActiveDropdown(null);
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <Pencil size={14} />
+                              Edit
+                            </DropdownItem>
+                          )}
+
+                          {/* Delete Employee */}
+                          {canDelete && (
+                            <DropdownItem
+                              onClick={() => {
+                                openDeleteDialog(employee);
+                                setActiveDropdown(null);
+                              }}
+                              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 size={14} />
+                              Delete
+                            </DropdownItem>
+                          )}
+                        </Dropdown>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -272,7 +282,7 @@ export default function EmployeeList() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={9}
+                    colSpan={8}
                     className="py-6 text-center text-gray-500 dark:text-gray-400"
                   >
                     {searchInput

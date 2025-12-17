@@ -15,6 +15,7 @@ import {
 } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../../components/ui/table";
 
 import {
   useCreatePurchaseMutation,
@@ -141,8 +142,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
           quantity: Number(i.quantity) || 0,
           unit_price: Number(i.unit_price || i.price) || 0,
           discount_per_unit: Number(i.discount_per_unit) || 0,
-          tax_rate: Number(i.tax_rate) || 0
-
+          tax_rate: Number(i.tax_rate) || 0,
         })),
       };
 
@@ -281,13 +281,19 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                       mode="single"
                       value={field.value ? new Date(field.value) : null}
                       onChange={(date) => {
-                        field.onChange(date && date instanceof Date ? date.toISOString().split("T")[0] : "");
+                        field.onChange(
+                          date && date instanceof Date
+                            ? date.toISOString().split("T")[0]
+                            : ""
+                        );
                       }}
                       placeholder="Select delivery date"
                       disableFuture={false}
                     />
                     {error && (
-                      <p className="mt-1 text-sm text-red-500">{error.message}</p>
+                      <p className="mt-1 text-sm text-red-500">
+                        {error.message}
+                      </p>
                     )}
                   </div>
                 )}
@@ -303,10 +309,12 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                           statusValue
                         ].description.split(" - ")[0],
                       }))
-                    : [{
-                        id: PurchaseOrderStatus.DRAFT,
-                        name: "Draft",
-                      }]
+                    : [
+                        {
+                          id: PurchaseOrderStatus.DRAFT,
+                          name: "Draft",
+                        },
+                      ]
                 }
                 value={status}
                 error={errors.status?.message}
@@ -410,7 +418,6 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                     unit_price: 0,
                     discount_per_unit: 0,
                     tax_rate: 0,
-
                   })
                 }
               >
@@ -419,22 +426,20 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
             </div>
 
             <div className="border rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="p-3 text-left">Product</th>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableCell isHeader={true}>Product</TableCell>
+                    <TableCell isHeader={true}>Qty</TableCell>
+                    <TableCell isHeader={true}>Unit Price</TableCell>
+                    <TableCell isHeader={true}>Discount</TableCell>
+                    <TableCell isHeader={true}>Tax Rate</TableCell>
+                    <TableCell isHeader={true}>Subtotal</TableCell>
+                    <TableCell isHeader={true}>{""}</TableCell>
+                  </TableRow>
+                </TableHeader>
 
-                    <th className="p-3 text-left">Qty</th>
-                    <th className="p-3 text-left">Unit Price</th>
-                    <th className="p-3 text-left">Discount/Unit</th>
-                    <th className="p-3 text-left">Tax Rate</th>
-
-                    <th className="p-3 text-left">Subtotal</th>
-                    <th className="p-3"></th>
-                  </tr>
-                </thead>
-
-                <tbody>
+                <TableBody>
                   {fields.map((field, index) => {
                     const item = items[index];
                     const qty = Number(item?.quantity) || 0;
@@ -451,9 +456,9 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                       (unitPrice - discountPerUnit) * qty * (1 + taxRate / 100);
 
                     return (
-                      <tr key={field.id} className="border-b">
+                      <TableRow key={field.id}>
                         {/* Product */}
-                        <td className="p-3">
+                        <TableCell>
                           <SelectField
                             label=""
                             data={products.map((p: any) => {
@@ -486,12 +491,10 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                               }
                             }}
                           />
-                        </td>
-
-
+                        </TableCell>
 
                         {/* Quantity */}
-                        <td className="p-3">
+                        <TableCell>
                           <Input
                             type="number"
                             min="0"
@@ -505,10 +508,10 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                               {errors.items[index]?.quantity?.message}
                             </p>
                           )}
-                        </td>
+                        </TableCell>
 
                         {/* Unit Price */}
-                        <td className="p-3">
+                        <TableCell>
                           <Input
                             step="0.01"
                             type="number"
@@ -522,10 +525,10 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                               {errors.items[index]?.unit_price?.message}
                             </p>
                           )}
-                        </td>
+                        </TableCell>
 
                         {/* Discount Per Unit */}
-                        <td className="p-3">
+                        <TableCell>
                           <Input
                             step="0.01"
                             type="number"
@@ -534,10 +537,10 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                               valueAsNumber: true,
                             })}
                           />
-                        </td>
+                        </TableCell>
 
                         {/* Tax Rate */}
-                        <td className="p-3">
+                        <TableCell>
                           <Input
                             step="0.1"
                             type="number"
@@ -547,17 +550,15 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                               valueAsNumber: true,
                             })}
                           />
-                        </td>
-
-
+                        </TableCell>
 
                         {/* Subtotal */}
-                        <td className="p-3 font-semibold">
+                        <TableCell className="font-semibold">
                           ৳{subtotal.toFixed(2)}
-                        </td>
+                        </TableCell>
 
                         {/* Remove */}
-                        <td className="p-3 text-right">
+                        <TableCell className="text-right">
                           <Button
                             type="button"
                             size="sm"
@@ -568,12 +569,12 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
                           >
                             Remove
                           </Button>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
             {errors.items && typeof errors.items.message === "string" && (

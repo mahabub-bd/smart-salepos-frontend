@@ -1,4 +1,11 @@
-import { BookOpen, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  BookOpen,
+  Eye,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
@@ -7,6 +14,8 @@ import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
+import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
+import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import SupplierFormModal from "./SupplierFormModal";
 
 import {
@@ -35,6 +44,7 @@ export default function SupplierList() {
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
     null
   );
+  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(null);
 
   /* =====================
      Handlers
@@ -71,7 +81,7 @@ export default function SupplierList() {
     return <p className="p-6 text-red-500">Failed to fetch suppliers.</p>;
 
   return (
-    <>
+    <div className="w-full">
       <PageHeader
         title="Supplier Management"
         icon={<Plus size={16} />}
@@ -83,44 +93,27 @@ export default function SupplierList() {
       {/* =====================
          Desktop Table View (hidden on mobile)
       ===================== */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-        <div className="max-w-full overflow-x-auto">
+      <div className="overflow-hidden  rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        <div className="overflow-x-auto ">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableCell isHeader className="w-24">
-                  Code
+                <TableCell isHeader>Code</TableCell>
+                <TableCell isHeader>Name</TableCell>
+                <TableCell isHeader className="hidden md:table-cell ">
+                  Contact
                 </TableCell>
-                <TableCell isHeader className="min-w-[140px]">
-                  Name
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="hidden lg:table-cell min-w-[130px]"
-                >
-                  Contact Person
-                </TableCell>
-                <TableCell isHeader className="w-32">
+                <TableCell isHeader className="w-24 whitespace-nowrap">
                   Phone
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="hidden xl:table-cell min-w-[180px]"
-                >
+                <TableCell isHeader className="hidden lg:table-cell ">
                   Email
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="hidden 2xl:table-cell min-w-[200px]"
-                >
+                <TableCell isHeader className="hidden 2xl:table-cell ">
                   Address
                 </TableCell>
-                <TableCell isHeader className="w-24 text-center">
-                  Products
-                </TableCell>
-                <TableCell isHeader className="w-36 text-right">
-                  Actions
-                </TableCell>
+                <TableCell isHeader>Product</TableCell>
+                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -129,60 +122,97 @@ export default function SupplierList() {
                 suppliers.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell>
-                      <div className="truncate">{s.supplier_code || "-"}</div>
+                      <div className="text-xs font-medium">
+                        {s.supplier_code || "-"}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <div className="truncate font-medium">{s.name}</div>
+                      <div className="text-sm font-medium">{s.name}</div>
+                      {s.contact_person && (
+                        <div className="text-xs text-gray-500 md:hidden">
+                          {s.contact_person}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <div className="text-sm">{s.contact_person || "-"}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">{s.phone || "-"}</div>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
-                      <div className="truncate">{s.contact_person || "-"}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="truncate">{s.phone || "-"}</div>
-                    </TableCell>
-                    <TableCell className="hidden xl:table-cell">
-                      <div className="truncate">{s.email || "-"}</div>
+                      <div className="text-sm">{s.email || "-"}</div>
                     </TableCell>
                     <TableCell className="hidden 2xl:table-cell">
-                      <div className="truncate">{s.address || "-"}</div>
+                      <div className="text-sm truncate max-w-[200px]">
+                        {s.address || "-"}
+                      </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      {s.products?.length || 0}
+                      <div className="text-sm font-medium">
+                        {s.products?.length || 0}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex justify-end gap-1">
-                        <Link to={`/suppliers/${s.id}`}>
-                          <IconButton
-                            icon={Eye}
-                            tooltip="View Details"
-                            color="purple"
-                            size={12}
-                          />
-                        </Link>
-                        <Link
-                          to={`/suppliers/${s.id}/ledger`}
-                          className="hidden md:inline-block"
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            setActiveDropdown(
+                              activeDropdown === s.id ? null : s.id
+                            )
+                          }
+                          className="dropdown-toggle p-1 hover:bg-gray-100 rounded-lg transition-colors"
                         >
-                          <IconButton
-                            icon={BookOpen}
-                            tooltip="View Ledger"
-                            color="green"
-                            size={12}
-                          />
-                        </Link>
-                        <IconButton
-                          icon={Pencil}
-                          tooltip="Edit"
-                          color="blue"
-                          size={12}
-                          onClick={() => openEdit(s)}
-                        />
-                        <IconButton
-                          icon={Trash2}
-                          color="red"
-                          size={12}
-                          onClick={() => openDelete(s)}
-                        />
+                          <MoreVertical size={16} className="text-gray-600" />
+                        </button>
+
+                        <Dropdown
+                          isOpen={activeDropdown === s.id}
+                          onClose={() => setActiveDropdown(null)}
+                          className="min-w-40"
+                        >
+                          <DropdownItem
+                            tag="a"
+                            to={`/suppliers/${s.id}`}
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-2"
+                          >
+                            <Eye size={14} />
+                            View Details
+                          </DropdownItem>
+
+                          <DropdownItem
+                            tag="a"
+                            to={`/suppliers/${s.id}/ledger`}
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-2"
+                          >
+                            <BookOpen size={14} />
+                            View Ledger
+                          </DropdownItem>
+
+                          <DropdownItem
+                            onClick={() => {
+                              openEdit(s);
+                              setActiveDropdown(null);
+                            }}
+                            className="flex items-center gap-2"
+                          >
+                            <Pencil size={14} />
+                            Edit
+                          </DropdownItem>
+
+                          <DropdownItem
+                            onClick={() => {
+                              openDelete(s);
+                              setActiveDropdown(null);
+                            }}
+                            className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -343,6 +373,6 @@ export default function SupplierList() {
         onConfirm={confirmDelete}
         onCancel={() => setIsDeleteModalOpen(false)}
       />
-    </>
+    </div>
   );
 }

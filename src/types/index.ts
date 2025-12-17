@@ -40,78 +40,133 @@ export interface SoftDeletable {
 
 export type PaymentMethod = "cash" | "bank" | "mobile" | "other";
 export type RefundPaymentMethod = "cash" | "bank_transfer" | "check";
-export type AttendanceStatus = "present" | "absent" | "late" | "half_day" | "leave";
-export type AccountTypeEnum = "asset" | "liability" | "equity" | "income" | "expense";
-export type SaleStatus = "held" | "completed" | "refunded" | "partial_refund" | "draft" | "pending" | "cancelled";
+export type AttendanceStatus =
+  | "present"
+  | "absent"
+  | "late"
+  | "half_day"
+  | "leave";
+export type AccountTypeEnum =
+  | "asset"
+  | "liability"
+  | "equity"
+  | "income"
+  | "expense";
+export type SaleStatus =
+  | "held"
+  | "completed"
+  | "refunded"
+  | "partial_refund"
+  | "draft"
+  | "pending"
+  | "cancelled";
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
-export type PurchaseReturnStatus = "draft" | "approved" | "processed" | "cancelled";
+export type PurchaseReturnStatus =
+  | "draft"
+  | "approved"
+  | "processed"
+  | "cancelled";
 
 export enum PurchaseOrderStatus {
-  DRAFT = 'draft',
-  SENT = 'sent',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  PARTIAL_RECEIVED = 'partial_received',
-  FULLY_RECEIVED = 'fully_received',
-  CANCELLED = 'cancelled',
-  CLOSED = 'closed',
+  DRAFT = "draft",
+  SENT = "sent",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  PARTIAL_RECEIVED = "partial_received",
+  FULLY_RECEIVED = "fully_received",
+  CANCELLED = "cancelled",
+  CLOSED = "closed",
 }
 
 export const PurchaseOrderStatusDescription = {
   [PurchaseOrderStatus.DRAFT]: {
-    description: 'Draft - Purchase Order is being prepared',
-    color: '#gray',
-    allowedTransitions: [PurchaseOrderStatus.SENT, PurchaseOrderStatus.CANCELLED],
+    description: "Draft - Purchase Order is being prepared",
+    color: "#gray",
+    allowedTransitions: [
+      PurchaseOrderStatus.SENT,
+      PurchaseOrderStatus.CANCELLED,
+    ],
   },
   [PurchaseOrderStatus.SENT]: {
-    description: 'Sent - Purchase Order sent to supplier',
-    color: '#blue',
-    allowedTransitions: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.REJECTED, PurchaseOrderStatus.CANCELLED],
+    description: "Sent - Purchase Order sent to supplier",
+    color: "#blue",
+    allowedTransitions: [
+      PurchaseOrderStatus.APPROVED,
+      PurchaseOrderStatus.REJECTED,
+      PurchaseOrderStatus.CANCELLED,
+    ],
   },
   [PurchaseOrderStatus.APPROVED]: {
-    description: 'Approved - Purchase Order approved by supplier',
-    color: '#green',
-    allowedTransitions: [PurchaseOrderStatus.PARTIAL_RECEIVED, PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CANCELLED],
+    description: "Approved - Purchase Order approved by supplier",
+    color: "#green",
+    allowedTransitions: [
+      PurchaseOrderStatus.PARTIAL_RECEIVED,
+      PurchaseOrderStatus.FULLY_RECEIVED,
+      PurchaseOrderStatus.CANCELLED,
+    ],
   },
   [PurchaseOrderStatus.REJECTED]: {
-    description: 'Rejected - Purchase Order rejected by supplier',
-    color: '#red',
-    allowedTransitions: [PurchaseOrderStatus.DRAFT, PurchaseOrderStatus.CANCELLED],
+    description: "Rejected - Purchase Order rejected by supplier",
+    color: "#red",
+    allowedTransitions: [
+      PurchaseOrderStatus.DRAFT,
+      PurchaseOrderStatus.CANCELLED,
+    ],
   },
   [PurchaseOrderStatus.PARTIAL_RECEIVED]: {
-    description: 'Partial Received - Some items have been received',
-    color: '#orange',
-    allowedTransitions: [PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CLOSED],
+    description: "Partial Received - Some items have been received",
+    color: "#orange",
+    allowedTransitions: [
+      PurchaseOrderStatus.FULLY_RECEIVED,
+      PurchaseOrderStatus.CLOSED,
+    ],
   },
   [PurchaseOrderStatus.FULLY_RECEIVED]: {
-    description: 'Fully Received - All items have been received',
-    color: '#green',
+    description: "Fully Received - All items have been received",
+    color: "#green",
     allowedTransitions: [PurchaseOrderStatus.CLOSED],
   },
   [PurchaseOrderStatus.CANCELLED]: {
-    description: 'Cancelled - Purchase Order has been cancelled',
-    color: '#red',
+    description: "Cancelled - Purchase Order has been cancelled",
+    color: "#red",
     allowedTransitions: [], // Final state
   },
   [PurchaseOrderStatus.CLOSED]: {
-    description: 'Closed - Purchase Order completed and closed',
-    color: '#purple',
+    description: "Closed - Purchase Order completed and closed",
+    color: "#purple",
     allowedTransitions: [], // Final state
   },
 };
 
 export const isPurchaseOrderStatusTransitionValid = (
   fromStatus: PurchaseOrderStatus,
-  toStatus: PurchaseOrderStatus,
+  toStatus: PurchaseOrderStatus
 ): boolean => {
   if (fromStatus === toStatus) return false;
 
   const transitionRules: Record<PurchaseOrderStatus, PurchaseOrderStatus[]> = {
-    [PurchaseOrderStatus.DRAFT]: [PurchaseOrderStatus.SENT, PurchaseOrderStatus.CANCELLED],
-    [PurchaseOrderStatus.SENT]: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.REJECTED, PurchaseOrderStatus.CANCELLED],
-    [PurchaseOrderStatus.APPROVED]: [PurchaseOrderStatus.PARTIAL_RECEIVED, PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CANCELLED],
-    [PurchaseOrderStatus.REJECTED]: [PurchaseOrderStatus.DRAFT, PurchaseOrderStatus.CANCELLED],
-    [PurchaseOrderStatus.PARTIAL_RECEIVED]: [PurchaseOrderStatus.FULLY_RECEIVED, PurchaseOrderStatus.CLOSED],
+    [PurchaseOrderStatus.DRAFT]: [
+      PurchaseOrderStatus.SENT,
+      PurchaseOrderStatus.CANCELLED,
+    ],
+    [PurchaseOrderStatus.SENT]: [
+      PurchaseOrderStatus.APPROVED,
+      PurchaseOrderStatus.REJECTED,
+      PurchaseOrderStatus.CANCELLED,
+    ],
+    [PurchaseOrderStatus.APPROVED]: [
+      PurchaseOrderStatus.PARTIAL_RECEIVED,
+      PurchaseOrderStatus.FULLY_RECEIVED,
+      PurchaseOrderStatus.CANCELLED,
+    ],
+    [PurchaseOrderStatus.REJECTED]: [
+      PurchaseOrderStatus.DRAFT,
+      PurchaseOrderStatus.CANCELLED,
+    ],
+    [PurchaseOrderStatus.PARTIAL_RECEIVED]: [
+      PurchaseOrderStatus.FULLY_RECEIVED,
+      PurchaseOrderStatus.CLOSED,
+    ],
     [PurchaseOrderStatus.FULLY_RECEIVED]: [PurchaseOrderStatus.CLOSED],
     [PurchaseOrderStatus.CANCELLED]: [],
     [PurchaseOrderStatus.CLOSED]: [],
@@ -121,29 +176,40 @@ export const isPurchaseOrderStatusTransitionValid = (
 };
 
 export enum PaymentTerm {
-  IMMEDIATE = 'immediate',
-  NET_7 = 'net_7',
-  NET_15 = 'net_15',
-  NET_30 = 'net_30',
-  NET_45 = 'net_45',
-  NET_60 = 'net_60',
-  NET_90 = 'net_90',
-  CUSTOM = 'custom',
+  IMMEDIATE = "immediate",
+  NET_7 = "net_7",
+  NET_15 = "net_15",
+  NET_30 = "net_30",
+  NET_45 = "net_45",
+  NET_60 = "net_60",
+  NET_90 = "net_90",
+  CUSTOM = "custom",
 }
 
 export const PaymentTermDescription = {
-  [PaymentTerm.IMMEDIATE]: 'Payment Due Immediately',
-  [PaymentTerm.NET_7]: 'Payment Due in 7 Days',
-  [PaymentTerm.NET_15]: 'Payment Due in 15 Days',
-  [PaymentTerm.NET_30]: 'Payment Due in 30 Days',
-  [PaymentTerm.NET_45]: 'Payment Due in 45 Days',
-  [PaymentTerm.NET_60]: 'Payment Due in 60 Days',
-  [PaymentTerm.NET_90]: 'Payment Due in 90 Days',
-  [PaymentTerm.CUSTOM]: 'Custom Payment Terms',
+  [PaymentTerm.IMMEDIATE]: "Payment Due Immediately",
+  [PaymentTerm.NET_7]: "Payment Due in 7 Days",
+  [PaymentTerm.NET_15]: "Payment Due in 15 Days",
+  [PaymentTerm.NET_30]: "Payment Due in 30 Days",
+  [PaymentTerm.NET_45]: "Payment Due in 45 Days",
+  [PaymentTerm.NET_60]: "Payment Due in 60 Days",
+  [PaymentTerm.NET_90]: "Payment Due in 90 Days",
+  [PaymentTerm.CUSTOM]: "Custom Payment Terms",
 };
 export type PayrollStatus = "pending" | "paid" | "failed";
-export type CashRegisterStatus = "active" | "inactive" | "closed" | "open" | "maintenance";
-export type TransactionType = "sale" | "cash_in" | "cash_out" | "opening_balance" | "closing_balance" | "adjustment";
+export type CashRegisterStatus =
+  | "active"
+  | "inactive"
+  | "closed"
+  | "open"
+  | "maintenance";
+export type TransactionType =
+  | "sale"
+  | "cash_in"
+  | "cash_out"
+  | "opening_balance"
+  | "closing_balance"
+  | "adjustment";
 
 // ============================================================================
 // PAGINATION & API RESPONSE TYPES
@@ -555,6 +621,11 @@ export interface PaymentHistory extends BaseEntity {
   purchase_id?: number;
 }
 
+export interface PurchaseMetadata {
+  status_changed_at?: string;
+  status_change_reason?: string;
+}
+
 export interface Purchase extends BaseEntity {
   po_no: string;
   supplier_id: number;
@@ -581,6 +652,7 @@ export interface Purchase extends BaseEntity {
   received_date?: string | null;
   items: PurchaseItem[];
   payment_history: PaymentHistory[];
+  metadata?: PurchaseMetadata;
   is_active?: boolean;
 }
 
@@ -628,7 +700,6 @@ export interface UpdatePurchaseStatusPayload {
   };
 }
 
-
 export interface ReceivePurchaseItemPayload {
   item_id: number;
   quantity: number;
@@ -642,7 +713,6 @@ export interface ReceivePurchasePayload {
     items: ReceivePurchaseItemPayload[];
   };
 }
-
 
 export interface PurchasePaymentPayload {
   id: string | number;
@@ -1112,7 +1182,8 @@ export interface CreateDepartmentPayload {
   notes?: string;
 }
 
-export interface UpdateDepartmentPayload extends Partial<CreateDepartmentPayload> {
+export interface UpdateDepartmentPayload
+  extends Partial<CreateDepartmentPayload> {
   id: number;
 }
 
@@ -1191,7 +1262,8 @@ export interface CreateDesignationPayload {
   sortOrder?: number;
 }
 
-export interface UpdateDesignationPayload extends Partial<CreateDesignationPayload> {
+export interface UpdateDesignationPayload
+  extends Partial<CreateDesignationPayload> {
   id: number;
 }
 
@@ -1371,7 +1443,7 @@ export interface UpdateAttendancePayload {
   notes?: string;
 }
 
-export interface GetAttendanceParams extends DateRangeParams { }
+export interface GetAttendanceParams extends DateRangeParams {}
 
 export interface GetAttendanceListParams extends PaginationParams {
   employee_id?: number;
@@ -1781,4 +1853,167 @@ export interface GetTransactionsParams extends PaginationParams {
   transaction_type?: TransactionType;
   start_date?: string;
   end_date?: string;
+}
+
+// ============================================================================
+// QUOTATION TYPES
+// ============================================================================
+
+export enum QuotationStatus {
+  DRAFT = "draft",
+  SENT = "sent",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  EXPIRED = "expired",
+  CONVERTED = "converted",
+}
+
+export const QuotationStatusDescription = {
+  [QuotationStatus.DRAFT]: "Draft",
+  [QuotationStatus.SENT]: "Sent",
+  [QuotationStatus.ACCEPTED]: "Accepted",
+  [QuotationStatus.REJECTED]: "Rejected",
+  [QuotationStatus.EXPIRED]: "Expired",
+  [QuotationStatus.CONVERTED]: "Converted",
+};
+
+export interface QuotationItem extends BaseEntity {
+  productId: number;
+  warehouseId: number;
+  quantity: string;
+  unit_price: string;
+  total_price: string;
+  discount_percentage: string;
+  discount_amount: string;
+  tax_percentage: string;
+  tax_amount: string;
+  net_price: string;
+  notes?: string | null;
+
+  product: ProductBasic;
+  unit: Unit;
+}
+
+export interface CreateQuotationDto {
+  items: {
+    product_id: number;
+    quantity: number;
+    unit_price?: number;
+    discount_percentage?: number;
+  }[];
+  discount_type?: "fixed" | "percentage";
+  discount_value?: number;
+  tax_percentage?: number;
+  customer_id: number;
+  quotation_no?: string;
+  branch_id?: number;
+  quotation_date?: string;
+  valid_until?: string;
+  terms_and_conditions?: string;
+  notes?: string;
+  status?: QuotationStatus;
+}
+
+export interface UpdateQuotationDto {
+  customer_id?: number;
+  branch_id?: number;
+  quotation_date?: string;
+  valid_until?: string;
+  status?: QuotationStatus;
+  notes?: string;
+  terms_and_conditions?: string;
+  items?: {
+    id?: number;
+    product_id: number;
+    quantity: number;
+    unit_price: number;
+    discount_percentage?: number;
+  }[];
+}
+
+export interface Quotation extends BaseEntity {
+  quotation_no: string;
+  items: QuotationItem[];
+
+  subtotal: string;
+  discount: string;
+  manual_discount: string;
+  group_discount: string;
+  tax: string;
+  total: string;
+
+  valid_until: string;
+  terms_and_conditions?: string;
+  notes?: string;
+
+  status: QuotationStatus;
+
+  customer: CustomerBasic;
+  created_by: UserBasic;
+
+  branch_id: number;
+  branch: BranchBasic;
+}
+export interface UpdateQuotationStatusDto {
+  status: QuotationStatus;
+  reason?: string;
+}
+
+export interface ConvertToSaleDto {
+  sale_date?: string;
+  notes?: string;
+  payment_method?: PaymentMethod;
+  paid_amount?: number;
+}
+
+export interface GetQuotationsParams extends PaginationParams {
+  status?: QuotationStatus;
+  customer_id?: number;
+  branch_id?: number;
+  start_date?: string;
+  end_date?: string;
+  search?: string;
+}
+
+export interface CreateQuotationPayload {
+  body: CreateQuotationDto;
+}
+
+export interface UpdateQuotationPayload {
+  id: string | number;
+  body: UpdateQuotationDto;
+}
+
+export interface UpdateQuotationStatusPayload {
+  id: string | number;
+  body: UpdateQuotationStatusDto;
+}
+
+export interface ConvertQuotationToSalePayload {
+  id: string | number;
+  body: ConvertToSaleDto;
+}
+
+export interface DailyQuotation {
+  date: string;
+  total: number;
+  count: number;
+}
+
+export interface QuotationStatusBreakdown {
+  draft: number;
+  sent: number;
+  accepted: number;
+  rejected: number;
+  expired: number;
+  converted: number;
+}
+
+export interface QuotationAnalytics {
+  totalQuotations: number;
+  totalAmount: number;
+  averageQuotationValue: number;
+  conversionRate: number;
+  statusBreakdown: QuotationStatusBreakdown;
+  dailyQuotations: DailyQuotation[];
 }

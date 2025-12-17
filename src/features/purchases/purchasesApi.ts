@@ -92,7 +92,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
     >({
       query: ({ id, body }) => ({
         url: `/purchase/${id}/receive`,
-        method: "PATCH",
+        method: "POST",
         body,
       }),
       invalidatesTags: (_result, _error, { id }) => [

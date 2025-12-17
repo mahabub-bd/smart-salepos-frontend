@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import SupplierSummaryCard from "../../../components/common/SupplierSummaryCard";
+import LedgerSummaryCard from "../../../components/common/LedgerSummaryCard";
 import Badge from "../../../components/ui/badge/Badge";
 import Pagination from "../../../components/ui/pagination/Pagination";
 import {
@@ -82,14 +82,21 @@ export default function SupplierLedgerPage() {
       {/* Page Container */}
       <div className="space-y-6">
         {/* Supplier Summary Card */}
-        <SupplierSummaryCard
-          supplier={supplier}
+        <LedgerSummaryCard
+          entity={{
+            name: supplier.name,
+            code: supplier.supplier_code,
+            contact_person: supplier.contact_person,
+            phone: supplier.phone,
+            email: supplier.email,
+          }}
           ledger={ledger}
           totalTransactions={entries.length}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           onBack={() => navigate(-1)}
           formatCurrency={formatCurrencyEnglish}
+          type="supplier"
         />
 
         {/* Transactions Table Container */}

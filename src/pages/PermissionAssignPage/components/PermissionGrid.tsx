@@ -133,7 +133,7 @@ export default function PermissionGrid({
 
               {/* Module Permissions */}
               {isExpanded && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3">
+                <div className="flex flex-wrap gap-4 p-3">
                   {perms.map((perm) => (
                     <PermissionCard
                       key={perm.key}

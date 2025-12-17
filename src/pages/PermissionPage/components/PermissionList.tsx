@@ -3,6 +3,7 @@ import { useState } from "react";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
@@ -69,7 +70,7 @@ export default function PermissionList() {
       await deletePermission(permissionToDelete.id).unwrap();
       setIsDeleteModalOpen(false);
       setPermissionToDelete(null);
-
+      toast("Permission Delete Sucessfully");
       // Adjust current page if necessary after deletion
       const newTotalPages = Math.ceil((totalItems - 1) / itemsPerPage);
       if (currentPage > newTotalPages && newTotalPages > 0) {

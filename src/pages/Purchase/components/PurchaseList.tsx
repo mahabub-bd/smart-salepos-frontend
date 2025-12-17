@@ -1,11 +1,21 @@
-import { Eye, FileCheck, Pencil, Plus, RotateCcw, Wallet } from "lucide-react";
+import {
+  Eye,
+  FileCheck,
+  MoreVertical,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
+import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
+import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import { useGetPurchasesQuery } from "../../../features/purchases/purchasesApi";
+import { formatDateTime } from "../../../utlis";
 import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
 
@@ -14,6 +24,7 @@ export default function PurchaseList() {
   const navigate = useNavigate();
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(null);
 
   const purchases = data?.data?.purchases || [];
 
@@ -44,21 +55,27 @@ export default function PurchaseList() {
                 <th className="table-header">Due</th>
                 <th className="table-header">Status</th>
                 <th className="table-header">Created At</th>
-                <th className="table-header flex justify-end w-full ">
-                  Actions
-                </th>
+                <th className="table-header text-center">Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {purchases.length > 0 ? (
                 purchases.map((p) => {
-                  const total = Number(p.total || 0);
+                  const total = Number(p.total_amount || p.total || 0);
                   const paid = Number(p.paid_amount || 0);
                   const due = Number(p.due_amount || 0);
                   const isFullyPaid = due === 0;
-                  const isReceived = p.status === "received";
-                  const canReturn = p.status === "received";
+                  const isReceived =
+                    p.status === "fully_received" ||
+                    p.status === "partial_received";
+                  const canReturn =
+                    p.status === "fully_received" ||
+                    p.status === "partial_received";
+                  const isDraft = p.status === "draft";
+                  const canEdit = isDraft && !isReceived;
+                  const shouldHideEditAndPayment =
+                    isFullyPaid && p.status === "fully_received";
 
                   return (
                     <tr key={p.id} className="border-b hover:bg-gray-50">
@@ -72,20 +89,21 @@ export default function PurchaseList() {
 
                       {/* Total */}
                       <td className="table-body font-medium">
-                        {total.toLocaleString()}
+                        ৳{total.toLocaleString()}
                       </td>
 
                       {/* Paid */}
                       <td className="table-body text-green-600 font-medium">
-                        {paid.toLocaleString()}
+                        ৳{paid.toLocaleString()}
                       </td>
 
                       {/* Due */}
                       <td
-                        className={`table-body font-medium ${due > 0 ? "text-red-500" : "text-gray-500"
-                          }`}
+                        className={`table-body font-medium ${
+                          due > 0 ? "text-red-500" : "text-gray-500"
+                        }`}
                       >
-                        {due.toLocaleString()}
+                        ৳{due.toLocaleString()}
                       </td>
 
                       {/* Status */}
@@ -95,62 +113,98 @@ export default function PurchaseList() {
 
                       {/* Created Date */}
                       <td className="table-body">
-                        {new Date(p.created_at).toLocaleDateString()}
+                        {formatDateTime(p.created_at)}
                       </td>
 
                       {/* Actions */}
                       <td className="table-body">
-                        <div className="flex justify-end gap-2">
-                          {/* View */}
-                          <IconButton
-                            icon={Eye}
-                            color="gray"
-                            tooltip="View"
-                            onClick={() => navigate(`/purchases/${p.id}`)}
-                          />
-
-                          {/* Receive Items */}
-                          <IconButton
-                            icon={FileCheck}
-                            color="green"
-                            tooltip="Receive"
-                            disabled={isReceived} // Disable if already received
+                        <div className="relative">
+                          <button
                             onClick={() =>
-                              navigate(`/purchases/${p.id}?receive=true`)
+                              setActiveDropdown(
+                                activeDropdown === p.id ? null : p.id
+                              )
                             }
-                          />
+                            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            <MoreVertical size={16} className="text-gray-600" />
+                          </button>
 
-                          {/* Make Payment */}
-                          <IconButton
-                            icon={Wallet}
-                            color="purple"
-                            tooltip={isFullyPaid ? "No Due" : "Make Payment"}
-                            disabled={isFullyPaid} // Disable if paid fully
-                            onClick={() =>
-                              navigate(`/purchases/${p.id}?payment=true`)
-                            }
-                          />
+                          <Dropdown
+                            isOpen={activeDropdown === p.id}
+                            onClose={() => setActiveDropdown(null)}
+                            className="min-w-[180px]"
+                          >
+                            {/* View Details */}
+                            <DropdownItem
+                              onClick={() => {
+                                navigate(`/purchases/${p.id}`);
+                                setActiveDropdown(null);
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye size={14} />
+                              View Details
+                            </DropdownItem>
 
-                          {/* Purchase Return */}
-                          <IconButton
-                            icon={RotateCcw}
-                            tooltip="Purchase Return"
-                            color="orange"
-                            disabled={!canReturn}
-                            onClick={() => {
-                              setSelectedPurchase(p);
-                              setIsReturnModalOpen(true);
-                            }}
-                          />
+                            {/* Receive Items - Only show when not received */}
+                            {!isReceived && (
+                              <DropdownItem
+                                onClick={() => {
+                                  navigate(`/purchases/${p.id}?receive=true`);
+                                  setActiveDropdown(null);
+                                }}
+                                className="flex items-center gap-2"
+                              >
+                                <FileCheck size={14} />
+                                Receive Items
+                              </DropdownItem>
+                            )}
 
-                          {/* Edit Purchase */}
-                          <IconButton
-                            icon={Pencil}
-                            tooltip="Edit"
-                            color="blue"
-                            disabled={isReceived} // Optional: block edit if received
-                            onClick={() => navigate(`/purchases/edit/${p.id}`)}
-                          />
+                            {/* Make Payment - Only show when due > 0 or not fully received */}
+                            {!shouldHideEditAndPayment && (
+                              <DropdownItem
+                                onClick={() => {
+                                  navigate(`/purchases/${p.id}?payment=true`);
+                                  setActiveDropdown(null);
+                                }}
+                                disabled={isFullyPaid}
+                                className="flex items-center gap-2"
+                              >
+                                <Wallet size={14} />
+                                Make Payment
+                              </DropdownItem>
+                            )}
+
+                            {/* Purchase Return */}
+                            <DropdownItem
+                              onClick={() => {
+                                setSelectedPurchase(p);
+                                setIsReturnModalOpen(true);
+                                setActiveDropdown(null);
+                              }}
+                              disabled={!canReturn}
+                              className="flex items-center gap-2"
+                            >
+                              <RotateCcw size={14} />
+                              Purchase Return
+                            </DropdownItem>
+
+                            {/* Edit Purchase - Only for draft status and not received, or when not fully paid and received */}
+                            {!shouldHideEditAndPayment && (
+                              <DropdownItem
+                                onClick={() => {
+                                  navigate(`/purchases/edit/${p.id}`);
+                                  setActiveDropdown(null);
+                                }}
+                                disabled={!canEdit}
+                                className="flex items-center gap-2"
+                              >
+                                <Pencil size={14} />
+                                Edit
+                              </DropdownItem>
+                            )}
+                          </Dropdown>
                         </div>
                       </td>
                     </tr>

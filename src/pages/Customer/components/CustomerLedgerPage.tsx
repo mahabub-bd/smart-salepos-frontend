@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import CustomerSummaryCard from "../../../components/common/SummaryCard";
+import LedgerSummaryCard from "../../../components/common/LedgerSummaryCard";
 import Badge from "../../../components/ui/badge/Badge";
 import Pagination from "../../../components/ui/pagination/Pagination";
 import {
@@ -82,14 +82,20 @@ export default function CustomerLedgerPage() {
       {/* Page Container */}
       <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/5">
         {/* Header */}
-        <CustomerSummaryCard
-          customer={customer}
+        <LedgerSummaryCard
+          entity={{
+            name: customer.name,
+            code: customer.customer_code,
+            phone: customer.phone,
+            email: customer.email,
+          }}
           ledger={ledger}
           totalTransactions={entries.length}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           onBack={() => navigate(-1)}
           formatCurrency={formatCurrencyEnglish}
+          type="customer"
         />
 
         {/* Transactions Table */}

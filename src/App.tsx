@@ -56,6 +56,10 @@ import PosTransactionHistoryPage from "./pages/POS/PosTransactionHistoryPage";
 import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
 import PurchaseDetailPage from "./pages/Purchase/components/PurchaseDetailPage";
 import PurchaseEdit from "./pages/Purchase/components/PurchaseEdit";
+import QuotationCreate from "./pages/Quotation/Create";
+import QuotationDetail from "./pages/Quotation/Detail";
+import QuotationEdit from "./pages/Quotation/Edit";
+import QuotationPage from "./pages/Quotation";
 import RolesPage from "./pages/Role";
 import SalesPage from "./pages/Sales";
 import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
@@ -169,6 +173,11 @@ export default function App() {
           <Route path="/purchases/edit/:id" element={<PurchaseEdit />} />
           {/* Purchase Detail */}
           <Route path="/purchases/:id" element={<PurchaseDetailPage />} />
+          {/* Quotation Routes */}
+          <Route path="/quotations" element={<QuotationPage />} />
+          <Route path="/quotations/create" element={<QuotationCreate />} />
+          <Route path="/quotations/:id" element={<QuotationDetail />} />
+          <Route path="/quotations/edit/:id" element={<QuotationEdit />} />
           <Route
             path="/inventory/stock-batch-wise"
             element={<InventoryPageBatchWise />}
