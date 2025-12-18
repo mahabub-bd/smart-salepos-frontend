@@ -1,4 +1,12 @@
-import { ApiResponse, Inventory, InventoryItem } from "../../types";
+import {
+  ApiResponse,
+  GetInventoryJournalParams,
+  GetStockMovementsParams,
+  Inventory,
+  InventoryItem,
+  InventoryJournalEntry,
+  StockMovement,
+} from "../../types";
 import { apiSlice } from "../apiSlice";
 
 export interface AdjustInventoryPayload {
@@ -10,12 +18,11 @@ export interface AdjustInventoryPayload {
 }
 
 export interface TransferPayload {
+  product_id: number;
   from_warehouse_id: number;
   to_warehouse_id: number;
-  items: {
-    product_id: number;
-    quantity: number;
-  }[];
+  quantity: number;
+  note?: string;
 }
 interface WarehouseReportParams {
   warehouse_id?: number;
@@ -106,6 +113,32 @@ export const inventoryApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["Inventory"],
     }),
+
+    // 🔹 GET STOCK MOVEMENTS
+    getStockMovements: builder.query<
+      ApiResponse<StockMovement[]>,
+      GetStockMovementsParams | void
+    >({
+      query: (params) => ({
+        url: "/inventory/movements",
+        method: "GET",
+        params: params || {},
+      }),
+      providesTags: ["Inventory"],
+    }),
+
+    // 🔹 GET INVENTORY JOURNAL
+    getInventoryJournal: builder.query<
+      ApiResponse<InventoryJournalEntry[]>,
+      GetInventoryJournalParams | void
+    >({
+      query: (params) => ({
+        url: "/inventory/journal",
+        method: "GET",
+        params: params || {},
+      }),
+      providesTags: ["Inventory"],
+    }),
   }),
 });
 
@@ -117,4 +150,6 @@ export const {
   useTransferInventoryMutation,
   useGetProductWiseReportQuery,
   useGetWarehouseWiseReportQuery,
+  useGetStockMovementsQuery,
+  useGetInventoryJournalQuery,
 } = inventoryApi;

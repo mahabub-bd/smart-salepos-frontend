@@ -5,14 +5,17 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import ReceiptPDF from "../../components/receipt/ReceiptPDF";
 import Button from "../../components/ui/button/Button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 
 import { useGetReceiptPreviewQuery } from "../../features/settings/settingsApi";
 import { ReceiptPreviewData, SaleData } from "../../types";
 
-/**
- * 🔹 Sample sale data for demonstration in preview & PDF
- *   (You can later replace this with real sale data)
- */
 const sampleSaleData: SaleData = {
   invoice_no: "INV-20251204-0013",
   items: [
@@ -129,11 +132,6 @@ interface A4ReceiptPreviewProps {
   saleData: SaleData;
 }
 
-/**
- * 📄 A4-sized visual preview component
- *   - Exact A4: 210mm × 297mm
- *   - Scrolls horizontally on small screens
- */
 const A4ReceiptPreview: React.FC<A4ReceiptPreviewProps> = ({
   receipt,
   saleData,
@@ -268,49 +266,49 @@ const A4ReceiptPreview: React.FC<A4ReceiptPreviewProps> = ({
 
             {/* Items */}
             <div className="mb-6">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-gray-800">
-                    <th className="text-left py-3 text-sm font-semibold">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b-2 border-gray-800">
+                    <TableCell isHeader className="text-left py-3 text-sm font-semibold">
                       Item
-                    </th>
-                    <th className="text-center py-3 text-sm font-semibold w-16">
+                    </TableCell>
+                    <TableCell isHeader className="text-center py-3 text-sm font-semibold w-16">
                       Qty
-                    </th>
-                    <th className="text-right py-3 text-sm font-semibold w-24">
+                    </TableCell>
+                    <TableCell isHeader className="text-right py-3 text-sm font-semibold w-24">
                       Price
-                    </th>
-                    <th className="text-right py-3 text-sm font-semibold w-24">
+                    </TableCell>
+                    <TableCell isHeader className="text-right py-3 text-sm font-semibold w-24">
                       Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+                    </TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {saleData.items.map((item, index) => (
-                    <tr key={index} className="border-b border-gray-200">
-                      <td className="py-3 text-sm">
+                    <TableRow key={index} className="border-b border-gray-200">
+                      <TableCell className="py-3 text-sm">
                         <div>
                           <p className="font-medium">{item.product.name}</p>
                           <p className="text-xs text-gray-500">
                             SKU: {item.product.sku}
                           </p>
                         </div>
-                      </td>
-                      <td className="text-center py-3 text-sm">
+                      </TableCell>
+                      <TableCell className="text-center py-3 text-sm">
                         {item.quantity}
-                      </td>
-                      <td className="text-right py-3 text-sm">
+                      </TableCell>
+                      <TableCell className="text-right py-3 text-sm">
                         {currencySymbol}
                         {item.unit_price}
-                      </td>
-                      <td className="text-right py-3 text-sm font-medium">
+                      </TableCell>
+                      <TableCell className="text-right py-3 text-sm font-medium">
                         {currencySymbol}
                         {item.line_total}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
 
             {/* Totals */}

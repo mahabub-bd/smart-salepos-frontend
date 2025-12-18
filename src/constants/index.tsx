@@ -104,8 +104,13 @@ const navItems: NavItem[] = [
     requiredPermission: "inventory.view",
     subItems: [
       {
-        name: "Inventory Movement",
-        path: "/inventory",
+        name: "Stock Movements",
+        path: "/inventory/stock-movements",
+        requiredPermission: "inventory.view",
+      },
+      {
+        name: "Inventory Journal",
+        path: "/inventory/journal",
         requiredPermission: "inventory.view",
       },
       {

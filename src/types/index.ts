@@ -845,6 +845,8 @@ export interface InventoryItem extends BaseEntity {
 }
 
 export interface WarehouseInventory {
+  id: number;
+  warehouse_id: number;
   warehouse: Warehouse;
   purchased_quantity: number;
   sold_quantity: number;
@@ -884,6 +886,67 @@ export interface ProductBatchWise extends BaseEntity {
 }
 
 export type Inventory = InventoryItem[];
+
+// ============================================================================
+// INVENTORY MOVEMENTS & JOURNAL
+// ============================================================================
+
+export type StockMovementType = "IN" | "OUT" | "ADJUST" | "TRANSFER";
+
+export interface StockMovement extends BaseEntity {
+  product_id: number;
+  product: Product;
+  warehouse_id: number;
+  warehouse: Warehouse;
+  type: StockMovementType;
+  quantity: number;
+  note?: string;
+  from_warehouse_id?: number;
+  from_warehouse?: Warehouse;
+  to_warehouse_id?: number;
+  to_warehouse?: Warehouse;
+  reference_type?: string;
+  reference_id?: number;
+  created_by?: UserBasic;
+}
+
+export interface GetStockMovementsParams {
+  product_id?: number;
+  warehouse_id?: number;
+  type?: StockMovementType;
+}
+
+export interface InventoryJournalEntry {
+  id: number;
+  date: string;
+  product: {
+    id: number;
+    name: string;
+    sku: string;
+    image?: string;
+  };
+  warehouse: {
+    id: number;
+    name: string;
+  };
+  type: StockMovementType;
+  description: string;
+  reference: string;
+  debit: number;
+  credit: number;
+  balance: number;
+  created_by?: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface GetInventoryJournalParams {
+  product_id?: number;
+  warehouse_id?: number;
+  start_date?: string;
+  end_date?: string;
+}
 
 // ============================================================================
 // SALES

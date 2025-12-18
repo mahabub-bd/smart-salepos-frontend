@@ -14,6 +14,13 @@ import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 import { useGetPurchasesQuery } from "../../../features/purchases/purchasesApi";
 import { formatDateTime } from "../../../utlis";
 import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
@@ -44,22 +51,24 @@ export default function PurchaseList() {
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="max-w-full overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b bg-gray-50">
-              <tr>
-                <th className="table-header">PO No</th>
-                <th className="table-header">Supplier</th>
-                <th className="table-header">Warehouse</th>
-                <th className="table-header">Total</th>
-                <th className="table-header">Paid</th>
-                <th className="table-header">Due</th>
-                <th className="table-header">Status</th>
-                <th className="table-header">Created At</th>
-                <th className="table-header text-center">Actions</th>
-              </tr>
-            </thead>
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow>
+                <TableCell isHeader>PO No</TableCell>
+                <TableCell isHeader>Supplier</TableCell>
+                <TableCell isHeader>Warehouse</TableCell>
+                <TableCell isHeader>Total</TableCell>
+                <TableCell isHeader>Paid</TableCell>
+                <TableCell isHeader>Due</TableCell>
+                <TableCell isHeader>Status</TableCell>
+                <TableCell isHeader>Created At</TableCell>
+                <TableCell isHeader className="text-center">
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHeader>
 
-            <tbody>
+            <TableBody>
               {purchases.length > 0 ? (
                 purchases.map((p) => {
                   const total = Number(p.total_amount || p.total || 0);
@@ -78,46 +87,44 @@ export default function PurchaseList() {
                     isFullyPaid && p.status === "fully_received";
 
                   return (
-                    <tr key={p.id} className="border-b hover:bg-gray-50">
-                      <td className="table-body font-medium">{p.po_no}</td>
-                      <td className="table-body">
+                    <TableRow key={p.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">{p.po_no}</TableCell>
+                      <TableCell>
                         {p.supplier?.name || `Supplier #${p.supplier_id}`}
-                      </td>
-                      <td className="table-body">
+                      </TableCell>
+                      <TableCell>
                         {p.warehouse?.name || `Warehouse #${p.warehouse_id}`}
-                      </td>
+                      </TableCell>
 
                       {/* Total */}
-                      <td className="table-body font-medium">
+                      <TableCell className="font-medium">
                         ৳{total.toLocaleString()}
-                      </td>
+                      </TableCell>
 
                       {/* Paid */}
-                      <td className="table-body text-green-600 font-medium">
+                      <TableCell className="text-green-600 font-medium">
                         ৳{paid.toLocaleString()}
-                      </td>
+                      </TableCell>
 
                       {/* Due */}
-                      <td
-                        className={`table-body font-medium ${
+                      <TableCell
+                        className={`font-medium ${
                           due > 0 ? "text-red-500" : "text-gray-500"
                         }`}
                       >
                         ৳{due.toLocaleString()}
-                      </td>
+                      </TableCell>
 
                       {/* Status */}
-                      <td className="table-body capitalize">
+                      <TableCell className="capitalize">
                         <PurchaseStatusBadge status={p.status} />
-                      </td>
+                      </TableCell>
 
                       {/* Created Date */}
-                      <td className="table-body">
-                        {formatDateTime(p.created_at)}
-                      </td>
+                      <TableCell>{formatDateTime(p.created_at)}</TableCell>
 
                       {/* Actions */}
-                      <td className="table-body">
+                      <TableCell>
                         <div className="relative">
                           <button
                             onClick={() =>
@@ -206,19 +213,22 @@ export default function PurchaseList() {
                             )}
                           </Dropdown>
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })
               ) : (
-                <tr>
-                  <td colSpan={9} className="py-6 text-center text-gray-500">
+                <TableRow>
+                  <TableCell
+                    colSpan={9}
+                    className="py-6 text-center text-gray-500"
+                  >
                     No purchases found
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 

@@ -15,9 +15,9 @@ import {
   PurchaseItem,
   PurchaseOrderStatus,
 } from "../../../types";
+import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import PurchaseReceiveModal from "./PurchaseReceiveModal";
-import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
 import PurchaseStatusModal from "./PurchaseStatusModal";
 
@@ -173,7 +173,8 @@ const HeaderSection = ({
     purchase.status === PurchaseOrderStatus.FULLY_RECEIVED ||
     purchase.status === PurchaseOrderStatus.PARTIAL_RECEIVED;
   const isFullyPaid = Number(purchase.due_amount || 0) === 0;
-  const shouldHidePaymentButton = isFullyPaid && purchase.status === PurchaseOrderStatus.FULLY_RECEIVED;
+  const shouldHidePaymentButton =
+    isFullyPaid && purchase.status === PurchaseOrderStatus.FULLY_RECEIVED;
   const canReturn =
     purchase.status === PurchaseOrderStatus.FULLY_RECEIVED ||
     purchase.status === PurchaseOrderStatus.PARTIAL_RECEIVED;

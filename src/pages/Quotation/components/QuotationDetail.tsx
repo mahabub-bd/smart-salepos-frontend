@@ -11,6 +11,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../../components/ui/button/Button";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import {
   useDeleteQuotationMutation,
   useGetQuotationByIdQuery,
   useUpdateQuotationStatusMutation,
@@ -20,8 +27,8 @@ import {
   formatCurrencyEnglish as formatCurrency,
   formatDateTime,
 } from "../../../utlis";
-import { QuotationStatusBadge } from "./QuotationStatusBadge";
 import ConvertToSaleModal from "./ConvertToSaleModal";
+import { QuotationStatusBadge } from "./QuotationStatusBadge";
 
 export default function QuotationDetail({ id }: { id: string }) {
   const {
@@ -100,13 +107,13 @@ export default function QuotationDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
-              Quotation {q.quotation_no}
+              {q.quotation_no}
             </h1>
             <p className="text-sm text-gray-500">
               Created on {formatDateTime(q.created_at)}
@@ -205,48 +212,40 @@ export default function QuotationDetail({ id }: { id: string }) {
           <div className="bg-white rounded-lg border p-6">
             <h2 className="text-lg font-semibold mb-4">Quotation Items</h2>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2">Product</th>
-                    <th className="text-center py-2">Quantity</th>
-                    <th className="text-right py-2">Unit Price</th>
-                    <th className="text-right py-2">Discount</th>
-                    <th className="text-right py-2">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow className="border-b">
+                    <TableCell isHeader>Product</TableCell>
+                    <TableCell isHeader>Quantity</TableCell>
+                    <TableCell isHeader>Unit Price</TableCell>
+                    <TableCell isHeader>Discount</TableCell>
+                    <TableCell isHeader>Total</TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {q.items?.map((item: QuotationItem) => (
-                    <tr key={item.id} className="border-b">
-                      <td className="py-3">
-                        <div>
-                          <p className="font-medium">{item.product?.name}</p>
-                          <p className="text-sm text-gray-500">
-                            {item.product?.sku}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {item.unit?.name}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="text-center py-3">{item.quantity}</td>
-                      <td className="text-right py-3">
+                    <TableRow key={item.id} className="border-b">
+                      <TableCell>{item.product?.name}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>
                         {formatCurrency(Number(item.unit_price))}
-                      </td>
-                      <td className="text-right py-3">
-                        {Number(item.discount_percentage) > 0 && (
+                      </TableCell>
+                      <TableCell>
+                        {Number(item.discount_percentage) > 0 ? (
                           <span className="text-sm">
-                            {item.discount_percentage}%
+                            {item.discount_percentage}
                           </span>
+                        ) : (
+                          "-"
                         )}
-                      </td>
-                      <td className="text-right py-3 font-medium">
+                      </TableCell>
+                      <TableCell>
                         {formatCurrency(Number(item.total_price))}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           </div>
 

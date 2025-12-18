@@ -56,10 +56,10 @@ import PosTransactionHistoryPage from "./pages/POS/PosTransactionHistoryPage";
 import PurchaseCreate from "./pages/Purchase/components/PurchaseCreate";
 import PurchaseDetailPage from "./pages/Purchase/components/PurchaseDetailPage";
 import PurchaseEdit from "./pages/Purchase/components/PurchaseEdit";
+import QuotationPage from "./pages/Quotation";
 import QuotationCreate from "./pages/Quotation/Create";
 import QuotationDetail from "./pages/Quotation/Detail";
 import QuotationEdit from "./pages/Quotation/Edit";
-import QuotationPage from "./pages/Quotation";
 import RolesPage from "./pages/Role";
 import SalesPage from "./pages/Sales";
 import SaleDetailPage from "./pages/Sales/components/SaleDetailPage";
@@ -67,6 +67,7 @@ import SaleFormPage from "./pages/Sales/components/SaleFormPage";
 
 import AttendanceListPage from "./pages/Attendance/AttendanceList";
 import AttendanceSummaryPage from "./pages/Attendance/AttendanceSummary";
+import BackupPage from "./pages/Backup";
 import CashRegisterManagementPage from "./pages/CashRegister/CashRegisterManagementPage";
 import CashRegisterOperationsPage from "./pages/CashRegister/CashRegisterOperationsPage";
 import CashRegisterTransactionsPage from "./pages/CashRegister/CashRegisterTransactionsPage";
@@ -76,6 +77,11 @@ import DepartmentProfilePage from "./pages/Departments/DepartmentProfilePage";
 import DesignationPage from "./pages/Designations";
 import EmployeePage from "./pages/Employees";
 import EmployeeProfilePage from "./pages/Employees/EmployeeProfilePage";
+import InventoryPageBatchWise from "./pages/Inventory/batch-wise";
+import InventoryJournalPage from "./pages/Inventory/inventory-journal";
+import InventoryProductWisePage from "./pages/Inventory/product-wise";
+import StockMovementPage from "./pages/Inventory/stock-movement";
+import InventoryProductWarehouseWise from "./pages/Inventory/warehouse-wise";
 import LeaveRequestPage from "./pages/Leave";
 import LeaveRequestDetail from "./pages/Leave/components/LeaveRequestDetail";
 import LeaveApprovalsPage from "./pages/LeaveApprovals";
@@ -90,12 +96,8 @@ import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
-import BackupPage from "./pages/Backup";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
-import InventoryProductWisePage from "./pages/Inventory/product-wise";
-import InventoryProductWarehouseWise from "./pages/Inventory/warehouse-wise";
-import InventoryPageBatchWise from "./pages/Inventory/batch-wise";
 
 export default function App() {
   return (
@@ -189,6 +191,14 @@ export default function App() {
           <Route
             path="/inventory/stock-warehouse-wise"
             element={<InventoryProductWarehouseWise />}
+          />
+          <Route
+            path="/inventory/stock-movements"
+            element={<StockMovementPage />}
+          />
+          <Route
+            path="/inventory/journal"
+            element={<InventoryJournalPage />}
           />
           <Route path="/accounts/balances" element={<AccountBalancePage />} />
           <Route path="/accounts/journal" element={<JournalPage />} />
