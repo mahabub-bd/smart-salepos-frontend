@@ -104,6 +104,7 @@ export default function CustomerGroupList() {
                           setEditGroup(group);
                           setIsModalOpen(true);
                         }}
+                        color="blue"
                       />
                     )}
                     {canDelete && (

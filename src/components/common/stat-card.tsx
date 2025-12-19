@@ -4,9 +4,10 @@ import { cn } from "../../utlis";
 interface BadgeProps {
   children: React.ReactNode;
   color?: "success" | "warning" | "danger" | "info" | "default";
+  className?: string;
 }
 
-export function Badge({ children, color = "default" }: BadgeProps) {
+export function Badge({ children, color = "default", className }: BadgeProps) {
   const colorClasses = {
     success:
       "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
@@ -21,7 +22,8 @@ export function Badge({ children, color = "default" }: BadgeProps) {
     <div
       className={cn(
         "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium",
-        colorClasses[color]
+        colorClasses[color],
+        className
       )}
     >
       {children}
@@ -47,6 +49,7 @@ interface StatCardProps {
     | "indigo"
     | "default";
   className?: string;
+  compact?: boolean;
 }
 
 export default function StatCard({
@@ -56,6 +59,7 @@ export default function StatCard({
   badge,
   bgColor = "default",
   className,
+  compact = false,
 }: StatCardProps) {
   const bgColorClasses = {
     blue: "bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800/30",
@@ -81,6 +85,44 @@ export default function StatCard({
     indigo: "bg-indigo-100/80 dark:bg-indigo-800/50",
     default: "bg-gray-100/80 dark:bg-gray-800/50",
   };
+
+  if (compact) {
+    return (
+      <div
+        className={cn(
+          "flex items-center gap-3 p-3 rounded-lg border",
+          bgColorClasses[bgColor],
+          className
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center justify-center w-8 h-8 rounded-md shrink-0",
+            iconBgClasses[bgColor]
+          )}
+        >
+          <Icon className="text-gray-700 dark:text-white/90 text-sm" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-gray-600 dark:text-gray-400 truncate">
+              {title}
+            </span>
+            {badge && (
+              <Badge color={badge.color} className="shrink-0">
+                {badge.icon && <badge.icon className="text-xs" />}
+                {badge.text}
+              </Badge>
+            )}
+          </div>
+          <p className="font-semibold text-sm text-gray-800 dark:text-white/90 truncate">
+            {value}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

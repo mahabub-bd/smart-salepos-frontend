@@ -1,8 +1,9 @@
-import { ArrowLeft, Edit, QrCode, Barcode as BarcodeIcon } from "lucide-react";
+import { ArrowLeft, Barcode as BarcodeIcon, Edit, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
-import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import { Barcode, CustomQRCode } from "../../../components/qr-barcode";
+import Button from "../../../components/ui/button/Button";
+import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import { useGetProductByIdQuery } from "../../../features/product/productApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 
@@ -35,13 +36,6 @@ export default function ProductDetail({ productId }: Props) {
       {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
-          <button
-            onClick={goBack}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Back to Products"
-          >
-            <ArrowLeft size={20} className="text-gray-600" />
-          </button>
           <div>
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white/90">
               {product.name}
@@ -62,14 +56,19 @@ export default function ProductDetail({ productId }: Props) {
           </span>
 
           {canUpdate && (
-            <button
-              onClick={handleEdit}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
+            <Button onClick={handleEdit} variant="primary" size="sm">
               <Edit size={16} />
-              Edit Product
-            </button>
+              Edit
+            </Button>
           )}
+          <Button
+            onClick={goBack}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            size="sm"
+          >
+            <ArrowLeft size={20} className="text-gray-200" />
+            Back to list
+          </Button>
         </div>
       </div>
 
@@ -114,15 +113,20 @@ export default function ProductDetail({ productId }: Props) {
               <Info label="SKU" value={product.sku} />
               <Info label="Barcode" value={product.barcode || "-"} />
               <Info label="Unit" value={product.unit?.name || "-"} />
-              <Info label="Status" value={
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  product.status
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}>
-                  {product.status ? "Active" : "Inactive"}
-                </span>
-              } />
+              <Info
+                label="Status"
+                value={
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      product.status
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {product.status ? "Active" : "Inactive"}
+                  </span>
+                }
+              />
               <Info
                 label="Created At"
                 value={new Date(product.created_at).toLocaleDateString()}
@@ -131,7 +135,9 @@ export default function ProductDetail({ productId }: Props) {
 
             {product.description && (
               <div className="mt-4">
-                <p className="text-sm text-gray-500 uppercase mb-1">Description</p>
+                <p className="text-sm text-gray-500 uppercase mb-1">
+                  Description
+                </p>
                 <p className="text-gray-700">{product.description}</p>
               </div>
             )}
@@ -176,7 +182,9 @@ export default function ProductDetail({ productId }: Props) {
                     />
                   ) : (
                     <div className="border border-gray-200 rounded-lg p-8 bg-gray-50">
-                      <p className="text-gray-500 text-sm">No barcode assigned</p>
+                      <p className="text-gray-500 text-sm">
+                        No barcode assigned
+                      </p>
                     </div>
                   )}
                 </div>
@@ -188,7 +196,9 @@ export default function ProductDetail({ productId }: Props) {
 
             {/* Product Information for Codes */}
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-600 mb-2 font-medium">Product Information:</p>
+              <p className="text-xs text-gray-600 mb-2 font-medium">
+                Product Information:
+              </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                 <div>
                   <span className="text-gray-500">Product ID:</span>
@@ -200,11 +210,18 @@ export default function ProductDetail({ productId }: Props) {
                 </div>
                 <div>
                   <span className="text-gray-500">Name:</span>
-                  <p className="font-mono text-gray-700 truncate" title={product.name}>{product.name}</p>
+                  <p
+                    className="font-mono text-gray-700 truncate"
+                    title={product.name}
+                  >
+                    {product.name}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">Price:</span>
-                  <p className="font-mono text-gray-700">৳{Number(product.selling_price).toLocaleString()}</p>
+                  <p className="font-mono text-gray-700">
+                    ৳{Number(product.selling_price).toLocaleString()}
+                  </p>
                 </div>
               </div>
             </div>
@@ -223,7 +240,11 @@ export default function ProductDetail({ productId }: Props) {
               />
               <Info
                 label="Discount Price"
-                value={product.discount_price ? `৳${Number(product.discount_price).toLocaleString()}` : "-"}
+                value={
+                  product.discount_price
+                    ? `৳${Number(product.discount_price).toLocaleString()}`
+                    : "-"
+                }
               />
             </div>
           </DetailCard>
@@ -231,23 +252,18 @@ export default function ProductDetail({ productId }: Props) {
           {/* Categories and Tags */}
           <DetailCard title="Categories & Tags">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Info
-                label="Category"
-                value={product.category?.name || "-"}
-              />
+              <Info label="Category" value={product.category?.name || "-"} />
               <Info
                 label="Subcategory"
                 value={product.subcategory?.name || "-"}
               />
-              <Info
-                label="Brand"
-                value={product.brand?.name || "-"}
-              />
+              <Info label="Brand" value={product.brand?.name || "-"} />
               <Info
                 label="Tags"
-                value={product.tags && product.tags.length > 0
-                  ? product.tags.map(tag => tag.name).join(", ")
-                  : "-"
+                value={
+                  product.tags && product.tags.length > 0
+                    ? product.tags.map((tag) => tag.name).join(", ")
+                    : "-"
                 }
               />
             </div>
@@ -273,7 +289,13 @@ export default function ProductDetail({ productId }: Props) {
               />
               <Metric
                 label="Sold Percentage"
-                value={`${product.total_stock > 0 ? Math.round((product.total_sold / product.total_stock) * 100) : 0}%`}
+                value={`${
+                  product.total_stock > 0
+                    ? Math.round(
+                        (product.total_sold / product.total_stock) * 100
+                      )
+                    : 0
+                }%`}
                 color="text-purple-600"
               />
             </div>
@@ -284,16 +306,21 @@ export default function ProductDetail({ productId }: Props) {
             <DetailCard title="Supplier Information">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Info label="Supplier Name" value={product.supplier.name} />
-                <Info label="Supplier Code" value={product.supplier.supplier_code} />
-                <Info label="Contact Person" value={product.supplier.contact_person || "-"} />
+                <Info
+                  label="Supplier Code"
+                  value={product.supplier.supplier_code}
+                />
+                <Info
+                  label="Contact Person"
+                  value={product.supplier.contact_person || "-"}
+                />
                 <Info label="Phone" value={product.supplier.phone || "-"} />
                 <Info label="Email" value={product.supplier.email || "-"} />
                 <Info label="Address" value={product.supplier.address || "-"} />
               </div>
             </DetailCard>
           )}
-
-          </div>
+        </div>
       </div>
     </>
   );
@@ -301,9 +328,17 @@ export default function ProductDetail({ productId }: Props) {
 
 /* ---------------------- Reusable Components ---------------------- */
 
-const DetailCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const DetailCard = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
   <div className="bg-white shadow-sm rounded-xl border border-gray-200 p-5 dark:border-gray-800">
-    <h2 className="text-lg font-medium text-gray-800 dark:text-white/90 mb-4">{title}</h2>
+    <h2 className="text-lg font-medium text-gray-800 dark:text-white/90 mb-4">
+      {title}
+    </h2>
     {children}
   </div>
 );
@@ -311,11 +346,21 @@ const DetailCard = ({ title, children }: { title: string; children: React.ReactN
 const Info = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div>
     <p className="text-xs text-gray-500 uppercase mb-1">{label}</p>
-    <p className="text-sm font-medium text-gray-800 dark:text-white/90">{value}</p>
+    <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+      {value}
+    </p>
   </div>
 );
 
-const Metric = ({ label, value, color }: { label: string; value: string | number; color: string }) => (
+const Metric = ({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  color: string;
+}) => (
   <div className="text-center p-3 bg-gray-50 rounded-lg">
     <p className="text-xs text-gray-500 uppercase mb-1">{label}</p>
     <p className={`text-lg font-bold ${color}`}>{value}</p>

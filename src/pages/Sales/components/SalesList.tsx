@@ -1,12 +1,4 @@
-import {
-  CreditCard,
-  Eye,
-  FileDown,
-  Plus,
-  ShoppingCart,
-  Wallet,
-  X,
-} from "lucide-react";
+import { CreditCard, Eye, Plus, ShoppingCart, Wallet, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -25,14 +17,12 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useGetBranchesQuery } from "../../../features/branch/branchApi";
 import { useGetCustomersQuery } from "../../../features/customer/customerApi";
 import { useGetSalesQuery } from "../../../features/sale/saleApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Sale } from "../../../types";
 import { formatCurrencyEnglish, formatDate } from "../../../utlis";
-import SingleSalePDF from "./pdf/SingleSalePDF";
 import SalePaymentModal from "./SalePaymentModal";
 
 // Import the Payment Modal
@@ -215,7 +205,12 @@ export default function SaleList() {
               id="sale-from-date"
               label="From Date"
               value={filters.fromDate ? new Date(filters.fromDate) : null}
-              onChange={(value) => handleFilterChange("fromDate", value ? (value as Date).toISOString().split('T')[0] : "")}
+              onChange={(value) =>
+                handleFilterChange(
+                  "fromDate",
+                  value ? (value as Date).toISOString().split("T")[0] : ""
+                )
+              }
               placeholder="Start date"
             />
           </div>
@@ -225,7 +220,12 @@ export default function SaleList() {
               id="sale-to-date"
               label="To Date"
               value={filters.toDate ? new Date(filters.toDate) : null}
-              onChange={(value) => handleFilterChange("toDate", value ? (value as Date).toISOString().split('T')[0] : "")}
+              onChange={(value) =>
+                handleFilterChange(
+                  "toDate",
+                  value ? (value as Date).toISOString().split("T")[0] : ""
+                )
+              }
               placeholder="End date"
             />
           </div>
@@ -357,16 +357,6 @@ export default function SaleList() {
                               }}
                             />
                           )}
-                          <PDFDownloadLink
-                            document={<SingleSalePDF sale={sale} />}
-                            fileName={`sale-${sale.invoice_no}.pdf`}
-                          >
-                            <IconButton
-                              icon={FileDown}
-                              tooltip="PDF"
-                              color="orange"
-                            />
-                          </PDFDownloadLink>
                         </div>
                       </TableCell>
                     </TableRow>

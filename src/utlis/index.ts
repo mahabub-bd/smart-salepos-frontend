@@ -80,9 +80,6 @@ export const formatDateTime = (dateString: string) => {
     year: "numeric",
     month: "short",
     day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
   });
 };
 
@@ -275,7 +272,10 @@ export const getPaymentMethodBadge = (method: string) => {
 };
 
 // Calculate business days between two dates (excluding weekends)
-export const calculateBusinessDays = (startDate: Date, endDate: Date): number => {
+export const calculateBusinessDays = (
+  startDate: Date,
+  endDate: Date
+): number => {
   let businessDays = 0;
   const currentDate = new Date(startDate);
 

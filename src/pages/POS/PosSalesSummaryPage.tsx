@@ -12,10 +12,10 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import StatCard from "../../components/common/stat-card";
 
+import DatePicker from "../../components/form/date-picker";
 import { useGetPosSalesSummaryQuery } from "../../features/pos/posApi";
 import { formatCurrencyEnglish } from "../../utlis";
 import PaymentBox from "./PaymentBox";
-import DatePicker from "../../components/form/date-picker";
 
 export default function PosSalesSummaryPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());

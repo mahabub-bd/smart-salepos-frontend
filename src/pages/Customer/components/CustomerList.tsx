@@ -1,6 +1,4 @@
 import {
-  ChevronLeft,
-  ChevronRight,
   Eye,
   Pencil,
   Plus,
@@ -16,6 +14,7 @@ import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import Badge from "../../../components/ui/badge/Badge";
+import Pagination from "../../../components/ui/pagination/Pagination";
 import {
   Table,
   TableBody,
@@ -66,8 +65,6 @@ export default function CustomerList() {
   const customers = data?.data || [];
   const totalItems = data?.meta?.total || 0;
   const totalPages = data?.meta?.totalPages || 1;
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + customers.length;
 
   const openDeleteDialog = (customer: Customer) => {
     setCustomerToDelete(customer);
@@ -220,69 +217,43 @@ export default function CustomerList() {
           </Table>
         </div>
 
-        {/* 🔥 Updated Pagination Only 👇 */}
+        {/* Pagination */}
         {totalItems > 0 && (
-          <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4 dark:border-white/5">
-            {/* Left – Items per page */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                Show
-              </span>
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                per page
-              </span>
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Show
+                </span>
+                <select
+                  value={limit}
+                  onChange={(e) => {
+                    setLimit(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  per page
+                </span>
+              </div>
             </div>
-
-            {/* Middle – Showing range */}
-            <div className="text-sm text-gray-700 dark:text-gray-300">
-              {startIndex + 1} - {Math.min(endIndex, totalItems)} of{" "}
-              {totalItems}
-            </div>
-
-            {/* Right – Icons */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="rounded p-1 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
-                aria-label="Previous Page"
-              >
-                <ChevronLeft
-                  size={20}
-                  className="text-gray-600 dark:text-gray-400"
-                />
-              </button>
-
-              <span className="px-3 text-sm text-gray-700 dark:text-gray-300">
-                Page {page} of {totalPages}
-              </span>
-
-              <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={page === totalPages}
-                className="rounded p-1 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
-                aria-label="Next Page"
-              >
-                <ChevronRight
-                  size={20}
-                  className="text-gray-600 dark:text-gray-400"
-                />
-              </button>
-            </div>
+            <Pagination
+              meta={{
+                currentPage: page,
+                totalPages: totalPages,
+                total: totalItems,
+              }}
+              currentPage={page}
+              onPageChange={setPage}
+              currentPageItems={customers.length}
+            />
           </div>
         )}
       </div>

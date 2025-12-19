@@ -1,4 +1,4 @@
-import { ArrowLeft, Phone } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router";
 import Loading from "../../components/common/Loading";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -173,9 +173,7 @@ export default function PosSaleDetailPage() {
                       <a
                         href={`tel:${sale.customer.phone}`}
                         className="text-blue-600 hover:text-blue-700"
-                      >
-                        <Phone className="h-4 w-4" />
-                      </a>
+                      ></a>
                     )}
                   </div>
                 </div>
@@ -273,14 +271,7 @@ export default function PosSaleDetailPage() {
                     {formatCurrencyEnglish(parseFloat(sale.subtotal))}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Discount
-                  </span>
-                  <span className="font-medium text-red-600">
-                    -{formatCurrencyEnglish(parseFloat(sale.discount))}
-                  </span>
-                </div>
+
                 {parseFloat(sale.manual_discount) > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">

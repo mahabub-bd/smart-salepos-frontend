@@ -1,4 +1,4 @@
-import { Eye, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -230,10 +230,10 @@ export default function ProductList() {
                       <div className="relative">
                         <button
                           onClick={() => toggleDropdown(product.id)}
-                          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors dropdown-toggle"
+                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                           title="Actions"
                         >
-                          <MoreHorizontal size={18} className="text-gray-500" />
+                          <MoreVertical size={16} className="text-gray-600" />
                         </button>
 
                         <Dropdown
