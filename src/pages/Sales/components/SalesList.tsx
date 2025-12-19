@@ -5,6 +5,7 @@ import {
   Plus,
   ShoppingCart,
   Wallet,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
@@ -12,6 +13,8 @@ import { Link, useNavigate } from "react-router";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
+import DatePicker from "../../../components/form/date-picker";
+import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import Badge from "../../../components/ui/badge/Badge";
 import Pagination from "../../../components/ui/pagination/Pagination";
 import {
@@ -23,6 +26,8 @@ import {
 } from "../../../components/ui/table";
 
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { useGetBranchesQuery } from "../../../features/branch/branchApi";
+import { useGetCustomersQuery } from "../../../features/customer/customerApi";
 import { useGetSalesQuery } from "../../../features/sale/saleApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Sale } from "../../../types";
@@ -32,6 +37,20 @@ import SalePaymentModal from "./SalePaymentModal";
 
 // Import the Payment Modal
 
+// Filter options
+const saleTypeOptions = [
+  { id: "pos", name: "POS" },
+  { id: "regular", name: "Regular" },
+];
+
+const statusOptions = [
+  { id: "held", name: "Held" },
+  { id: "completed", name: "Completed" },
+  { id: "refunded", name: "Refunded" },
+  { id: "partial_refund", name: "Partial Refund" },
+  { id: "draft", name: "Draft" },
+];
+
 export default function SaleList() {
   const canView = useHasPermission("sale.view");
   const navigate = useNavigate();
@@ -39,13 +58,34 @@ export default function SaleList() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
 
+  const [filters, setFilters] = useState({
+    saleType: undefined as string | undefined,
+    status: undefined as string | undefined,
+    branch_id: undefined as number | undefined,
+    customer_id: undefined as number | undefined,
+    fromDate: undefined as string | undefined,
+    toDate: undefined as string | undefined,
+  });
+
   // Modal State
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
 
+  // Fetch dropdown data
+  const { data: branchesData } = useGetBranchesQuery();
+  const { data: customersData } = useGetCustomersQuery({});
+  const branches = branchesData?.data || [];
+  const customers = customersData?.data || [];
+
   const { data, isLoading, isFetching, isError, refetch } = useGetSalesQuery({
     page,
     limit,
+    saleType: filters.saleType,
+    status: filters.status,
+    branch_id: filters.branch_id,
+    customer_id: filters.customer_id,
+    fromDate: filters.fromDate,
+    toDate: filters.toDate,
   });
 
   const sales = data?.data || [];
@@ -55,6 +95,33 @@ export default function SaleList() {
   // Handle pagination
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]:
+        value === ""
+          ? undefined
+          : key.includes("_id")
+          ? parseInt(value)
+          : value,
+    }));
+    setPage(1); // Reset to first page when applying filters
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      saleType: undefined,
+      status: undefined,
+      branch_id: undefined,
+      customer_id: undefined,
+      fromDate: undefined,
+      toDate: undefined,
+    });
+    setPage(1);
   };
 
   // Only show full loading screen on initial load, not on pagination
@@ -91,14 +158,95 @@ export default function SaleList() {
         permission="sale.create"
       />
 
+      {/* Filters Section */}
+      <div className="mb-6 rounded-xl border bg-white p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-[180px]">
+            <SelectField
+              label="Sale Type"
+              data={saleTypeOptions}
+              value={filters.saleType || ""}
+              onChange={(value) => handleFilterChange("saleType", value)}
+              placeholder="Select sale type"
+              allowEmpty={true}
+              emptyLabel="All Types"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[180px]">
+            <SelectField
+              label="Status"
+              data={statusOptions}
+              value={filters.status || ""}
+              onChange={(value) => handleFilterChange("status", value)}
+              placeholder="Select status"
+              allowEmpty={true}
+              emptyLabel="All Status"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[180px]">
+            <SelectField
+              label="Branch"
+              data={branches}
+              value={filters.branch_id?.toString() || ""}
+              onChange={(value) => handleFilterChange("branch_id", value)}
+              placeholder="Select branch"
+              allowEmpty={true}
+              emptyLabel="All Branches"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[180px]">
+            <SelectField
+              label="Customer"
+              data={customers}
+              value={filters.customer_id?.toString() || ""}
+              onChange={(value) => handleFilterChange("customer_id", value)}
+              placeholder="Select customer"
+              allowEmpty={true}
+              emptyLabel="All Customers"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[180px]">
+            <DatePicker
+              id="sale-from-date"
+              label="From Date"
+              value={filters.fromDate ? new Date(filters.fromDate) : null}
+              onChange={(value) => handleFilterChange("fromDate", value ? (value as Date).toISOString().split('T')[0] : "")}
+              placeholder="Start date"
+            />
+          </div>
+
+          <div className="flex-1 min-w-[180px]">
+            <DatePicker
+              id="sale-to-date"
+              label="To Date"
+              value={filters.toDate ? new Date(filters.toDate) : null}
+              onChange={(value) => handleFilterChange("toDate", value ? (value as Date).toISOString().split('T')[0] : "")}
+              placeholder="End date"
+            />
+          </div>
+
+          <div className="mb-px">
+            <IconButton
+              icon={X}
+              tooltip="Clear Filters"
+              color="gray"
+              onClick={clearFilters}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Sales Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e] relative">
         {/* Loading overlay during pagination */}
         {isFetching && data && (
           <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Loading...
-            </div>
+            <Loading message=" Loading..." />
           </div>
         )}
         <div className="max-w-full overflow-x-auto">

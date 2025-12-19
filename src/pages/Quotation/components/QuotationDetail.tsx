@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   Edit,
+  FileDown,
   FileText,
   Send,
   ShoppingBag,
@@ -22,6 +23,7 @@ import {
   useGetQuotationByIdQuery,
   useUpdateQuotationStatusMutation,
 } from "../../../features/quotation/quotationApi";
+import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
 import { QuotationItem, QuotationStatus } from "../../../types";
 import {
   formatCurrencyEnglish as formatCurrency,
@@ -38,11 +40,27 @@ export default function QuotationDetail({ id }: { id: string }) {
   } = useGetQuotationByIdQuery(Number(id));
   const navigate = useNavigate();
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
+  const [getInvoicePdf, { isLoading: isDownloadingPdf }] = useLazyGetInvoicePdfQuery();
 
   const [updateQuotationStatus, { isLoading: isSending }] =
     useUpdateQuotationStatusMutation();
   const [deleteQuotation, { isLoading: isDeleting }] =
     useDeleteQuotationMutation();
+
+  const handleDownloadPdf = async () => {
+    try {
+      const blob = await getInvoicePdf({ type: "quotation", id: Number(id) }).unwrap();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      // Clean up the object URL after a short delay
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+    } catch (error) {
+      toast.error("Failed to open PDF");
+      console.error("PDF open error:", error);
+    }
+  };
 
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (error)
@@ -154,6 +172,16 @@ export default function QuotationDetail({ id }: { id: string }) {
           <Button variant="outline" size="sm" onClick={handleDuplicate}>
             <FileText size={16} className="mr-1" />
             Duplicate
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
+          >
+            <FileDown size={16} className="mr-1" />
+            {isDownloadingPdf ? "Opening PDF..." : "View PDF"}
           </Button>
 
           {(isDraft || q.status === "rejected") && !isConverted && (

@@ -364,33 +364,38 @@ const A4ReceiptPreview: React.FC<A4ReceiptPreviewProps> = ({
               </p>
             </div>
 
-            {/* Barcode */}
-            {receipt.include_barcode && (
+            {/* QR Code */}
+            {receipt.include_qr_code && (
               <div className="flex justify-center mb-6">
                 <div className="text-center">
-                  <div className="bg-black h-12 w-48 flex items-center justify-center rounded">
-                    <svg className="w-full h-full" viewBox="0 0 100 40">
-                      <rect x="5" y="5" width="2" height="30" fill="white" />
-                      <rect x="10" y="5" width="1" height="30" fill="white" />
-                      <rect x="13" y="5" width="3" height="30" fill="white" />
-                      <rect x="19" y="5" width="1" height="30" fill="white" />
-                      <rect x="22" y="5" width="1" height="30" fill="white" />
-                      <rect x="26" y="5" width="3" height="30" fill="white" />
-                      <rect x="32" y="5" width="2" height="30" fill="white" />
-                      <rect x="37" y="5" width="1" height="30" fill="white" />
-                      <rect x="40" y="5" width="3" height="30" fill="white" />
-                      <rect x="46" y="5" width="2" height="30" fill="white" />
-                      <rect x="51" y="5" width="1" height="30" fill="white" />
-                      <rect x="54" y="5" width="2" height="30" fill="white" />
-                      <rect x="59" y="5" width="1" height="30" fill="white" />
-                      <rect x="62" y="5" width="3" height="30" fill="white" />
-                      <rect x="68" y="5" width="2" height="30" fill="white" />
-                      <rect x="73" y="5" width="1" height="30" fill="white" />
-                      <rect x="76" y="5" width="3" height="30" fill="white" />
-                      <rect x="82" y="5" width="1" height="30" fill="white" />
-                      <rect x="85" y="5" width="2" height="30" fill="white" />
-                      <rect x="90" y="5" width="1" height="30" fill="white" />
-                      <rect x="93" y="5" width="2" height="30" fill="white" />
+                  <div className="mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      {receipt.qr_code_type === "business_info" ? "Business Information" :
+                       receipt.qr_code_type === "invoice_info" ? "Invoice Details" :
+                       receipt.qr_code_type === "custom" ? "Custom QR Code" : "QR Code"}
+                    </span>
+                  </div>
+                  <div className="bg-white p-2 rounded border">
+                    <svg className="w-32 h-32" viewBox="0 0 100 100">
+                      {/* QR Code pattern - simplified representation */}
+                      <rect x="10" y="10" width="80" height="80" fill="black" />
+                      <rect x="15" y="15" width="70" height="70" fill="white" />
+                      <rect x="20" y="20" width="10" height="10" fill="black" />
+                      <rect x="35" y="20" width="10" height="10" fill="black" />
+                      <rect x="50" y="20" width="10" height="10" fill="black" />
+                      <rect x="65" y="20" width="10" height="10" fill="black" />
+                      <rect x="20" y="35" width="10" height="10" fill="black" />
+                      <rect x="35" y="35" width="10" height="10" fill="white" />
+                      <rect x="50" y="35" width="10" height="10" fill="black" />
+                      <rect x="65" y="35" width="10" height="10" fill="black" />
+                      <rect x="20" y="50" width="10" height="10" fill="black" />
+                      <rect x="35" y="50" width="10" height="10" fill="black" />
+                      <rect x="50" y="50" width="10" height="10" fill="white" />
+                      <rect x="65" y="50" width="10" height="10" fill="black" />
+                      <rect x="20" y="65" width="10" height="10" fill="black" />
+                      <rect x="35" y="65" width="10" height="10" fill="black" />
+                      <rect x="50" y="65" width="10" height="10" fill="black" />
+                      <rect x="65" y="65" width="10" height="10" fill="black" />
                     </svg>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
@@ -549,16 +554,31 @@ const ReceiptSettings: React.FC = () => {
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-700">
-                  Include Barcode
+                  Include QR Code
                 </span>
                 <span
                   className={`text-sm ${
-                    receipt.include_barcode ? "text-green-600" : "text-red-600"
+                    receipt.include_qr_code ? "text-green-600" : "text-red-600"
                   }`}
                 >
-                  {receipt.include_barcode ? "Enabled" : "Disabled"}
+                  {receipt.include_qr_code ? "Enabled" : "Disabled"}
                 </span>
               </div>
+
+              {/* QR Code Type - only show if QR is enabled */}
+              {receipt.include_qr_code && (
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm font-medium text-gray-700">
+                    QR Code Type
+                  </span>
+                  <span className="text-sm text-gray-600 capitalize">
+                    {receipt.qr_code_type === "business_info" ? "Business Information" :
+                     receipt.qr_code_type === "invoice_info" ? "Invoice Details" :
+                     receipt.qr_code_type === "custom" ? "Custom" : "Unknown"}
+                  </span>
+                </div>
+              )}
+
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-700">
                   Customer Details

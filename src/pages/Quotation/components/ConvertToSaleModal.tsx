@@ -8,38 +8,44 @@ import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
 import Select from "../../../components/form/Select";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 
+import Loading from "../../../components/common/Loading";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useConvertQuotationToSaleMutation } from "../../../features/quotation/quotationApi";
 
 // 🛡️ Validation Schema
 const convertToSaleSchema = (total: number) =>
-  z.object({
-    sale_date: z.string().min(1, "Sale date is required"),
-    notes: z.string().optional(),
-    payment_method: z.enum(["cash", "bank", "mobile"]).optional(),
-    paid_amount: z
-      .number()
-      .min(0, "Paid amount must be 0 or greater")
-      .refine((value) => value <= total, {
-        message: `Paid amount cannot exceed total ${total}`
-      }),
-    payment_account_code: z.string().optional(),
-  }).refine(
-    (data) => {
-      // If payment_method is selected, payment_account_code is required
-      if (data.payment_method && !data.payment_account_code) {
-        return false;
+  z
+    .object({
+      sale_date: z.string().min(1, "Sale date is required"),
+      notes: z.string().optional(),
+      payment_method: z.enum(["cash", "bank", "mobile"]).optional(),
+      paid_amount: z
+        .number()
+        .min(0, "Paid amount must be 0 or greater")
+        .refine((value) => value <= total, {
+          message: `Paid amount cannot exceed total ${total}`,
+        }),
+      payment_account_code: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        // If payment_method is selected, payment_account_code is required
+        if (data.payment_method && !data.payment_account_code) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: "Payment account is required when payment method is selected",
+        path: ["payment_account_code"],
       }
-      return true;
-    },
-    {
-      message: "Payment account is required when payment method is selected",
-      path: ["payment_account_code"],
-    }
-  );
+    );
 
-export type ConvertToSaleFormValues = z.infer<ReturnType<typeof convertToSaleSchema>>;
+export type ConvertToSaleFormValues = z.infer<
+  ReturnType<typeof convertToSaleSchema>
+>;
 
 interface ConvertToSaleModalProps {
   isOpen: boolean;
@@ -54,11 +60,9 @@ export default function ConvertToSaleModal({
   quotation,
   onSuccess,
 }: ConvertToSaleModalProps) {
-  // 🔥 ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
   const [convertQuotation, { isLoading }] = useConvertQuotationToSaleMutation();
   const [includePayment, setIncludePayment] = useState(false);
 
-  // 🔍 Get accounts
   const { data: accountsData } = useGetAccountsQuery({
     type: "asset",
     isCash: true,
@@ -66,10 +70,8 @@ export default function ConvertToSaleModal({
   });
   const accounts = accountsData?.data || [];
 
-  // Calculate total amount safely - will be 0 if quotation is not available
   const totalAmount = quotation ? Number(quotation.total || 0) : 0;
 
-  // 🧾 Setup form - always call this hook, even if we might return early
   const {
     register,
     handleSubmit,
@@ -80,8 +82,10 @@ export default function ConvertToSaleModal({
   } = useForm<ConvertToSaleFormValues>({
     resolver: zodResolver(convertToSaleSchema(totalAmount)),
     defaultValues: {
-      sale_date: new Date().toISOString().split('T')[0], // Today's date
-      notes: quotation ? `Converted from quotation ${quotation.quotation_no}` : "",
+      sale_date: new Date().toISOString().split("T")[0], // Today's date
+      notes: quotation
+        ? `Converted from quotation ${quotation.quotation_no}`
+        : "",
       paid_amount: 0,
       payment_method: undefined,
       payment_account_code: "",
@@ -91,7 +95,6 @@ export default function ConvertToSaleModal({
   const paidAmount = watch("paid_amount");
   const selectedMethod = watch("payment_method");
 
-  // 🏦 Account filter - memoize to prevent unnecessary recalculations
   const filteredAccounts = accounts.filter((acc: any) =>
     selectedMethod === "cash"
       ? acc.isCash
@@ -100,7 +103,6 @@ export default function ConvertToSaleModal({
       : false
   );
 
-  // 📝 Auto adjust payment method based on paid amount
   useEffect(() => {
     if (paidAmount > 0) {
       setIncludePayment(true);
@@ -111,14 +113,14 @@ export default function ConvertToSaleModal({
     }
   }, [paidAmount, setValue]);
 
-  // 🧠 Handle conditional rendering - AFTER all hooks are called
+
   if (!isOpen) return null;
 
   if (!quotation) {
     return (
-      <div className="modal-overlay">
-        <div className="modal-box max-w-md p-6">Loading quotation details...</div>
-      </div>
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl">
+        <Loading message="Loading quotation details..." />
+      </Modal>
     );
   }
 
@@ -129,18 +131,21 @@ export default function ConvertToSaleModal({
       const payloadBody: any = {
         sale_date: values.sale_date,
         notes: values.notes,
-        branch_id: 1, // Default branch ID - you may want to get this from context
-        warehouse_id: 1, // Default warehouse ID - you may want to get this from context
       };
 
       // Add payments array if payment is included
-      if (includePayment && values.paid_amount > 0 && values.payment_method && values.payment_account_code) {
+      if (
+        includePayment &&
+        values.paid_amount > 0 &&
+        values.payment_method &&
+        values.payment_account_code
+      ) {
         payloadBody.payments = [
           {
             method: values.payment_method,
             amount: values.paid_amount,
             account_code: values.payment_account_code,
-          }
+          },
         ];
       }
 
@@ -157,7 +162,9 @@ export default function ConvertToSaleModal({
       if (includePayment && values.paid_amount > 0) {
         const isFullPayment = values.paid_amount === totalAmount;
         toast.info(
-          `Payment of ${values.paid_amount} recorded (${isFullPayment ? 'Full' : 'Partial'} payment)`
+          `Payment of ${values.paid_amount} recorded (${
+            isFullPayment ? "Full" : "Partial"
+          } payment)`
         );
       }
 
@@ -170,25 +177,31 @@ export default function ConvertToSaleModal({
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-box max-w-lg p-6 bg-white rounded-xl shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">
-          Convert to Sale — Quotation #{quotation?.quotation_no}
-        </h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Convert to Sale — Quotation #${quotation?.quotation_no}`}
+      className="max-w-lg"
+      showCloseButton={true}
+    >
+      <div className="space-y-4">
         <div className="mb-4 p-3 bg-blue-50 rounded-lg">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-blue-900">Quotation Total:</span>
+            <span className="text-sm font-medium text-blue-900">
+              Quotation Total:
+            </span>
             <span className="text-sm font-bold text-blue-900">
-              {new Intl.NumberFormat('en-BD', {
-                style: 'currency',
-                currency: 'BDT',
+              {new Intl.NumberFormat("en-BD", {
+                style: "currency",
+                currency: "BDT",
               }).format(totalAmount)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-blue-900">Customer:</span>
-            <span className="text-sm text-blue-900">{quotation?.customer?.name}</span>
+            <span className="text-sm text-blue-900">
+              {quotation?.customer?.name}
+            </span>
           </div>
         </div>
 
@@ -283,7 +296,9 @@ export default function ConvertToSaleModal({
                           options={filteredAccounts.map((acc: any) => ({
                             value: acc.code,
                             label: `${acc.name} - ${acc.code}${
-                              acc.account_number ? ` - ${acc.account_number}` : ""
+                              acc.account_number
+                                ? ` - ${acc.account_number}`
+                                : ""
                             }`,
                           }))}
                           placeholder="Select Account"
@@ -325,6 +340,6 @@ export default function ConvertToSaleModal({
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 }

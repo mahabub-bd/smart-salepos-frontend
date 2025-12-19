@@ -16,27 +16,75 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import Info from "../../../components/common/Info";
 import Button from "../../../components/ui/button/Button";
+import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
 import { useGetSaleByIdQuery } from "../../../features/sale/saleApi";
-import { useGetReceiptPreviewQuery } from "../../../features/settings/settingsApi";
 import { SaleItem, SalePayment } from "../../../types";
-import SingleSalePDF from "./pdf/SingleSalePDF";
 import SalePaymentModal from "./SalePaymentModal";
 
 export default function SaleDetailPage() {
   const { id } = useParams<{ id: string }>();
 
   const { data, isLoading, isError, refetch } = useGetSaleByIdQuery(String(id));
-  const { data: receiptData } = useGetReceiptPreviewQuery();
+  const [getInvoicePdf, { isLoading: isDownloadingPdf }] =
+    useLazyGetInvoicePdfQuery();
 
   const sale = data?.data;
-  const receiptSettings = receiptData?.data;
 
   // Modal state
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    try {
+      console.log("Downloading PDF for sale ID:", id, "Type: sale");
+      // Force a new request with unique cache key to avoid caching issues
+      const blob = await getInvoicePdf({
+        type: "sale",
+        id: Number(id),
+      }).unwrap();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      // Clean up the object URL after a short delay
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+    } catch (error) {
+      toast.error("Failed to open PDF");
+      console.error("PDF open error:", error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
+
+      // Try alternative approach with timestamp
+      try {
+        console.log("Retrying with timestamp...");
+        const timestamp = Date.now();
+        const response = await fetch(`http://localhost:8000/v1/invoice/sale/${id}?t=${timestamp}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/pdf',
+            'Origin': 'http://localhost:5000'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+        }, 1000);
+      } catch (fallbackError) {
+        console.error("Fallback request failed:", fallbackError);
+        toast.error("Failed to open PDF. Please try again.");
+      }
+    }
+  };
 
   if (isLoading) return <Loading message="Loading sale details..." />;
   if (isError || !sale)
@@ -60,19 +108,15 @@ export default function SaleDetailPage() {
               Back to Sales
             </Button>
           </Link>
-          <PDFDownloadLink
-            document={
-              <SingleSalePDF sale={sale} settings={receiptSettings} />
-            }
-            fileName={`sale-${sale.invoice_no}.pdf`}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
           >
-            {({ loading }) => (
-              <Button variant="outline" size="sm">
-                <FileDown size={16} />
-                {loading ? "Generating PDF..." : "Download PDF"}
-              </Button>
-            )}
-          </PDFDownloadLink>
+            <FileDown size={16} />
+            {isDownloadingPdf ? "Opening PDF..." : "View PDF"}
+          </Button>
         </div>
         {/* Sale Info */}
         <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">

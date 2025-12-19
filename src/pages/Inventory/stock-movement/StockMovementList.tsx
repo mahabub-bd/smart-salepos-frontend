@@ -1,7 +1,13 @@
-import { ArrowDownLeft, ArrowRightLeft, ArrowUpRight, Edit3 } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowRightLeft,
+  ArrowUpRight,
+  Edit3,
+} from "lucide-react";
 import { useState } from "react";
 
 import Loading from "../../../components/common/Loading";
+import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import {
   Table,
   TableBody,
@@ -10,6 +16,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetStockMovementsQuery } from "../../../features/inventory/inventoryApi";
+import { useGetProductsQuery } from "../../../features/product/productApi";
 import { StockMovement, StockMovementType } from "../../../types";
 import { formatDateTime } from "../../../utlis";
 
@@ -19,7 +26,8 @@ const MovementTypeBadge = ({ type }: { type: StockMovementType }) => {
     IN: {
       icon: ArrowDownLeft,
       label: "Stock In",
-      className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+      className:
+        "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
     },
     OUT: {
       icon: ArrowUpRight,
@@ -29,12 +37,14 @@ const MovementTypeBadge = ({ type }: { type: StockMovementType }) => {
     ADJUST: {
       icon: Edit3,
       label: "Adjustment",
-      className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+      className:
+        "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
     },
     TRANSFER: {
       icon: ArrowRightLeft,
       label: "Transfer",
-      className: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+      className:
+        "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
     },
   };
 
@@ -50,12 +60,23 @@ const MovementTypeBadge = ({ type }: { type: StockMovementType }) => {
   );
 };
 
+// Movement type options for filter
+const movementTypeOptions = [
+  { id: "IN", name: "Stock In" },
+  { id: "OUT", name: "Stock Out" },
+  { id: "ADJUST", name: "Adjustment" },
+  { id: "TRANSFER", name: "Transfer" },
+];
+
 export default function StockMovementList() {
-  const [filters] = useState({
-    product_id: undefined,
-    warehouse_id: undefined,
-    type: undefined,
+  const [filters, setFilters] = useState({
+    product_id: undefined as number | undefined,
+    warehouse_id: undefined as number | undefined,
+    type: undefined as StockMovementType | undefined,
   });
+
+  const { data: productsData } = useGetProductsQuery();
+  const products = productsData?.data || [];
 
   const { data, isLoading, isError } = useGetStockMovementsQuery(filters);
   const movements: StockMovement[] = data?.data || [];
@@ -66,6 +87,57 @@ export default function StockMovementList() {
 
   return (
     <div>
+      {/* Filters Section */}
+      <div className="mb-6 rounded-xl border bg-white p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SelectField
+            label="Product"
+            data={products}
+            value={filters.product_id?.toString() || ""}
+            onChange={(value) =>
+              setFilters((prev) => ({
+                ...prev,
+                product_id: value === "" ? undefined : parseInt(value),
+              }))
+            }
+            placeholder="Select a product"
+            allowEmpty={true}
+            emptyLabel="All Products"
+          />
+
+          <SelectField
+            label="Movement Type"
+            data={movementTypeOptions}
+            value={filters.type || ""}
+            onChange={(value) =>
+              setFilters((prev) => ({
+                ...prev,
+                type: value === "" ? undefined : value as StockMovementType,
+              }))
+            }
+            placeholder="Select movement type"
+            allowEmpty={true}
+            emptyLabel="All Types"
+          />
+
+          <div className="flex items-end">
+            <button
+              onClick={() =>
+                setFilters({
+                  product_id: undefined,
+                  warehouse_id: undefined,
+                  type: undefined,
+                })
+              }
+              className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-xl border bg-white">
         <div className="overflow-x-auto">
           <Table className="w-full text-sm">
@@ -94,9 +166,8 @@ export default function StockMovementList() {
                     {/* Product */}
                     <TableCell className="align-middle">
                       <div className="flex flex-col">
-                        <span className="font-medium">{movement.product.name}</span>
-                        <span className="text-xs text-gray-500">
-                          SKU: {movement.product.sku}
+                        <span className="font-medium">
+                          {movement.product.name}
                         </span>
                       </div>
                     </TableCell>
@@ -129,11 +200,6 @@ export default function StockMovementList() {
                           <span className="font-medium">
                             {movement.from_warehouse.name}
                           </span>
-                          {movement.from_warehouse.location && (
-                            <span className="text-xs text-gray-500">
-                              {movement.from_warehouse.location}
-                            </span>
-                          )}
                         </div>
                       ) : (
                         <span className="text-gray-400">—</span>
@@ -147,11 +213,6 @@ export default function StockMovementList() {
                           <span className="font-medium">
                             {movement.to_warehouse.name}
                           </span>
-                          {movement.to_warehouse.location && (
-                            <span className="text-xs text-gray-500">
-                              {movement.to_warehouse.location}
-                            </span>
-                          )}
                         </div>
                       ) : movement.type === "TRANSFER" ? (
                         <span className="text-gray-400">—</span>
@@ -160,11 +221,6 @@ export default function StockMovementList() {
                           <span className="font-medium">
                             {movement.warehouse.name}
                           </span>
-                          {movement.warehouse.location && (
-                            <span className="text-xs text-gray-500">
-                              {movement.warehouse.location}
-                            </span>
-                          )}
                         </div>
                       )}
                     </TableCell>
@@ -184,9 +240,6 @@ export default function StockMovementList() {
                         <div className="flex flex-col">
                           <span className="font-medium">
                             {movement.created_by.full_name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {movement.created_by.username}
                           </span>
                         </div>
                       ) : (

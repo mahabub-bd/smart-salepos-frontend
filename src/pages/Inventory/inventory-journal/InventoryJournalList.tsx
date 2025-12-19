@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import Loading from "../../../components/common/Loading";
+import DatePicker from "../../../components/form/date-picker";
+import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import {
   Table,
   TableBody,
@@ -9,6 +11,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetInventoryJournalQuery } from "../../../features/inventory/inventoryApi";
+import { useGetProductsQuery } from "../../../features/product/productApi";
 import { InventoryJournalEntry } from "../../../types";
 import { formatDateTime } from "../../../utlis";
 
@@ -49,12 +52,15 @@ const MovementTypeBadge = ({ type }: { type: string }) => {
 };
 
 export default function InventoryJournalList() {
-  const [filters] = useState({
-    product_id: undefined,
-    warehouse_id: undefined,
-    start_date: undefined,
-    end_date: undefined,
+  const [filters, setFilters] = useState({
+    product_id: undefined as number | undefined,
+    warehouse_id: undefined as number | undefined,
+    start_date: undefined as string | undefined,
+    end_date: undefined as string | undefined,
   });
+
+  const { data: productsData } = useGetProductsQuery();
+  const products = productsData?.data || [];
 
   const { data, isLoading, isError } = useGetInventoryJournalQuery(filters);
   const journal: InventoryJournalEntry[] = data?.data || [];
@@ -65,6 +71,69 @@ export default function InventoryJournalList() {
 
   return (
     <div>
+      {/* Filters Section */}
+      <div className="mb-6 rounded-xl border bg-white p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Filters
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <SelectField
+            label="Product"
+            data={products}
+            value={filters.product_id?.toString() || ""}
+            onChange={(value) =>
+              setFilters(prev => ({
+                ...prev,
+                product_id: value === "" ? undefined : parseInt(value)
+              }))
+            }
+            placeholder="Select a product"
+            allowEmpty={true}
+            emptyLabel="All Products"
+          />
+
+          <DatePicker
+            id="inventory-from-date"
+            label="From Date"
+            value={filters.start_date ? new Date(filters.start_date) : null}
+            onChange={(value) =>
+              setFilters(prev => ({
+                ...prev,
+                start_date: value ? (value as Date).toISOString().split('T')[0] : undefined
+              }))
+            }
+            placeholder="Start date"
+          />
+
+          <DatePicker
+            id="inventory-to-date"
+            label="To Date"
+            value={filters.end_date ? new Date(filters.end_date) : null}
+            onChange={(value) =>
+              setFilters(prev => ({
+                ...prev,
+                end_date: value ? (value as Date).toISOString().split('T')[0] : undefined
+              }))
+            }
+            placeholder="End date"
+          />
+
+          <div className="flex items-end">
+            <button
+              onClick={() => setFilters({
+                product_id: undefined,
+                warehouse_id: undefined,
+                start_date: undefined,
+                end_date: undefined,
+              })}
+              className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-xl border bg-white">
         <div className="overflow-x-auto">
           <Table className="w-full text-sm">

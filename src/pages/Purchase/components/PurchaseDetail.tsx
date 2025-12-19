@@ -1,5 +1,6 @@
-import { CreditCard, PackageCheck, RefreshCcw, RotateCcw } from "lucide-react";
+import { CreditCard, FileDown, PackageCheck, RefreshCcw, RotateCcw } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import {
@@ -9,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/common/Table";
+import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
 import { useGetPurchaseByIdQuery } from "../../../features/purchases/purchasesApi";
 import {
   PaymentHistory,
@@ -28,11 +30,27 @@ interface Props {
 export default function PurchaseDetail({ purchaseId }: Props) {
   const { data, isLoading, isError } = useGetPurchaseByIdQuery(purchaseId);
   const purchase = data?.data;
+  const [getInvoicePdf, { isLoading: isDownloadingPdf }] = useLazyGetInvoicePdfQuery();
 
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    try {
+      const blob = await getInvoicePdf({ type: "purchase", id: Number(purchaseId) }).unwrap();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      // Clean up the object URL after a short delay
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+    } catch (error) {
+      toast.error("Failed to open PDF");
+      console.error("PDF open error:", error);
+    }
+  };
 
   if (isLoading) return <Loading message="Loading Purchase..." />;
   if (isError || !purchase) return <ErrorMessage />;
@@ -49,6 +67,8 @@ export default function PurchaseDetail({ purchaseId }: Props) {
         openPayment={() => setIsPaymentModalOpen(true)}
         openStatus={() => setIsStatusModalOpen(true)}
         openReturn={() => setIsReturnModalOpen(true)}
+        downloadPdf={handleDownloadPdf}
+        isDownloadingPdf={isDownloadingPdf}
       />
 
       <DetailCard title="Purchase Information">
@@ -168,6 +188,8 @@ const HeaderSection = ({
   openPayment,
   openStatus,
   openReturn,
+  downloadPdf,
+  isDownloadingPdf,
 }: any) => {
   const isReceived =
     purchase.status === PurchaseOrderStatus.FULLY_RECEIVED ||
@@ -218,6 +240,16 @@ const HeaderSection = ({
             Return
           </IconButton>
         )}
+
+        <IconButton
+          icon={FileDown}
+          color="blue"
+          tooltip="Download PDF"
+          onClick={downloadPdf}
+          disabled={isDownloadingPdf}
+        >
+          {isDownloadingPdf ? "Opening PDF..." : "View PDF"}
+        </IconButton>
 
         <IconButton
           icon={RefreshCcw}

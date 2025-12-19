@@ -1136,6 +1136,9 @@ export interface SettingsData extends BaseEntity {
   footer_text: string | null;
   receipt_header: string | null;
   include_barcode: boolean;
+  include_qr_code: boolean;
+  qr_code_type: "business_info" | "invoice_info" | "custom";
+  qr_code_custom_content: string | null;
   include_customer_details: boolean;
   enable_auto_backup: boolean;
   backup_retention_days: number;
@@ -1194,6 +1197,9 @@ export interface ReceiptPreviewData {
   footer_text: string | null;
   receipt_header: string | null;
   include_barcode: boolean;
+  include_qr_code: boolean;
+  qr_code_type: "business_info" | "invoice_info" | "custom";
+  qr_code_custom_content: string | null;
   include_customer_details: boolean;
   logo_url: string;
   default_invoice_layout: string;

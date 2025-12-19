@@ -76,7 +76,10 @@ export default function SingleSalePDF({
 }) {
   return (
     <Document>
-      <Page size={(settings?.invoice_paper_size as any) || "A4"} style={styles.page}>
+      <Page
+        size={(settings?.invoice_paper_size as any) || "A4"}
+        style={styles.page}
+      >
         {/* Logo */}
         {settings?.logo_url && (
           <Image src={settings.logo_url} style={styles.logo} cache={false} />
@@ -219,6 +222,100 @@ export default function SingleSalePDF({
                 <Text>{p.amount}</Text>
               </View>
             ))}
+          </View>
+        )}
+
+        {/* QR Code */}
+        {settings?.include_qr_code && (
+          <View style={styles.section}>
+            <View style={{ alignItems: "center", marginTop: 10 }}>
+              <Text
+                style={[styles.bold, { marginBottom: 5, textAlign: "center" }]}
+              >
+                {settings.qr_code_type === "business_info"
+                  ? "Business Information"
+                  : settings.qr_code_type === "invoice_info"
+                  ? "Invoice Details"
+                  : settings.qr_code_type === "custom"
+                  ? "Custom QR Code"
+                  : "QR Code"}
+              </Text>
+              <View
+                style={{
+                  backgroundColor: "white",
+                  padding: 10,
+                  border: "1 solid #e5e7eb",
+                  borderRadius: 4,
+                }}
+              >
+                {/* Since @react-pdf/renderer doesn't support SVG directly,
+                    we'll create a simplified QR code representation */}
+                <View
+                  style={{
+                    width: 80,
+                    height: 80,
+                    backgroundColor: "black",
+                    position: "relative",
+                  }}
+                >
+                  {/* QR Code pattern using View elements */}
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 10,
+                      left: 10,
+                      width: 60,
+                      height: 60,
+                      backgroundColor: "white",
+                    }}
+                  />
+                  {/* Position markers */}
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 15,
+                      left: 15,
+                      width: 10,
+                      height: 10,
+                      backgroundColor: "black",
+                    }}
+                  />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 20,
+                      left: 20,
+                      width: 0,
+                      height: 0,
+                      backgroundColor: "white",
+                    }}
+                  />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 15,
+                      left: 55,
+                      width: 10,
+                      height: 10,
+                      backgroundColor: "black",
+                    }}
+                  />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 55,
+                      left: 15,
+                      width: 10,
+                      height: 10,
+                      backgroundColor: "black",
+                    }}
+                  />
+                </View>
+              </View>
+              <Text style={{ fontSize: 8, textAlign: "center", marginTop: 5 }}>
+                Invoice: {sale.invoice_no}
+              </Text>
+            </View>
           </View>
         )}
 

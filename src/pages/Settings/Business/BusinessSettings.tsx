@@ -36,6 +36,9 @@ const businessSettingsSchema = z.object({
   footer_text: z.string().optional(),
   receipt_header: z.string().optional(),
   include_barcode: z.boolean().optional(),
+  include_qr_code: z.boolean().optional(),
+  qr_code_type: z.enum(["business_info", "invoice_info", "custom"]).optional(),
+  qr_code_custom_content: z.string().optional(),
   include_customer_details: z.boolean().optional(),
   enable_auto_backup: z.boolean().optional(),
   backup_retention_days: z.number().min(1).max(365).optional(),
@@ -97,6 +100,9 @@ const BusinessSettings = () => {
         footer_text: data.footer_text || "",
         receipt_header: data.receipt_header || "",
         include_barcode: data.include_barcode || false,
+        include_qr_code: data.include_qr_code || false,
+        qr_code_type: (data.qr_code_type as "business_info" | "invoice_info" | "custom") || "business_info",
+        qr_code_custom_content: data.qr_code_custom_content || "",
         include_customer_details: data.include_customer_details || false,
         enable_auto_backup: data.enable_auto_backup || false,
         backup_retention_days: data.backup_retention_days || 30,
@@ -515,6 +521,45 @@ const BusinessSettings = () => {
                       Include Barcode on Receipt
                     </span>
                   </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      {...register("include_qr_code")}
+                      type="checkbox"
+                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Include QR Code on Receipt
+                    </span>
+                  </label>
+
+                  {/* QR Code Type Selection */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      QR Code Type
+                    </label>
+                    <select
+                      {...register("qr_code_type")}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                      <option value="business_info">Business Information</option>
+                      <option value="invoice_info">Invoice Information</option>
+                      <option value="custom">Custom Content</option>
+                    </select>
+                  </div>
+
+                  {/* Custom QR Code Content - only show when custom type is selected */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Custom QR Code Content
+                    </label>
+                    <textarea
+                      {...register("qr_code_custom_content")}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Enter custom content for QR code (URL, text, etc.)"
+                    />
+                  </div>
 
                   <label className="flex items-center space-x-3">
                     <input

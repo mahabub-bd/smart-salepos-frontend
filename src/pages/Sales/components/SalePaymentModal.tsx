@@ -7,7 +7,9 @@ import { z } from "zod";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 
+import Loading from "../../../components/common/Loading";
 import { useGetAccountsQuery } from "../../../features/accounts/accountsApi";
 import { useCreatePaymentMutation } from "../../../features/payment/paymentApi";
 
@@ -34,9 +36,9 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
   // 🧠 Handle sale data loading
   if (!sale) {
     return (
-      <div className="modal-overlay">
-        <div className="modal-box max-w-md p-6">Loading sale details...</div>
-      </div>
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl">
+        <Loading message="Loading sale details..." />
+      </Modal>
     );
   }
 
@@ -51,17 +53,17 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
   // ⛔ If no outstanding payment
   if (dueAmount <= 0) {
     return (
-      <div className="modal-overlay">
-        <div className="modal-box max-w-md p-6 bg-white rounded-xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-2">No Pending Due</h2>
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-md">
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">No Pending Due</h2>
           <p className="text-gray-600">There is no outstanding amount to pay.</p>
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end">
             <Button size="sm" variant="outline" onClick={onClose}>
               Close
             </Button>
           </div>
         </div>
-      </div>
+      </Modal>
     );
   }
 
@@ -138,13 +140,15 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-box max-w-md p-6 bg-white rounded-xl shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">
-          Pay Due — Sale #{sale?.invoice_no}
-        </h2>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Pay Due — Sale #${sale?.invoice_no}`}
+      className="max-w-md"
+      showCloseButton={true}
+    >
+      <div className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* 💰 Amount */}
           <Input
             type="number"
@@ -206,7 +210,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
           />
 
           {/* 🔘 Buttons */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-4 border-t">
             <Button size="sm" variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -216,6 +220,6 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 }
