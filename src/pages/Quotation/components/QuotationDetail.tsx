@@ -18,13 +18,13 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
 import {
   useDeleteQuotationMutation,
   useGetQuotationByIdQuery,
   useUpdateQuotationStatusMutation,
 } from "../../../features/quotation/quotationApi";
-import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
-import { QuotationItem, QuotationStatus } from "../../../types";
+import { QuotationItem, QuotationStatus } from "../../../types/quotation";
 import {
   formatCurrencyEnglish as formatCurrency,
   formatDateTime,

@@ -1,90 +1,8 @@
 import { ApiResponse } from "../../types";
+import { Backup, BackupSchedule, CreateBackupDto, ListBackupsParams, ListSchedulesParams, RestoreBackupDto, ScheduleBackupDto } from "../../types/backup";
 import { apiSlice } from "../apiSlice";
 
-// Types
-export interface Backup {
-  id: string;
-  filename: string;
-  type: BackupType;
-  status: BackupStatus;
-  file_size: number;
-  file_path: string;
-  s3_url?: string;
-  created_by: string;
-  created_at: string;
-  completed_at?: string;
-  error_message?: string;
-  tables?: string[];
-  branch_id?: string;
-  description?: string;
-}
 
-export interface BackupSchedule {
-  id: string;
-  name: string;
-  type: BackupType;
-  frequency: "daily" | "weekly" | "monthly";
-  time: string; // HH:mm format
-  day_of_week?: number; // 0-6 (Sunday to Saturday)
-  day_of_month?: number; // 1-31
-  is_active: boolean;
-  tables?: string[];
-  retention_days: number;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  last_run?: string;
-  next_run?: string;
-  branch_id?: string;
-  description?: string;
-}
-
-export enum BackupType {
-  FULL = "full",
-  SELECTIVE = "selective",
-}
-
-export enum BackupStatus {
-  PENDING = "pending",
-  IN_PROGRESS = "in_progress",
-  COMPLETED = "completed",
-  FAILED = "failed",
-}
-
-export interface CreateBackupDto {
-  type?: BackupType;
-  tables?: string[];
-  description?: string;
-}
-
-export interface ScheduleBackupDto {
-  name: string;
-  type: BackupType;
-  frequency: "daily" | "weekly" | "monthly";
-  time: string;
-  day_of_week?: number;
-  day_of_month?: number;
-  tables?: string[];
-  retention_days?: number;
-  description?: string;
-}
-
-export interface RestoreBackupDto {
-  backup_id: string;
-  confirm?: boolean;
-}
-
-export interface ListBackupsParams {
-  page?: number;
-  limit?: number;
-  status?: BackupStatus;
-  type?: BackupType;
-}
-
-export interface ListSchedulesParams {
-  page?: number;
-  limit?: number;
-}
 
 export const backupApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -116,8 +34,9 @@ export const backupApi = apiSlice.injectEndpoints({
         if (params?.type) queryParams.append("type", params.type);
 
         return {
-          url: `/backup/list${queryParams.toString() ? `?${queryParams.toString()}` : ""
-            }`,
+          url: `/backup/list${
+            queryParams.toString() ? `?${queryParams.toString()}` : ""
+          }`,
           method: "GET",
         };
       },
@@ -193,8 +112,9 @@ export const backupApi = apiSlice.injectEndpoints({
         if (params?.limit) queryParams.append("limit", params.limit.toString());
 
         return {
-          url: `/backup/schedule/list${queryParams.toString() ? `?${queryParams.toString()}` : ""
-            }`,
+          url: `/backup/schedule/list${
+            queryParams.toString() ? `?${queryParams.toString()}` : ""
+          }`,
           method: "GET",
         };
       },

@@ -2,12 +2,15 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import { FormField, SelectField } from "../../../components/form/form-elements/SelectFiled";
+import {
+  FormField,
+  SelectField,
+} from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
-import { BackupSchedule } from "../../../features/backup/backupApi";
+import { BackupSchedule } from "../../../types/backup";
 
 interface ScheduleFormModalProps {
   isOpen: boolean;

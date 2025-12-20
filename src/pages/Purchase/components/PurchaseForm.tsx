@@ -48,7 +48,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
   const { data: supplierData, isLoading: isLoadingSuppliers } =
     useGetSuppliersQuery();
   const { data: productData, isLoading: isLoadingProducts } =
-    useGetProductsQuery();
+    useGetProductsQuery({});
   const { data: warehouseData, isLoading: isLoadingWarehouses } =
     useGetWarehousesQuery();
 

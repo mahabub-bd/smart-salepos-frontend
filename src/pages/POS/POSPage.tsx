@@ -21,7 +21,7 @@ import {
   useGetAvailableCashRegistersQuery,
   useGetCashRegistersQuery,
   useOpenCashRegisterMutation,
-} from "../../features/cash-register";
+} from "../../features/cash-register/cashRegisterApi";
 import { useGetCustomersQuery } from "../../features/customer/customerApi";
 
 import { FormField } from "../../components/form/form-elements/SelectFiled";
@@ -34,13 +34,7 @@ import { useGetWarehouseWiseReportQuery } from "../../features/inventory/invento
 import { useCreatePosSaleMutation } from "../../features/pos/posApi";
 import { useGetReceiptPreviewQuery } from "../../features/settings/settingsApi";
 import { useGetWarehousesQuery } from "../../features/warehouse/warehouseApi";
-import {
-  Account,
-  CashRegister,
-  Customer,
-  ReceiptPreviewData,
-  Warehouse,
-} from "../../types";
+import { Account, Customer, ReceiptPreviewData, Warehouse } from "../../types";
 import {
   CartItem,
   CloseCounterFormData,
@@ -54,6 +48,7 @@ import {
   WarehouseReport,
 } from "../../types/posPage";
 import CustomerFormModal from "../Customer/components/CustomerFormModal";
+import { CashRegister } from "../../types/cashregister";
 
 export default function POSPage() {
   const [searchProduct, setSearchProduct] = useState("");

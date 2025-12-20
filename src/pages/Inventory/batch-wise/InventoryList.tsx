@@ -1,6 +1,3 @@
-import { Eye } from "lucide-react";
-
-import { useNavigate } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
 import {
   Table,
@@ -11,7 +8,6 @@ import {
 import { useGetInventoryQuery } from "../../../features/inventory/inventoryApi";
 
 export default function InventoryListBatchWise() {
-  const navigate = useNavigate();
   const { data, isLoading, isError } = useGetInventoryQuery();
 
   const inventory = data?.data || [];
@@ -50,9 +46,6 @@ export default function InventoryListBatchWise() {
                 <TableCell className="table-header">Potential Profit</TableCell>
                 <TableCell isHeader className="table-header">
                   Supplier
-                </TableCell>
-                <TableCell isHeader className="table-header text-right">
-                  Actions
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -104,15 +97,6 @@ export default function InventoryListBatchWise() {
 
                     <TableCell className="table-body">
                       {item.supplier}
-                    </TableCell>
-
-                    <TableCell className="table-body text-right">
-                      <button
-                        className="p-2 rounded hover:bg-gray-100"
-                        onClick={() => navigate(`/inventory/${item.id}`)}
-                      >
-                        <Eye size={18} />
-                      </button>
                     </TableCell>
                   </TableRow>
                 ))

@@ -1,4 +1,9 @@
-import { ApiResponse } from "../../types";
+import {
+  ApiResponse,
+  GetPaymentsParams,
+  GetPaymentsResponse,
+  Payment,
+} from "../../types";
 import { apiSlice } from "../apiSlice";
 
 export interface CreatePaymentPayload {
@@ -9,7 +14,7 @@ export interface CreatePaymentPayload {
   sale_id?: number;
   amount: number;
   payment_account_code: string;
-  method: "cash" | "bank" | "bkash";
+  method: "cash" | "bank" | "mobile";
   note?: string;
 }
 
@@ -21,14 +26,23 @@ export const paymentsApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Purchases", "Sales", "Suppliers"],
+      invalidatesTags: ["Purchases", "Sales", "Suppliers", "Payments"],
     }),
-    getPayments: builder.query({
-      query: () => "/payments",
+    getPayments: builder.query<GetPaymentsResponse, GetPaymentsParams>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params.page) searchParams.append("page", params.page.toString());
+        if (params.limit) searchParams.append("limit", params.limit.toString());
+        if (params.type) searchParams.append("type", params.type);
+        if (params.method) searchParams.append("method", params.method);
+
+        const queryString = searchParams.toString();
+        return `/payments${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: ["Payments", "Purchases", "Sales", "Suppliers"],
     }),
 
-    getPaymentById: builder.query({
+    getPaymentById: builder.query<ApiResponse<Payment>, number>({
       query: (id) => `/payments/${id}`,
       providesTags: ["Payments", "Purchases", "Sales", "Suppliers"],
     }),

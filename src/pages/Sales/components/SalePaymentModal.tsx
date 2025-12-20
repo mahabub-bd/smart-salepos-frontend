@@ -19,8 +19,10 @@ const paymentSchema = (due: number) =>
     amount: z
       .number()
       .positive("Amount must be greater than 0")
-      .refine((value) => value <= due, { message: `Amount cannot exceed ${due}` }),
-    method: z.enum(["cash", "bank", "bkash"]),
+      .refine((value) => value <= due, {
+        message: `Amount cannot exceed ${due}`,
+      }),
+    method: z.enum(["cash", "bank"]),
     payment_account_code: z.string().min(1, "Payment account is required"),
     note: z.string().optional(),
   });
@@ -56,7 +58,9 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-md">
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">No Pending Due</h2>
-          <p className="text-gray-600">There is no outstanding amount to pay.</p>
+          <p className="text-gray-600">
+            There is no outstanding amount to pay.
+          </p>
           <div className="flex justify-end">
             <Button size="sm" variant="outline" onClick={onClose}>
               Close
@@ -167,7 +171,7 @@ export default function SalePaymentModal({ isOpen, onClose, sale }: any) {
                 options={[
                   { value: "cash", label: "Cash" },
                   { value: "bank", label: "Bank" },
-                  { value: "bkash", label: "Bkash" },
+                  { value: "mobile", label: "Mobile" },
                 ]}
                 placeholder="Select Method"
                 defaultValue={field.value}

@@ -18,13 +18,10 @@ import {
   useCloseCashRegisterMutation,
   useGetCashRegisterByIdQuery,
   useGetCashRegistersQuery,
-} from "../../features/cash-register";
-import {
-  AdjustBalancePayload,
-  CashInPayload,
-  CashOutPayload,
-} from "../../types";
+} from "../../features/cash-register/cashRegisterApi";
+
 import { formatCurrencyEnglish, formatDateTime } from "../../utlis";
+import { AdjustBalancePayload, CashInPayload, CashOutPayload } from "../../types/cashregister";
 
 const CashRegisterOperationsPage: React.FC = () => {
   const [selectedRegister, setSelectedRegister] = useState<number | null>(null);

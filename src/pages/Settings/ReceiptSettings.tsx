@@ -36,6 +36,7 @@ const sampleSaleData: SaleData = {
         available_stock: 75,
         created_at: "2025-11-27T10:27:46.696Z",
         updated_at: "2025-12-04T06:08:41.536Z",
+        is_variable: false,
       },
       warehouse_id: 1,
       quantity: 1,
@@ -371,8 +372,8 @@ const A4ReceiptPreview: React.FC<A4ReceiptPreviewProps> = ({
                   <div className="mb-2">
                     <span className="text-sm font-medium text-gray-700">
                       {receipt.qr_code_type === "business_info" ? "Business Information" :
-                       receipt.qr_code_type === "invoice_info" ? "Invoice Details" :
-                       receipt.qr_code_type === "custom" ? "Custom QR Code" : "QR Code"}
+                        receipt.qr_code_type === "invoice_info" ? "Invoice Details" :
+                          receipt.qr_code_type === "custom" ? "Custom QR Code" : "QR Code"}
                     </span>
                   </div>
                   <div className="bg-white p-2 rounded border">
@@ -557,9 +558,8 @@ const ReceiptSettings: React.FC = () => {
                   Include QR Code
                 </span>
                 <span
-                  className={`text-sm ${
-                    receipt.include_qr_code ? "text-green-600" : "text-red-600"
-                  }`}
+                  className={`text-sm ${receipt.include_qr_code ? "text-green-600" : "text-red-600"
+                    }`}
                 >
                   {receipt.include_qr_code ? "Enabled" : "Disabled"}
                 </span>
@@ -573,8 +573,8 @@ const ReceiptSettings: React.FC = () => {
                   </span>
                   <span className="text-sm text-gray-600 capitalize">
                     {receipt.qr_code_type === "business_info" ? "Business Information" :
-                     receipt.qr_code_type === "invoice_info" ? "Invoice Details" :
-                     receipt.qr_code_type === "custom" ? "Custom" : "Unknown"}
+                      receipt.qr_code_type === "invoice_info" ? "Invoice Details" :
+                        receipt.qr_code_type === "custom" ? "Custom" : "Unknown"}
                   </span>
                 </div>
               )}
@@ -584,11 +584,10 @@ const ReceiptSettings: React.FC = () => {
                   Customer Details
                 </span>
                 <span
-                  className={`text-sm ${
-                    receipt.include_customer_details
+                  className={`text-sm ${receipt.include_customer_details
                       ? "text-green-600"
                       : "text-red-600"
-                  }`}
+                    }`}
                 >
                   {receipt.include_customer_details ? "Enabled" : "Disabled"}
                 </span>

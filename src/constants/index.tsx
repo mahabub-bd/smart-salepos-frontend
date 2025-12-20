@@ -139,11 +139,11 @@ const navItems: NavItem[] = [
   // ========== PRODUCT CATALOG ==========
   {
     icon: <Package2Icon />,
-    name: "Product Catalog",
+    name: "Products",
     requiredPermission: "product.view",
     subItems: [
       {
-        name: "Products",
+        name: "Products List",
         path: "/products",
         requiredPermission: "product.view",
       },
@@ -166,6 +166,11 @@ const navItems: NavItem[] = [
         name: "Tags",
         path: "/tags",
         requiredPermission: "tag.view",
+      },
+      {
+        name: "Variation",
+        path: "/variation-templates",
+        requiredPermission: "template.view",
       },
     ],
   },
@@ -423,3 +428,4 @@ const othersItems: NavItem[] = [
 ];
 
 export { navItems, othersItems };
+

@@ -1,13 +1,14 @@
-import { Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useGetWarehouseWiseReportQuery } from "../../../features/inventory/inventoryApi";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../../components/ui/table";
 import Loading from "../../../components/common/Loading";
-
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import { useGetWarehouseWiseReportQuery } from "../../../features/inventory/inventoryApi";
 
 export default function InventoryWarehouseList() {
-  const navigate = useNavigate();
   const { data, isLoading, isError } = useGetWarehouseWiseReportQuery({});
 
   const warehouses = data?.data || [];
@@ -31,7 +32,6 @@ export default function InventoryWarehouseList() {
                 <TableCell isHeader>Purchase Value</TableCell>
                 <TableCell isHeader>Sale Value</TableCell>
                 <TableCell isHeader>Products</TableCell>
-                <TableCell isHeader>Actions</TableCell>
               </TableRow>
             </TableHeader>
 
@@ -101,27 +101,17 @@ export default function InventoryWarehouseList() {
                     </TableCell>
 
                     {/* Action */}
-                    <TableCell className="table-body text-right">
-                      <button
-                        className="p-2 rounded hover:bg-gray-100"
-                        onClick={() =>
-                          navigate(`/inventory/warehouse/${item.warehouse_id}`)
-                        }
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </TableCell>
                   </TableRow>
                 ))
               ) : (
-                <tr>
+                <TableRow>
                   <TableCell
                     colSpan={9}
                     className="py-6 text-center text-gray-500"
                   >
                     No warehouse inventory found
                   </TableCell>
-                </tr>
+                </TableRow>
               )}
             </TableBody>
           </Table>

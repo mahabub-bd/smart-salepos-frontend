@@ -197,12 +197,7 @@ export const PaymentTermDescription = {
   [PaymentTerm.CUSTOM]: "Custom Payment Terms",
 };
 export type PayrollStatus = "pending" | "paid" | "failed";
-export type CashRegisterStatus =
-  | "active"
-  | "inactive"
-  | "closed"
-  | "open"
-  | "maintenance";
+
 export type TransactionType =
   | "sale"
   | "cash_in"
@@ -435,11 +430,19 @@ export interface Product extends BaseEntity {
   supplier?: Supplier;
   tags?: Tag[];
   images?: Attachment[];
+  origin?: string;
+  expire_date?: string | null;
+  is_variable: boolean;
+  variable_options?: any;
+  parent_product_id?: number | null;
+  inventories?: ProductInventory[];
+  variation_templates?: VariationTemplate[];
   purchase_value?: number;
   sale_value?: number;
   total_stock: number;
   total_sold: number;
   available_stock: number;
+  stock_by_warehouse?: StockByWarehouse[];
 }
 
 export interface ProductRequest {
@@ -458,6 +461,12 @@ export interface ProductRequest {
   supplier_id?: number;
   tag_ids?: number[];
   image_ids?: number[];
+  origin?: string;
+  expire_date?: string | null;
+  is_variable?: boolean;
+  variable_options?: any;
+  parent_product_id?: number | null;
+  variation_template_ids?: number[];
 }
 
 // Simplified product type for nested objects
@@ -908,6 +917,41 @@ export interface StockMovement extends BaseEntity {
   reference_type?: string;
   reference_id?: number;
   created_by?: UserBasic;
+}
+
+export interface ProductInventory extends BaseEntity {
+  product_id: number;
+  warehouse_id: number;
+  warehouse?: Warehouse;
+  batch_no: string;
+  quantity: number;
+  sold_quantity: number;
+  expiry_date?: string | null;
+  purchase_price: string;
+  supplier?: string;
+  purchase_item_id?: number;
+}
+
+export interface VariationTemplate {
+  id: number;
+  name: string;
+  values: string;
+  description?: string;
+  is_active: boolean;
+  sort_order: number;
+  created_by_id?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StockByWarehouse {
+  warehouse: Warehouse;
+  batch_no: string;
+  quantity: number;
+  sold_quantity: number;
+  available_quantity: number;
+  purchase_price: string;
+  expiry_date?: string | null;
 }
 
 export interface GetStockMovementsParams {
@@ -1794,295 +1838,63 @@ export interface LeaveApprovalDashboardStats {
 }
 
 // ============================================================================
-// CASH REGISTER
+// PAYMENT
 // ============================================================================
 
-export interface CashRegister extends BaseEntity {
-  register_code?: string;
-  name: string;
-  description?: string;
-  status: CashRegisterStatus;
-  branch_id?: number;
-  branch?: Branch;
-  opening_balance: string;
-  current_balance: string;
-  expected_amount?: string | null;
-  actual_amount?: string | null;
-  variance?: string | null;
-  opened_by?: User | null;
-  closed_by?: User | null;
-  opened_at?: string | null;
-  closed_at?: string | null;
-  notes?: string | null;
-}
-
-export interface CashRegisterTransaction extends BaseEntity {
-  cash_register: CashRegister;
-  transaction_type: TransactionType;
-  amount: string;
-  payment_method: PaymentMethod;
+export interface Payment extends BaseEntity {
+  type: "supplier" | "customer";
+  supplier?: {
+    id: number;
+    name: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+  };
+  customer?: {
+    id: number;
+    name: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+  };
+  purchase?: {
+    id: number;
+    po_no: string;
+    total?: number;
+  };
   sale?: {
     id: number;
     invoice_no: string;
-  } | null;
-  user: User;
-  description?: string;
-  running_balance: string;
-  reference_no?: string | null;
-}
-
-export interface CreateCashRegisterPayload {
-  code: string;
-  name: string;
-  description?: string;
-  branch_id: number;
-  status?: "active" | "inactive";
-}
-
-export interface OpenCashRegisterPayload {
-  cash_register_id: number;
-  opening_balance: number;
-  notes?: string;
-}
-
-export interface CloseCashRegisterPayload {
-  cash_register_id: number;
-  actual_amount: number;
-  notes?: string;
-}
-
-export interface CashInPayload {
+    total?: number;
+  };
   amount: number;
-  description?: string;
-  payment_method?: PaymentMethod;
-  notes?: string;
+  method: "cash" | "bank" | "mobile";
+  payment_account_code?: string;
+  note?: string;
 }
 
-export interface CashOutPayload {
-  amount: number;
-  description?: string;
-  payment_method?: PaymentMethod;
-  notes?: string;
+export interface GetPaymentsParams {
+  page?: number;
+  limit?: number;
+  type?: "supplier" | "customer";
+  method?: "cash" | "bank" | "mobile";
 }
 
-export interface AdjustBalancePayload {
-  amount: number;
-  description: string;
-  adjustment_type: "increase" | "decrease";
-  notes?: string;
-}
-
-export interface VarianceReport {
-  cash_register_id: number;
-  cash_register: CashRegister;
-  opening_balance: number;
-  total_sales: number;
-  total_cash_in: number;
-  total_cash_out: number;
-  expected_balance: number;
-  counted_balance: number;
-  variance: number | null;
-  variance_percentage: number;
-  cash_in: {
-    sales: number;
-    cash_in: number;
-    adjustments: number;
+export interface GetPaymentsResponse {
+  message: string;
+  data: Payment[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
   };
-  cash_out: {
-    refunds: number;
-    cash_out: number;
-    adjustments: number;
-  };
-  transactions_summary: {
-    sales_count: number;
-    cash_in_count: number;
-    cash_out_count: number;
-    total_transactions: number;
-  };
-  payment_breakdown: {
-    cash: number;
-    card: number;
-    mobile: number;
-    other: number;
-  };
-  opened_at: string;
-  closed_at: string;
-  duration_minutes: number;
-  notes?: string;
-}
-
-export interface GetCashRegistersParams extends PaginationParams {
-  branch_id?: number;
-  status?: CashRegisterStatus;
-  search?: string;
-}
-
-export interface GetTransactionsParams extends PaginationParams {
-  cash_register_id?: number;
-  transaction_type?: TransactionType;
-  start_date?: string;
-  end_date?: string;
 }
 
 // ============================================================================
-// QUOTATION TYPES
+// CASH REGISTER
 // ============================================================================
 
-export enum QuotationStatus {
-  DRAFT = "draft",
-  SENT = "sent",
-  ACCEPTED = "accepted",
-  REJECTED = "rejected",
-  EXPIRED = "expired",
-  CONVERTED = "converted",
-}
 
-export const QuotationStatusDescription = {
-  [QuotationStatus.DRAFT]: "Draft",
-  [QuotationStatus.SENT]: "Sent",
-  [QuotationStatus.ACCEPTED]: "Accepted",
-  [QuotationStatus.REJECTED]: "Rejected",
-  [QuotationStatus.EXPIRED]: "Expired",
-  [QuotationStatus.CONVERTED]: "Converted",
-};
 
-export interface QuotationItem extends BaseEntity {
-  productId: number;
-  warehouseId: number;
-  quantity: string;
-  unit_price: string;
-  total_price: string;
-  discount_percentage: string;
-  discount_amount: string;
-  tax_percentage: string;
-  tax_amount: string;
-  net_price: string;
-  notes?: string | null;
 
-  product: ProductBasic;
-  unit: Unit;
-}
-
-export interface CreateQuotationDto {
-  items: {
-    product_id: number;
-    quantity: number;
-    unit_price?: number;
-    discount_percentage?: number;
-  }[];
-  discount_type?: "fixed" | "percentage";
-  discount_value?: number;
-  tax_percentage?: number;
-  customer_id: number;
-  quotation_no?: string;
-  branch_id?: number;
-  quotation_date?: string;
-  valid_until?: string;
-  terms_and_conditions?: string;
-  notes?: string;
-  status?: QuotationStatus;
-}
-
-export interface UpdateQuotationDto {
-  customer_id?: number;
-  branch_id?: number;
-  quotation_date?: string;
-  valid_until?: string;
-  status?: QuotationStatus;
-  notes?: string;
-  terms_and_conditions?: string;
-  items?: {
-    id?: number;
-    product_id: number;
-    quantity: number;
-    unit_price: number;
-    discount_percentage?: number;
-  }[];
-}
-
-export interface Quotation extends BaseEntity {
-  quotation_no: string;
-  items: QuotationItem[];
-
-  subtotal: string;
-  discount: string;
-  manual_discount: string;
-  group_discount: string;
-  tax: string;
-  total: string;
-
-  valid_until: string;
-  terms_and_conditions?: string;
-  notes?: string;
-
-  status: QuotationStatus;
-
-  customer: CustomerBasic;
-  created_by: UserBasic;
-
-  branch_id: number;
-  branch: BranchBasic;
-}
-export interface UpdateQuotationStatusDto {
-  status: QuotationStatus;
-  reason?: string;
-}
-
-export interface ConvertToSaleDto {
-  sale_date?: string;
-  notes?: string;
-  payment_method?: PaymentMethod;
-  paid_amount?: number;
-}
-
-export interface GetQuotationsParams extends PaginationParams {
-  status?: QuotationStatus;
-  customer_id?: number;
-  branch_id?: number;
-  start_date?: string;
-  end_date?: string;
-  search?: string;
-}
-
-export interface CreateQuotationPayload {
-  body: CreateQuotationDto;
-}
-
-export interface UpdateQuotationPayload {
-  id: string | number;
-  body: UpdateQuotationDto;
-}
-
-export interface UpdateQuotationStatusPayload {
-  id: string | number;
-  body: UpdateQuotationStatusDto;
-}
-
-export interface ConvertQuotationToSalePayload {
-  id: string | number;
-  body: ConvertToSaleDto;
-}
-
-export interface DailyQuotation {
-  date: string;
-  total: number;
-  count: number;
-}
-
-export interface QuotationStatusBreakdown {
-  draft: number;
-  sent: number;
-  accepted: number;
-  rejected: number;
-  expired: number;
-  converted: number;
-}
-
-export interface QuotationAnalytics {
-  totalQuotations: number;
-  totalAmount: number;
-  averageQuotationValue: number;
-  conversionRate: number;
-  statusBreakdown: QuotationStatusBreakdown;
-  dailyQuotations: DailyQuotation[];
-}

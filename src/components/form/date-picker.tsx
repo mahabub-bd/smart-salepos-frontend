@@ -49,7 +49,8 @@ export default function DatePicker({
       mode: mode === "datetime" ? "single" : mode,
       static: true,
       position: "below",
-      dateFormat: mode === "time" || mode === "datetime" ? "F j, Y H:i" : "F j, Y",
+      dateFormat:
+        mode === "time" || mode === "datetime" ? "F j, Y H:i" : "F j, Y",
       monthSelectorType: "dropdown",
       defaultDate: value || undefined,
       maxDate: disableFuture ? "today" : undefined,
@@ -101,7 +102,7 @@ export default function DatePicker({
 
   // Updated input classes to match Input and Select exactly
   const getInputClasses = () => {
-    let inputClasses = `h-9 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800`;
+    let inputClasses = `h-10 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800`;
 
     if (error) {
       inputClasses += ` border-error-500 focus:border-error-300 focus:ring-error-500/20 dark:text-error-400 dark:border-error-500 dark:focus:border-error-800`;
@@ -135,7 +136,7 @@ export default function DatePicker({
         />
 
         <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400 ">
-          {(mode === "time" || mode === "datetime" || enableTime) ? (
+          {mode === "time" || mode === "datetime" || enableTime ? (
             <TimeIcon className="size-5 cursor-pointer" />
           ) : (
             <CalenderIcon className="size-5 cursor-pointer" />

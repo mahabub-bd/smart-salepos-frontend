@@ -26,12 +26,12 @@ import {
   useDeleteQuotationMutation,
   useGetQuotationsQuery,
 } from "../../../features/quotation/quotationApi";
-import { QuotationStatus } from "../../../types";
+import { QuotationStatus } from "../../../types/quotation";
 import { formatDateTime } from "../../../utlis";
 import QuotationStatusBadge from "./QuotationStatusBadge";
 
 export default function QuotationList() {
-  const { data, isLoading, isError } = useGetQuotationsQuery();
+  const { data, isLoading, isError } = useGetQuotationsQuery({});
   const navigate = useNavigate();
   const [deleteQuotation] = useDeleteQuotationMutation();
   const [activeDropdown, setActiveDropdown] = useState<string | number | null>(

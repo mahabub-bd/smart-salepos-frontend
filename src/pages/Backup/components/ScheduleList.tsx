@@ -16,8 +16,6 @@ import {
 } from "../../../components/ui/table";
 
 import {
-  BackupSchedule,
-  BackupType,
   useDeleteScheduleMutation,
   useListSchedulesQuery,
   useToggleScheduleMutation,
@@ -26,6 +24,7 @@ import {
 import { useHasPermission } from "../../../hooks/useHasPermission";
 
 import ScheduleFormModal from "./ScheduleFormModal";
+import { BackupSchedule, BackupType } from "../../../types/backup";
 
 export default function ScheduleList() {
   /* ================= MODAL STATES ================= */

@@ -15,12 +15,16 @@ import Button from "../../components/ui/button/Button";
 import { Modal } from "../../components/ui/modal";
 
 import {
-  useGetCashRegistersQuery,
-  useGetVarianceReportQuery,
-} from "../../features/cash-register";
-import { CashRegister } from "../../types";
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+
 import { formatCurrencyEnglish } from "../../utlis";
-import { Table, TableHeader, TableBody, TableRow, TableCell } from "../../components/ui/table";
+import { useGetCashRegistersQuery, useGetVarianceReportQuery } from "../../features/cash-register/cashRegisterApi";
+import { CashRegister } from "../../types/cashregister";
 
 const CashRegisterVarianceReportPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,7 +52,9 @@ const CashRegisterVarianceReportPage: React.FC = () => {
   const filteredRegisters = registers.filter(
     (register) =>
       register.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (register.register_code || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (register.register_code || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       register.branch?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -206,9 +212,7 @@ const CashRegisterVarianceReportPage: React.FC = () => {
                       </TableCell>
                       <TableCell className="table-body">
                         <div>
-                          <div className="font-medium">
-                            {register.name}
-                          </div>
+                          <div className="font-medium">{register.name}</div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {register.branch?.name}
                           </div>
@@ -218,12 +222,16 @@ const CashRegisterVarianceReportPage: React.FC = () => {
                         <div className="text-sm">
                           <div className="text-gray-900 dark:text-white">
                             {register.opened_at
-                              ? new Date(register.opened_at).toLocaleDateString()
+                              ? new Date(
+                                  register.opened_at
+                                ).toLocaleDateString()
                               : "N/A"}
                           </div>
                           <div className="text-gray-500 dark:text-gray-400">
                             {register.opened_at
-                              ? new Date(register.opened_at).toLocaleTimeString()
+                              ? new Date(
+                                  register.opened_at
+                                ).toLocaleTimeString()
                               : "N/A"}
                           </div>
                         </div>
@@ -232,19 +240,25 @@ const CashRegisterVarianceReportPage: React.FC = () => {
                         <div className="text-sm">
                           <div className="text-gray-900 dark:text-white">
                             {register.closed_at
-                              ? new Date(register.closed_at).toLocaleDateString()
+                              ? new Date(
+                                  register.closed_at
+                                ).toLocaleDateString()
                               : "N/A"}
                           </div>
                           <div className="text-gray-500 dark:text-gray-400">
                             {register.closed_at
-                              ? new Date(register.closed_at).toLocaleTimeString()
+                              ? new Date(
+                                  register.closed_at
+                                ).toLocaleTimeString()
                               : "N/A"}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="table-body">
                         <span className="font-medium text-gray-900 dark:text-white">
-                          {formatCurrencyEnglish(Number(register.current_balance))}
+                          {formatCurrencyEnglish(
+                            Number(register.current_balance)
+                          )}
                         </span>
                       </TableCell>
                       <TableCell className="table-body">
@@ -302,7 +316,9 @@ const CashRegisterVarianceReportPage: React.FC = () => {
                   Opening Balance
                 </p>
                 <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {formatCurrencyEnglish(Number(varianceReport.opening_balance))}
+                  {formatCurrencyEnglish(
+                    Number(varianceReport.opening_balance)
+                  )}
                 </p>
               </div>
               <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">

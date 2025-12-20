@@ -54,6 +54,7 @@ export const apiSlice = createApi({
     "Backup",
     "BackupSchedule",
     "Quotations",
+    "VariationTemplates",
   ],
   endpoints: () => ({}),
 });

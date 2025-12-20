@@ -1,19 +1,16 @@
 import { Info, Minus, Plus, TrendingUp } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import {
-  useCashInMutation,
-  useCashOutMutation,
-  useGetCashRegisterByIdQuery,
-} from "../../features/cash-register";
-import { CashInPayload, CashOutPayload } from "../../types";
+
 import { formatCurrencyEnglish, formatDateTime } from "../../utlis";
 
 import { FormField } from "../../components/form/form-elements/SelectFiled";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
+import { CashInPayload, CashOutPayload } from "../../types/cashregister";
 import Button from "../ui/button/Button";
 import { Modal } from "../ui/modal";
+import { useCashInMutation, useCashOutMutation, useGetCashRegisterByIdQuery } from "../../features/cash-register/cashRegisterApi";
 
 interface CashRegisterSidebarProps {
   cashRegisterId: number;

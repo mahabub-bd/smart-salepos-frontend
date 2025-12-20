@@ -13,13 +13,13 @@ import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
 import Button from "../../../components/ui/button/Button";
 
+import { useGetProductsQuery } from "../../../features/product/productApi";
 import {
   useCreateQuotationMutation,
   useGetQuotationByIdQuery,
   useUpdateQuotationMutation,
 } from "../../../features/quotation/quotationApi";
-import { useGetProductsQuery } from "../../../features/product/productApi";
-import { QuotationStatus } from "../../../types";
+import { QuotationStatus } from "../../../types/quotation";
 
 import { BasicInfoFields } from "./QuotationForm/BasicInfoFields";
 import { QuotationItemRow } from "./QuotationForm/QuotationItemRow";
@@ -40,7 +40,7 @@ export default function QuotationForm({ mode, quotationId }: Props) {
 
   /** Fetch Data */
   const { data: productData, isLoading: isLoadingProducts } =
-    useGetProductsQuery();
+    useGetProductsQuery({});
 
   const products = productData?.data || [];
 

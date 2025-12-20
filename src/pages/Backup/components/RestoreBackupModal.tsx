@@ -8,7 +8,8 @@ import {
 } from "../../../components/form/form-elements/SelectFiled";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
-import { Backup } from "../../../features/backup/backupApi";
+import { Backup } from "../../../types/backup";
+
 
 interface RestoreBackupModalProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ export default function RestoreBackupModal({
   isOpen,
   onClose,
   onConfirm,
-  backups
+  backups,
 }: RestoreBackupModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState("");
@@ -64,7 +65,7 @@ export default function RestoreBackupModal({
     }
   };
 
-  const selectedBackupData = backups.find(b => b.id === selectedBackup);
+  const selectedBackupData = backups.find((b) => b.id === selectedBackup);
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} className="max-w-lg">
@@ -92,8 +93,9 @@ export default function RestoreBackupModal({
                   Warning: This will restore the database
                 </p>
                 <p className="mt-1 text-yellow-700 dark:text-yellow-300">
-                  Restoring from a backup will overwrite all current data. This action cannot be undone.
-                  Make sure you have a recent backup before proceeding.
+                  Restoring from a backup will overwrite all current data. This
+                  action cannot be undone. Make sure you have a recent backup
+                  before proceeding.
                 </p>
               </div>
             </div>
@@ -107,7 +109,9 @@ export default function RestoreBackupModal({
             onChange={handleBackupChange}
             data={backups.map((backup) => ({
               id: backup.id,
-              name: `${backup.filename} (${new Date(backup.created_at).toLocaleDateString()})`,
+              name: `${backup.filename} (${new Date(
+                backup.created_at
+              ).toLocaleDateString()})`,
             }))}
           />
 
@@ -118,11 +122,23 @@ export default function RestoreBackupModal({
                 Backup Details:
               </h4>
               <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                <div><span className="font-medium">File:</span> {selectedBackupData.filename}</div>
-                <div><span className="font-medium">Created:</span> {new Date(selectedBackupData.created_at).toLocaleString()}</div>
-                <div><span className="font-medium">Size:</span> {(selectedBackupData.file_size / (1024 * 1024)).toFixed(2)} MB</div>
+                <div>
+                  <span className="font-medium">File:</span>{" "}
+                  {selectedBackupData.filename}
+                </div>
+                <div>
+                  <span className="font-medium">Created:</span>{" "}
+                  {new Date(selectedBackupData.created_at).toLocaleString()}
+                </div>
+                <div>
+                  <span className="font-medium">Size:</span>{" "}
+                  {(selectedBackupData.file_size / (1024 * 1024)).toFixed(2)} MB
+                </div>
                 {selectedBackupData.description && (
-                  <div><span className="font-medium">Description:</span> {selectedBackupData.description}</div>
+                  <div>
+                    <span className="font-medium">Description:</span>{" "}
+                    {selectedBackupData.description}
+                  </div>
                 )}
               </div>
             </div>
@@ -137,7 +153,8 @@ export default function RestoreBackupModal({
                   <div className="text-sm text-red-800 dark:text-red-200">
                     <p className="font-medium">Final Confirmation Required</p>
                     <p className="mt-1">
-                      Type "RESTORE" in the confirmation field to proceed with the database restore.
+                      Type "RESTORE" in the confirmation field to proceed with
+                      the database restore.
                     </p>
                   </div>
                 </div>
@@ -151,7 +168,8 @@ export default function RestoreBackupModal({
                   type="text"
                   {...register("confirm", {
                     required: "Please type RESTORE to confirm",
-                    validate: (value) => value === "RESTORE" || "Please type RESTORE exactly",
+                    validate: (value) =>
+                      value === "RESTORE" || "Please type RESTORE exactly",
                   })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-white"
                   placeholder="Type RESTORE"
@@ -178,7 +196,7 @@ export default function RestoreBackupModal({
             </Button>
           </div>
         </form>
-      </div >
-    </Modal >
+      </div>
+    </Modal>
   );
 }

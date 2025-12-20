@@ -1,6 +1,6 @@
+import { ApiResponse } from "../../types";
 import {
   AdjustBalancePayload,
-  ApiResponse,
   CashInPayload,
   CashOutPayload,
   CashRegister,
@@ -11,7 +11,7 @@ import {
   GetTransactionsParams,
   OpenCashRegisterPayload,
   VarianceReport,
-} from "../../types";
+} from "../../types/cashregister";
 import { apiSlice } from "../apiSlice";
 
 export const cashRegisterApi = apiSlice.injectEndpoints({

@@ -1,4 +1,5 @@
-import { QuotationStatus } from "../../../types";
+import { QuotationStatus } from "../../../types/quotation";
+
 
 interface QuotationStatusBadgeProps {
   status: QuotationStatus;
@@ -58,3 +59,4 @@ export default function QuotationStatusBadge({
 }
 
 export { QuotationStatusBadge };
+

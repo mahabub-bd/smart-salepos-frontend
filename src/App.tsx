@@ -95,9 +95,11 @@ import SupplierLedgerPage from "./pages/Supplier/components/SupplierLedgerPage";
 import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
+
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
+import VariationTemplatePage from "./pages/VariationTemplate";
 
 export default function App() {
   return (
@@ -163,6 +165,7 @@ export default function App() {
           <Route path="/products/view/:id" element={<ProductDetailPage />} />
           // For editing a product
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
+          <Route path="/variation-templates" element={<VariationTemplatePage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
           <Route
