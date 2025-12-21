@@ -140,7 +140,7 @@ export default function SupplierList() {
                       <div className="text-sm">{s.email || "-"}</div>
                     </TableCell>
                     <TableCell className="hidden 2xl:table-cell">
-                      <div className="text-sm truncate max-w-[200px]">
+                      <div className="text-sm truncate max-w-xs">
                         {s.address || "-"}
                       </div>
                     </TableCell>

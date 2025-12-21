@@ -32,7 +32,7 @@ export default function ProductDetail({ productId }: Props) {
 
   if (isError || !product)
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
             <Package className="w-8 h-8 text-red-600 dark:text-red-400" />

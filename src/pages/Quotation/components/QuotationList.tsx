@@ -166,7 +166,7 @@ export default function QuotationList() {
                           <Dropdown
                             isOpen={activeDropdown === q.id}
                             onClose={() => setActiveDropdown(null)}
-                            className="min-w-[180px]"
+                            className="min-w-45"
                           >
                             {/* View Details */}
                             <DropdownItem
