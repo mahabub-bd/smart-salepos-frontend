@@ -1,8 +1,29 @@
-const HeaderSection = ({ customer }: any) => (
-  <div className="flex justify-between mb-4">
-    <h1 className="text-xl font-semibold">Customer Details {customer?.name}</h1>
-  </div>
-);
+import { BookOpen, Pencil } from "lucide-react";
+import { Link } from "react-router";
+import IconButton from "../../../components/common/IconButton";
+import { useHasPermission } from "../../../hooks/useHasPermission";
+
+const HeaderSection = ({ customer, customerId }: any) => {
+  const canUpdate = useHasPermission("customer.update");
+
+  return (
+    <div className="flex justify-between items-center mb-4">
+      <h1 className="text-xl font-semibold">
+        Customer Details {customer?.name}
+      </h1>
+      <div className="flex gap-2">
+        <Link to={`/customers/${customerId}/ledger`}>
+          <IconButton icon={BookOpen} tooltip="View Ledger" color="purple" />
+        </Link>
+        {canUpdate && (
+          <Link to={`/customers/${customerId}/edit`}>
+            <IconButton icon={Pencil} tooltip="Edit" color="blue" />
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const DetailCard = ({ title, children }: any) => (
   <div className="bg-white shadow-sm rounded-xl border p-4 mb-4">
@@ -18,9 +39,9 @@ const TableCard = ({ title, children }: any) => (
 );
 
 const Info = ({ label, value }: { label: string; value: any }) => (
-  <div>
+  <div className="flex gap-4">
     <p className="text-gray-500 text-xs uppercase">{label}</p>
-    <p className="mt-1 font-medium">{value}</p>
+    <p className=" font-medium">{value}</p>
   </div>
 );
 
@@ -43,3 +64,4 @@ const Metric = ({ label, value, color }: any) => (
 );
 
 export { DetailCard, HeaderSection, Info, Metric, MetricsCard, TableCard };
+

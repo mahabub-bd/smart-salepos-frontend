@@ -83,10 +83,9 @@ export default function Pagination({
           disabled={currentPage === 1}
           variant="outline"
           size="sm"
-          className="px-3 py-2"
           startIcon={<ChevronLeft className="h-4 w-4" />}
         >
-          Previous
+          Prev
         </Button>
 
         {/* Page Numbers */}
@@ -124,7 +123,6 @@ export default function Pagination({
           disabled={currentPage === meta.totalPages}
           variant="outline"
           size="sm"
-          className="px-3 py-2"
           endIcon={<ChevronRight className="h-4 w-4" />}
         >
           Next

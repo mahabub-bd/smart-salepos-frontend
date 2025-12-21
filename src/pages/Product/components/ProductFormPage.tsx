@@ -13,7 +13,6 @@ import {
   FormField,
   SelectField,
 } from "../../../components/form/form-elements/SelectFiled";
-import Checkbox from "../../../components/form/input/Checkbox";
 import FileInput from "../../../components/form/input/FileInput";
 import Input from "../../../components/form/input/InputField";
 import MultiSelect from "../../../components/form/MultiSelect";
@@ -37,10 +36,6 @@ import {
 import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { useGetTagsQuery } from "../../../features/tag/tagApi";
 import { useGetUnitsQuery } from "../../../features/unit/unitApi";
-import {
-  useGetVariationTemplatesQuery,
-  VariationTemplateValue,
-} from "../../../features/variation-template/variationTemplateApi";
 import { ProductRequest } from "../../../types";
 
 // Validation Schema
@@ -92,9 +87,6 @@ const productSchema = z.object({
 
   origin: z.string().optional(),
   expire_date: z.date().optional().nullable(),
-  is_variable: z.boolean().optional(),
-  parent_product_id: z.coerce.number().optional(),
-  variation_template_ids: z.array(z.coerce.number()).optional(),
 
   status: z.boolean(),
 });
@@ -116,7 +108,6 @@ export default function ProductFormPage() {
   const { data: units } = useGetUnitsQuery();
   const { data: tags } = useGetTagsQuery();
   const { data: suppliers } = useGetSuppliersQuery();
-  const { data: variationTemplates } = useGetVariationTemplatesQuery({});
 
   // API Mutations
   const [createProduct, { isLoading: createLoading }] =
@@ -166,9 +157,6 @@ export default function ProductFormPage() {
       image_ids: [],
       origin: "",
       expire_date: null,
-      is_variable: false,
-      parent_product_id: undefined,
-      variation_template_ids: [],
       status: true,
     },
   });
@@ -178,8 +166,6 @@ export default function ProductFormPage() {
   const brandId = watch("brand_id");
   const unitId = watch("unit_id");
   const supplierId = watch("supplier_id");
-  const isVariable = watch("is_variable");
-  const parentProductId = watch("parent_product_id");
   const expireDateId = "product-expire-date";
 
   // Load product data in edit mode
@@ -210,10 +196,6 @@ export default function ProductFormPage() {
         image_ids: product.images?.map((img) => Number(img.id)) || [],
         origin: product.origin || "",
         expire_date: product.expire_date ? new Date(product.expire_date) : null,
-        is_variable: product.is_variable || false,
-        parent_product_id: product.parent_product_id || undefined,
-        variation_template_ids:
-          product.variation_templates?.map((t) => t.id) || [],
         status: product.status,
       });
 
@@ -297,9 +279,6 @@ export default function ProductFormPage() {
         expire_date: values.expire_date
           ? values.expire_date.toISOString().split("T")[0]
           : null,
-        is_variable: values.is_variable || false,
-        parent_product_id: values.parent_product_id,
-        variation_template_ids: values.variation_template_ids,
       };
 
       if (isEditMode && id) {
@@ -372,7 +351,7 @@ export default function ProductFormPage() {
               Additional Details
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="Origin" error={errors.origin?.message}>
                 <Input
                   {...register("origin")}
@@ -403,88 +382,8 @@ export default function ProductFormPage() {
                   error={!!errors.expire_date}
                 />
               </FormField>
-
-              <FormField label="Variable Product">
-                <Checkbox
-                  id="variable-product"
-                  checked={watch("is_variable") || false}
-                  onChange={(checked) => setValue("is_variable", checked)}
-                  label="This is a variable product"
-                />
-              </FormField>
-
-              <FormField
-                label="Parent Product"
-                error={errors.parent_product_id?.message}
-              >
-                <Input
-                  type="number"
-                  {...register("parent_product_id")}
-                  placeholder="Parent Product ID"
-                  className="w-full"
-                  disabled={isVariable}
-                />
-              </FormField>
             </div>
           </div>
-
-          {/* Variation Templates - Show only for variable products without parent */}
-          {isVariable && !parentProductId && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
-                Variation Templates
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {variationTemplates?.data?.map((template) => {
-                  const isChecked =
-                    watch("variation_template_ids")?.includes(template.id) ||
-                    false;
-
-                  return (
-                    <div
-                      key={template.id}
-                      className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
-                    >
-                      <Checkbox
-                        id={`template-${template.id}`}
-                        checked={isChecked}
-                        onChange={(checked) => {
-                          const currentValues =
-                            watch("variation_template_ids") || [];
-                          if (checked) {
-                            setValue("variation_template_ids", [
-                              ...currentValues,
-                              template.id,
-                            ]);
-                          } else {
-                            setValue(
-                              "variation_template_ids",
-                              currentValues.filter((id) => id !== template.id)
-                            );
-                          }
-                        }}
-                      />
-                      <div className="ml-3">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {template.name}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {Array.isArray(template.values)
-                            ? template.values
-                              .map((v: VariationTemplateValue) => v.value)
-                              .join(", ")
-                            : typeof template.values === "string"
-                              ? template.values.split(",").join(", ")
-                              : ""}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* SKU & Barcode */}
           <div className="space-y-4">
@@ -548,18 +447,9 @@ export default function ProductFormPage() {
                   type="number"
                   step="0.01"
                   {...register("purchase_price")}
-                  placeholder={
-                    isVariable && !parentProductId
-                      ? "0.00 (for parent variable product)"
-                      : "0.00"
-                  }
+                  placeholder="0.00"
                   className="w-full"
                 />
-                {isVariable && !parentProductId && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Parent variable products typically have 0 price
-                  </p>
-                )}
               </FormField>
 
               <FormField
@@ -570,18 +460,9 @@ export default function ProductFormPage() {
                   type="number"
                   step="0.01"
                   {...register("selling_price")}
-                  placeholder={
-                    isVariable && !parentProductId
-                      ? "0.00 (for parent variable product)"
-                      : "0.00"
-                  }
+                  placeholder="0.00"
                   className="w-full"
                 />
-                {isVariable && !parentProductId && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Parent variable products typically have 0 price
-                  </p>
-                )}
               </FormField>
 
               <FormField
@@ -594,13 +475,7 @@ export default function ProductFormPage() {
                   {...register("discount_price")}
                   placeholder="0.00"
                   className="w-full"
-                  disabled={isVariable && !parentProductId}
                 />
-                {isVariable && !parentProductId && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Not applicable for parent variable products
-                  </p>
-                )}
               </FormField>
             </div>
           </div>
@@ -882,54 +757,6 @@ export default function ProductFormPage() {
               </div>
             </div>
           )}
-
-          {/* Variation Templates - Display only in edit mode */}
-          {isEditMode &&
-            product?.variation_templates &&
-            product.variation_templates.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Variation Templates
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {product.variation_templates.map((template) => (
-                    <div
-                      key={template.id}
-                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          {template.name}
-                        </h4>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${template.is_active
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                            }`}
-                        >
-                          {template.is_active ? "Active" : "Inactive"}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        {template.description}
-                      </p>
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">
-                          Values:{" "}
-                        </span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {template.values
-                            .split(",")
-                            .map((v) => v.trim())
-                            .join(", ")}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">

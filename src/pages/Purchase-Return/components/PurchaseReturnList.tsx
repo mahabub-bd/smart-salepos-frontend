@@ -1,15 +1,15 @@
-import { Check, Eye, Edit, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Check, Edit, Eye } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
-import PageHeader from "../../../components/common/PageHeader";
 import { useGetPurchaseReturnsQuery } from "../../../features/purchase-return/purchaseReturnApi";
-import PurchaseReturnStatusBadge from "./PurchaseReturnStatusBadge";
-import PurchaseReturnEditModal from "./PurchaseReturnEditModal";
 import ApprovalModal from "./ApprovalModal";
+import PurchaseReturnEditModal from "./PurchaseReturnEditModal";
+import PurchaseReturnStatusBadge from "./PurchaseReturnStatusBadge";
 
+import { Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -46,11 +46,6 @@ export default function PurchaseReturnList() {
 
   return (
     <>
-      <PageHeader
-        title="Purchase Returns Management"
-        icon={<Plus size={16} />}
-      />
-
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="max-w-full overflow-x-auto">
           <Table>
@@ -73,10 +68,14 @@ export default function PurchaseReturnList() {
                 purchaseReturns.map((pr) => (
                   <TableRow
                     key={pr.id}
-                    className={`hover:bg-gray-50 ${pr.status === 'approved' ? 'bg-blue-50' : ''}`}
+                    className={`hover:bg-gray-50 ${
+                      pr.status === "approved" ? "bg-blue-50" : ""
+                    }`}
                   >
                     <TableCell className="font-medium">
-                      {pr.return_no}
+                      <Link to={`/purchase-returns/${pr.id}`}>
+                        {pr.return_no}
+                      </Link>
                     </TableCell>
 
                     <TableCell className="font-medium">
@@ -111,7 +110,8 @@ export default function PurchaseReturnList() {
                           />
                         )}
                         {/* Edit */}
-                        {(pr.status === "draft" || pr.status === "approved") && (
+                        {(pr.status === "draft" ||
+                          pr.status === "approved") && (
                           <IconButton
                             icon={Edit}
                             color="blue"

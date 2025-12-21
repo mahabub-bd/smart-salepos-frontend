@@ -39,7 +39,7 @@ export default function CustomerDetail({ customerId }: Props) {
 
   return (
     <>
-      <HeaderSection customer={customer} />
+      <HeaderSection customer={customer} customerId={customerId} />
 
       <DetailCard title="Customer Information">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">

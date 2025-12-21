@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { Link } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
@@ -108,7 +109,7 @@ export default function QuotationList() {
                   return (
                     <TableRow key={q.id} className="hover:bg-gray-50">
                       <TableCell className="font-medium">
-                        {q.quotation_no}
+                        <Link to={`/quotations/${q.id}`}>{q.quotation_no}</Link>
                       </TableCell>
                       <TableCell>
                         {q.customer?.name || `Customer #${q.customer.id}`}

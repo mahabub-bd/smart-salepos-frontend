@@ -44,7 +44,9 @@ export default function SupplierList() {
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
     null
   );
-  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(
+    null
+  );
 
   /* =====================
      Handlers
@@ -121,19 +123,13 @@ export default function SupplierList() {
               {suppliers.length > 0 ? (
                 suppliers.map((s) => (
                   <TableRow key={s.id}>
+                    <TableCell>{s.supplier_code || "-"}</TableCell>
                     <TableCell>
-                      <div className="text-xs font-medium">
-                        {s.supplier_code || "-"}
-                      </div>
+                      <Link to={`/suppliers/${s.id}`}>
+                        <div className="font-medium">{s.name}</div>
+                      </Link>
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm font-medium">{s.name}</div>
-                      {s.contact_person && (
-                        <div className="text-xs text-gray-500 md:hidden">
-                          {s.contact_person}
-                        </div>
-                      )}
-                    </TableCell>
+
                     <TableCell className="hidden md:table-cell">
                       <div className="text-sm">{s.contact_person || "-"}</div>
                     </TableCell>

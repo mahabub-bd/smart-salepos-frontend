@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
         requiredPermission: "quotation.view",
       },
       {
-        name: "Sales Orders",
+        name: "Sales List",
         path: "/sales",
         requiredPermission: "sales.view",
       },

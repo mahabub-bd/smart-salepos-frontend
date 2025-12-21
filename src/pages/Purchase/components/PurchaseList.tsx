@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { Link } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
@@ -31,7 +32,9 @@ export default function PurchaseList() {
   const navigate = useNavigate();
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | number | null>(
+    null
+  );
 
   const purchases = data?.data?.purchases || [];
 
@@ -88,7 +91,9 @@ export default function PurchaseList() {
 
                   return (
                     <TableRow key={p.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">{p.po_no}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link to={`/purchases/${p.id}`}>{p.po_no}</Link>
+                      </TableCell>
                       <TableCell>
                         {p.supplier?.name || `Supplier #${p.supplier_id}`}
                       </TableCell>

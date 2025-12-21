@@ -34,6 +34,7 @@ import {
 } from "../../../features/product/productApi";
 import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 
+import { Link } from "react-router-dom";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 import { Product } from "../../../types";
@@ -321,9 +322,6 @@ export default function ProductList() {
                   { id: "china", name: "China" },
                   { id: "usa", name: "USA" },
                   { id: "japan", name: "Japan" },
-                  { id: "korea", name: "Korea" },
-                  { id: "europe", name: "Europe" },
-                  { id: "local", name: "Local" },
                 ]}
                 value={selectedOrigin}
                 onChange={setSelectedOrigin}
@@ -433,7 +431,12 @@ export default function ProductList() {
                     <TableCell className="py-3">
                       <div className="flex flex-col gap-1">
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {product.name}
+                          <Link
+                            to={`/products/view/${product.id}`}
+                            className=" hover:underline"
+                          >
+                            {product.name}
+                          </Link>
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
                           <div>
