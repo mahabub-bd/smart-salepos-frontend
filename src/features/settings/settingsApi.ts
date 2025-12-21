@@ -33,19 +33,13 @@ export const settingsApi = apiSlice.injectEndpoints({
     // Upload logo for settings
     uploadSettingsLogo: builder.mutation<
       ApiResponse<any>,
-      { id: number; logo: File }
+      { attachment_id: number }
     >({
-      query: ({ id, logo }) => {
-        const formData = new FormData();
-        formData.append("logo", logo);
-
-        return {
-          url: `/settings/logo/${id}`,
-          method: "POST",
-          body: formData,
-          formData: true,
-        };
-      },
+      query: ({ attachment_id }) => ({
+        url: `/settings/logo/${attachment_id}`,
+        method: "POST",
+        body: {}, // Empty body as mentioned
+      }),
       invalidatesTags: ["Settings"],
     }),
 

@@ -12,6 +12,7 @@ import FileInput from "../../../components/form/input/FileInput";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
+import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
@@ -62,6 +63,7 @@ const BusinessSettings = () => {
     useUpdateSettingsMutation();
   const [uploadLogo, { isLoading: isUploadingLogo }] =
     useUploadSettingsLogoMutation();
+  const [uploadSingleAttachment] = useUploadSingleAttachmentMutation();
   const [selectedLogo, setSelectedLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
@@ -166,10 +168,18 @@ const BusinessSettings = () => {
     if (!selectedLogo || !settingsData?.data?.id) return;
 
     try {
+      // Step 1: Upload file to get attachment ID
+      const formData = new FormData();
+      formData.append("file", selectedLogo);
+
+      const attachmentResponse = await uploadSingleAttachment(formData).unwrap();
+      const attachmentId = attachmentResponse.data.id;
+
+      // Step 2: Send attachment ID to settings logo endpoint
       await uploadLogo({
-        id: settingsData.data.id,
-        logo: selectedLogo,
+        attachment_id: attachmentId,
       }).unwrap();
+
       toast.success("Logo uploaded successfully");
       setSelectedLogo(null);
     } catch (error: any) {
