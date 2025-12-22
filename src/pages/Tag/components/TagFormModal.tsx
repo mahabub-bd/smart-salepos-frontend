@@ -4,17 +4,17 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import Switch from "../../../components/form/switch/Switch";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 
 import {
   useCreateTagMutation,
   useUpdateTagMutation,
 } from "../../../features/tag/tagApi";
-import { Tag } from "../../../types";
+import { Tag } from "../../../types/product";
 
 const slugify = (str: string) =>
   str

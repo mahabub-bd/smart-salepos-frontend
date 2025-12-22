@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import Input from "../../../components/form/input/InputField";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Input from "../../../components/form/input/InputField";
 import Switch from "../../../components/form/switch/Switch";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
@@ -11,7 +11,7 @@ import {
   useUpdateUnitMutation,
 } from "../../../features/unit/unitApi";
 
-import { Unit } from "../../../types";
+import { Unit } from "../../../types/product";
 
 interface UnitFormModalProps {
   isOpen: boolean;

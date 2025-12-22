@@ -1,0 +1,131 @@
+import {
+  Attachment,
+  BaseEntity,
+  BaseEntityWithStatus,
+  Brand,
+  ProductInventory,
+  StockByWarehouse,
+  Supplier,
+} from ".";
+
+export interface Unit {
+  id: number;
+  name: string;
+  code: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateUnitRequest {
+  name: string;
+  code: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateUnitRequest extends Partial<CreateUnitRequest> {
+  id: number;
+}
+
+export interface Category extends BaseEntity {
+  name: string;
+  slug?: string | null;
+  description?: string;
+  status: boolean;
+  category_id?: string;
+  logo_attachment: Attachment;
+  logo_attachment_id?: number;
+}
+
+export interface SubCategory extends Category {
+  category_id: string;
+}
+
+export interface CategoryWithChildren extends Category {
+  children?: SubCategory[];
+}
+
+export interface Tag extends BaseEntityWithStatus {
+  name: string;
+  slug?: string;
+  description?: string | null;
+}
+
+export enum ProductType {
+  RAW_MATERIAL = "raw_material",
+  COMPONENT = "component",
+  FINISHED_GOOD = "finished_good",
+  RESALE = "resale",
+  CONSUMABLE = "consumable",
+  PACKAGING = "packaging",
+  SERVICE = "service",
+}
+
+export interface Product extends BaseEntity {
+  name: string;
+  sku: string;
+  barcode?: string;
+  description?: string;
+  selling_price: string;
+  purchase_price: string;
+  discount_price?: string;
+  status: boolean;
+  product_type?: ProductType;
+  brand?: Brand;
+  category?: Category;
+  subcategory?: SubCategory;
+  unit?: Unit;
+  supplier?: Supplier;
+  tags?: Tag[];
+  images?: Attachment[];
+  origin?: string;
+  expire_date?: string | null;
+  is_variable: boolean;
+  variable_options?: any;
+  parent_product_id?: number | null;
+  inventories?: ProductInventory[];
+  purchase_value?: number;
+  sale_value?: number;
+  total_stock: number;
+  total_sold: number;
+  available_stock: number;
+  stock_by_warehouse?: StockByWarehouse[];
+}
+
+export interface ProductRequest {
+  name: string;
+  sku: string;
+  barcode?: string;
+  description?: string;
+  selling_price: number;
+  purchase_price: number;
+  discount_price?: number;
+  status?: boolean;
+  product_type?: ProductType;
+  brand_id?: number;
+  category_id?: number;
+  subcategory_id?: number;
+  unit_id?: number;
+  supplier_id?: number;
+  tag_ids?: number[];
+  image_ids?: number[];
+  origin?: string;
+  expire_date?: string | null;
+}
+
+// Simplified product type for nested objects
+export interface ProductBasic {
+  id: number;
+  name: string;
+  sku: string;
+  barcode: string;
+  description: string;
+  selling_price: string;
+  purchase_price: string;
+  discount_price: string;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+}

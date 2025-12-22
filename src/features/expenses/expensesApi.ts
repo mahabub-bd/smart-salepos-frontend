@@ -1,6 +1,7 @@
 // src/features/expenses/expensesApi.ts
 
-import { ApiResponse, CreateExpensePayload, Expense } from "../../types";
+import { ApiResponse } from "../../types";
+import {  CreateExpensePayload, Expense } from "../../types/expenses";
 
 import { apiSlice } from "../apiSlice";
 

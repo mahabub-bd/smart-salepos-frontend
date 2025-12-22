@@ -1,4 +1,5 @@
-import { ApiResponse, Product, ProductRequest } from "../../types";
+import { ApiResponse } from "../../types";
+import { Product, ProductRequest } from "../../types/product";
 import { apiSlice } from "../apiSlice";
 
 export interface UpdateProductPayload {
@@ -27,17 +28,24 @@ export const productApi = apiSlice.injectEndpoints({
       query: (params) => {
         const searchParams = new URLSearchParams();
 
-        if (params.page) searchParams.append('page', params.page.toString());
-        if (params.limit) searchParams.append('limit', params.limit.toString());
-        if (params.search) searchParams.append('search', params.search);
-        if (params.brandId) searchParams.append('brandId', params.brandId.toString());
-        if (params.supplierId) searchParams.append('supplierId', params.supplierId.toString());
-        if (params.categoryId) searchParams.append('categoryId', params.categoryId.toString());
-        if (params.subcategoryId) searchParams.append('subcategoryId', params.subcategoryId.toString());
-        if (params.origin) searchParams.append('origin', params.origin);
-        if (params.isVariable !== undefined) searchParams.append('isVariable', params.isVariable.toString());
-        if (params.hasExpiry !== undefined) searchParams.append('hasExpiry', params.hasExpiry.toString());
-        if (params.status !== undefined) searchParams.append('status', params.status.toString());
+        if (params.page) searchParams.append("page", params.page.toString());
+        if (params.limit) searchParams.append("limit", params.limit.toString());
+        if (params.search) searchParams.append("search", params.search);
+        if (params.brandId)
+          searchParams.append("brandId", params.brandId.toString());
+        if (params.supplierId)
+          searchParams.append("supplierId", params.supplierId.toString());
+        if (params.categoryId)
+          searchParams.append("categoryId", params.categoryId.toString());
+        if (params.subcategoryId)
+          searchParams.append("subcategoryId", params.subcategoryId.toString());
+        if (params.origin) searchParams.append("origin", params.origin);
+        if (params.isVariable !== undefined)
+          searchParams.append("isVariable", params.isVariable.toString());
+        if (params.hasExpiry !== undefined)
+          searchParams.append("hasExpiry", params.hasExpiry.toString());
+        if (params.status !== undefined)
+          searchParams.append("status", params.status.toString());
 
         return {
           url: `/product?${searchParams.toString()}`,

@@ -85,6 +85,13 @@ import InventoryProductWarehouseWise from "./pages/Inventory/warehouse-wise";
 import LeaveRequestPage from "./pages/Leave";
 import LeaveRequestDetail from "./pages/Leave/components/LeaveRequestDetail";
 import LeaveApprovalsPage from "./pages/LeaveApprovals";
+
+// Production imports
+import ProductionOrderList from "./pages/Production/Order";
+import ProductionOrderDetailPage from "./pages/Production/Order/ProductionOrderDetailPage";
+import ProductionOrderFormPage from "./pages/Production/Order/ProductionOrderFormPage";
+import ProductionRecipeList from "./pages/Production/Recipe";
+
 import PurchaseReturnPage from "./pages/Purchase-Return";
 import PurchaseReturnDetailPage from "./pages/Purchase-Return/components/PurchaseReturnDetailPage";
 import ReceiptSettingsPage from "./pages/Settings";
@@ -96,10 +103,10 @@ import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 
+import VariationTemplatePage from "./pages/VariationTemplate";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
-import VariationTemplatePage from "./pages/VariationTemplate";
 
 export default function App() {
   return (
@@ -165,7 +172,10 @@ export default function App() {
           <Route path="/products/view/:id" element={<ProductDetailPage />} />
           // For editing a product
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
-          <Route path="/variation-templates" element={<VariationTemplatePage />} />
+          <Route
+            path="/variation-templates"
+            element={<VariationTemplatePage />}
+          />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
           <Route
@@ -199,10 +209,7 @@ export default function App() {
             path="/inventory/stock-movements"
             element={<StockMovementPage />}
           />
-          <Route
-            path="/inventory/journal"
-            element={<InventoryJournalPage />}
-          />
+          <Route path="/inventory/journal" element={<InventoryJournalPage />} />
           <Route path="/accounts/balances" element={<AccountBalancePage />} />
           <Route path="/accounts/journal" element={<JournalPage />} />
           <Route path="/accounts/payment" element={<PaymentsPage />} />
@@ -290,6 +297,14 @@ export default function App() {
           <Route path="/hrm/leave-approvals" element={<LeaveApprovalsPage />} />
           <Route path="/employees" element={<EmployeePage />} />
           <Route path="/employees/:id" element={<EmployeeProfilePage />} />
+
+          {/* Production Routes */}
+          <Route path="/production/orders" element={<ProductionOrderList />} />
+          <Route path="/production/orders/create" element={<ProductionOrderFormPage />} />
+          <Route path="/production/orders/:id" element={<ProductionOrderDetailPage />} />
+          <Route path="/production/orders/:id/edit" element={<ProductionOrderFormPage />} />
+          <Route path="/production/recipes" element={<ProductionRecipeList />} />
+
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

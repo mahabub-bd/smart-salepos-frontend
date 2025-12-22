@@ -13,6 +13,7 @@ import {
   UsersRound,
   Wallet,
   Warehouse,
+  Wrench,
 } from "lucide-react";
 import { NavItem } from "../layout/AppSidebar";
 
@@ -167,10 +168,34 @@ const navItems: NavItem[] = [
         path: "/tags",
         requiredPermission: "tag.view",
       },
+    ],
+  },
+
+  // ========== PRODUCTION ==========
+  {
+    icon: <Wrench />,
+    name: "Production",
+    requiredPermission: "production.view",
+    subItems: [
       {
-        name: "Variation",
-        path: "/variation-templates",
-        requiredPermission: "template.view",
+        name: "Production Orders",
+        path: "/production/orders",
+        requiredPermission: "production.view",
+      },
+      {
+        name: "Production Recipes",
+        path: "/production/recipes",
+        requiredPermission: "production.view",
+      },
+      {
+        name: "Material Consumption",
+        path: "/production/material-consumption",
+        requiredPermission: "production.view",
+      },
+      {
+        name: "Production Statistics",
+        path: "/production/statistics",
+        requiredPermission: "production.view",
       },
     ],
   },

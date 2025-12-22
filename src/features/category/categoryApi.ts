@@ -1,4 +1,5 @@
-import { ApiResponse, Category } from "../../types";
+import { ApiResponse, } from "../../types";
+import { Category } from "../../types/product";
 import { apiSlice } from "../apiSlice";
 
 export const categoryApi = apiSlice.injectEndpoints({

@@ -1,4 +1,6 @@
+import { Product, ProductBasic } from "./product";
 import { Role } from "./role";
+import { Sale } from "./sales";
 
 // ============================================================================
 // BASE TYPES & UTILITIES
@@ -52,14 +54,7 @@ export type AccountTypeEnum =
   | "equity"
   | "income"
   | "expense";
-export type SaleStatus =
-  | "held"
-  | "completed"
-  | "refunded"
-  | "partial_refund"
-  | "draft"
-  | "pending"
-  | "cancelled";
+
 export type PurchaseStatus = "draft" | "ordered" | "received" | "cancelled";
 export type PurchaseReturnStatus =
   | "draft"
@@ -361,125 +356,6 @@ export interface BranchBasic {
   phone: string;
   email: string;
   is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-// ============================================================================
-// PRODUCT MANAGEMENT
-// ============================================================================
-
-export interface Unit {
-  id: number;
-  name: string;
-  code: string;
-  description?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateUnitRequest {
-  name: string;
-  code: string;
-  description?: string;
-  isActive?: boolean;
-}
-
-export interface UpdateUnitRequest extends Partial<CreateUnitRequest> {
-  id: number;
-}
-
-export interface Category extends BaseEntity {
-  name: string;
-  slug?: string | null;
-  description?: string;
-  status: boolean;
-  category_id?: string;
-  logo_attachment: Attachment;
-  logo_attachment_id?: number;
-}
-
-export interface SubCategory extends Category {
-  category_id: string;
-}
-
-export interface CategoryWithChildren extends Category {
-  children?: SubCategory[];
-}
-
-export interface Tag extends BaseEntityWithStatus {
-  name: string;
-  slug?: string;
-  description?: string | null;
-}
-
-export interface Product extends BaseEntity {
-  name: string;
-  sku: string;
-  barcode?: string;
-  description?: string;
-  selling_price: string;
-  purchase_price: string;
-  discount_price?: string;
-  status: boolean;
-  brand?: Brand;
-  category?: Category;
-  subcategory?: SubCategory;
-  unit?: Unit;
-  supplier?: Supplier;
-  tags?: Tag[];
-  images?: Attachment[];
-  origin?: string;
-  expire_date?: string | null;
-  is_variable: boolean;
-  variable_options?: any;
-  parent_product_id?: number | null;
-  inventories?: ProductInventory[];
-  variation_templates?: VariationTemplate[];
-  purchase_value?: number;
-  sale_value?: number;
-  total_stock: number;
-  total_sold: number;
-  available_stock: number;
-  stock_by_warehouse?: StockByWarehouse[];
-}
-
-export interface ProductRequest {
-  name: string;
-  sku: string;
-  barcode?: string;
-  description?: string;
-  selling_price: number;
-  purchase_price: number;
-  discount_price?: number;
-  status?: boolean;
-  brand_id?: number;
-  category_id?: number;
-  subcategory_id?: number;
-  unit_id?: number;
-  supplier_id?: number;
-  tag_ids?: number[];
-  image_ids?: number[];
-  origin?: string;
-  expire_date?: string | null;
-  is_variable?: boolean;
-  variable_options?: any;
-  parent_product_id?: number | null;
-  variation_template_ids?: number[];
-}
-
-// Simplified product type for nested objects
-export interface ProductBasic {
-  id: number;
-  name: string;
-  sku: string;
-  barcode: string;
-  description: string;
-  selling_price: string;
-  purchase_price: string;
-  discount_price: string;
-  status: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -996,96 +872,7 @@ export interface GetInventoryJournalParams {
 // SALES
 // ============================================================================
 
-export interface SaleItem {
-  id: number;
-  product: Product;
-  quantity: number;
-  warehouse_id?: number;
-  unit_price: string;
-  discount: string;
-  tax: string;
-  line_total: string;
-}
 
-export interface SalePayment {
-  id?: number;
-  method: string;
-  amount: string;
-  account_code: string;
-  reference?: string;
-  created_at: string;
-}
-
-export interface Sale extends BaseEntity {
-  invoice_no: string;
-  items: SaleItem[];
-  subtotal: string;
-  discount: string;
-  tax: string;
-  total: string;
-  paid_amount: string;
-  payments: SalePayment[];
-  status: SaleStatus;
-  sale_type: string;
-  served_by: User;
-  customer: Customer;
-}
-
-export interface SaleData {
-  invoice_no: string;
-  items: SaleItem[];
-  subtotal: string;
-  discount: string;
-  manual_discount: string;
-  group_discount: string;
-  tax: string;
-  total: string;
-  paid_amount: string;
-  payments: SalePayment[];
-  customer: CustomerBasic;
-  created_by: UserWithRoles;
-  branch: BranchBasic;
-  served_by: UserWithRoles;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SaleResponse extends BaseEntity {
-  invoice_no: string;
-  items: SaleItem[];
-  subtotal: string;
-  discount: string;
-  manual_discount: string;
-  group_discount: string;
-  tax: string;
-  total: string;
-  paid_amount: string;
-  payments: SalePayment[];
-  customer: CustomerBasic;
-  created_by: UserWithRoles;
-  branch: BranchBasic;
-  served_by: UserWithRoles;
-  status: string;
-  sale_type: string;
-}
-
-export type SaleListResponse = ListResponse<SaleResponse>;
-
-export interface SaleDetail {
-  sale_id: number;
-  invoice_no: string;
-  total: number;
-  created_at: string;
-  customer?: { id: number; name: string; phone: string };
-  served_by?: { id: number; full_name: string };
-  transactions: JournalTransaction[];
-}
-
-export interface SaleTransactionsResponse {
-  statusCode: number;
-  message: string;
-  data: SaleDetail[];
-}
 
 // ============================================================================
 // ANALYTICS
@@ -1116,145 +903,6 @@ export interface MonthWiseAnalytics {
   monthlySales: MonthlySale[];
   totalYearlySales: number;
   totalYearlyOrders: number;
-}
-
-// ============================================================================
-// EXPENSES
-// ============================================================================
-
-export interface ExpenseCategory extends BaseEntity {
-  name: string;
-  description: string;
-  is_active: boolean;
-}
-
-export interface Expense extends BaseEntity {
-  title: string;
-  description: string;
-  amount: string;
-  category: ExpenseCategory;
-  category_id: number;
-  receipt_url: string | null;
-  branch: Branch | null;
-  branch_id?: number | null;
-  payment_method?: string;
-  account_code?: string;
-  created_by: User;
-}
-
-export interface CreateExpensePayload {
-  title: string;
-  description?: string;
-  amount: number;
-  category_id: number;
-  receipt_url?: string;
-  branch_id?: number;
-  payment_method?: string;
-  account_code?: string;
-}
-
-export interface UpdateExpensePayload extends Partial<CreateExpensePayload> {
-  id: number;
-}
-
-// ============================================================================
-// SETTINGS
-// ============================================================================
-
-export interface SettingsData extends BaseEntity {
-  business_name: string | null;
-  tagline: string | null;
-  email: string | null;
-  phone: string | null;
-  address: string | null;
-  country: string;
-  website: string | null;
-  currency: string;
-  currency_symbol: string;
-  tax_registration: string | null;
-  company_registration: string | null;
-  default_tax_percentage: string;
-  low_stock_threshold: string;
-  logo_attachment_id: number | null;
-  logo_attachment?: Attachment;
-  footer_text: string | null;
-  receipt_header: string | null;
-  include_barcode: boolean;
-  include_qr_code: boolean;
-  qr_code_type: "business_info" | "invoice_info" | "custom";
-  qr_code_custom_content: string | null;
-  include_customer_details: boolean;
-  enable_auto_backup: boolean;
-  backup_retention_days: number;
-  default_invoice_layout: string;
-  show_product_images: boolean;
-  show_product_skus: boolean;
-  show_item_tax_details: boolean;
-  show_payment_breakdown: boolean;
-  invoice_paper_size: string;
-  print_duplicate_copy: boolean;
-  invoice_footer_message: string | null;
-  use_thermal_printer: boolean;
-}
-
-export interface SettingsUpdateRequest {
-  business_name?: string;
-  tagline?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  country?: string;
-  website?: string;
-  currency?: string;
-  currency_symbol?: string;
-  tax_registration?: string;
-  company_registration?: string;
-  default_tax_percentage?: number;
-  low_stock_threshold?: number;
-  footer_text?: string;
-  receipt_header?: string;
-  include_barcode?: boolean;
-  include_customer_details?: boolean;
-  enable_auto_backup?: boolean;
-  backup_retention_days?: number;
-  default_invoice_layout?: string;
-  show_product_images?: boolean;
-  show_product_skus?: boolean;
-  show_item_tax_details?: boolean;
-  show_payment_breakdown?: boolean;
-  invoice_paper_size?: string;
-  print_duplicate_copy?: boolean;
-  invoice_footer_message?: string;
-  use_thermal_printer?: boolean;
-}
-
-export interface ReceiptPreviewData {
-  business_name: string | null;
-  email: string | null;
-  phone: string | null;
-  address: string | null;
-  website: string | null;
-  currency: string;
-  currency_symbol: string;
-  tax_registration: string | null;
-  company_registration: string | null;
-  footer_text: string | null;
-  receipt_header: string | null;
-  include_barcode: boolean;
-  include_qr_code: boolean;
-  qr_code_type: "business_info" | "invoice_info" | "custom";
-  qr_code_custom_content: string | null;
-  include_customer_details: boolean;
-  logo_url: string;
-  default_invoice_layout: string;
-  show_product_images: boolean;
-  show_product_skus: boolean;
-  show_item_tax_details: boolean;
-  show_payment_breakdown: boolean;
-  invoice_paper_size: string;
-  print_duplicate_copy: boolean;
-  invoice_footer_message: string | null;
-  use_thermal_printer: boolean;
 }
 
 // ============================================================================
@@ -1894,7 +1542,3 @@ export interface GetPaymentsResponse {
 // ============================================================================
 // CASH REGISTER
 // ============================================================================
-
-
-
-

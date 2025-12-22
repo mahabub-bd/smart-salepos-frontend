@@ -22,7 +22,7 @@ import Info from "../../../components/common/Info";
 import Button from "../../../components/ui/button/Button";
 import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
 import { useGetSaleByIdQuery } from "../../../features/sale/saleApi";
-import { SaleItem, SalePayment } from "../../../types";
+import { SaleItem, SalePayment } from "../../../types/sales";
 import SalePaymentModal from "./SalePaymentModal";
 
 export default function SaleDetailPage() {

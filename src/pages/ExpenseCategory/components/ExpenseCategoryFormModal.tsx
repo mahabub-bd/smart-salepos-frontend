@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
-import Checkbox from "../../../components/form/input/Checkbox";
+import { Modal } from "../../../components/ui/modal";
 import {
   useCreateExpenseCategoryMutation,
   useUpdateExpenseCategoryMutation,
 } from "../../../features/expense-category/expenseCategoryApi";
-import { ExpenseCategory } from "../../../types";
+import { ExpenseCategory } from "../../../types/expenses";
 
 interface Props {
   isOpen: boolean;

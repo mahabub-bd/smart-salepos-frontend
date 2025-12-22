@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { Sale } from "../../../types";
+import { Sale } from "../../../types/sales";
 
 const SalesTable = ({ sales }: any) => (
   <div className="max-w-full overflow-x-auto">

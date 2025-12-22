@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
 import { EmployeeStatus, EmployeeType } from "../types";
+import { ProductType } from "../types/product";
 export const baseUrl = import.meta.env.VITE_API_URL;
 export const statusOptions = [
   { value: "pending", label: "Pending" },
@@ -268,6 +269,28 @@ export const getPaymentMethodBadge = (method: string) => {
       return { color: "info" as const, text: "Mobile" };
     default:
       return { color: "light" as const, text: method };
+  }
+};
+
+// Get product type badge properties
+export const getProductTypeBadge = (type: ProductType) => {
+  switch (type) {
+    case ProductType.RAW_MATERIAL:
+      return { color: "warning" as const, text: "Raw Material" };
+    case ProductType.COMPONENT:
+      return { color: "info" as const, text: "Component" };
+    case ProductType.FINISHED_GOOD:
+      return { color: "success" as const, text: "Finished Good" };
+    case ProductType.RESALE:
+      return { color: "primary" as const, text: "Resale" };
+    case ProductType.CONSUMABLE:
+      return { color: "secondary" as const, text: "Consumable" };
+    case ProductType.PACKAGING:
+      return { color: "light" as const, text: "Packaging" };
+    case ProductType.SERVICE:
+      return { color: "dark" as const, text: "Service" };
+    default:
+      return { color: "light" as const, text: type };
   }
 };
 

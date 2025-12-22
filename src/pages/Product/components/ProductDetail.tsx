@@ -16,6 +16,7 @@ import Button from "../../../components/ui/button/Button";
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import { useGetProductByIdQuery } from "../../../features/product/productApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { ProductType } from "../../../types/product";
 
 interface Props {
   productId: string;
@@ -27,6 +28,14 @@ export default function ProductDetail({ productId }: Props) {
   const product = data?.data;
 
   const canUpdate = useHasPermission("product.update");
+
+  // Helper function to format product type
+  const formatProductType = (type: ProductType | undefined): string => {
+    if (!type) return 'Not specified';
+    return type.split('_').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
 
   if (isLoading) return <Loading message="Loading Product..." />;
 
@@ -322,6 +331,10 @@ export default function ProductDetail({ productId }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                 <Info label="Product Name" value={product.name} />
                 <Info label="SKU" value={product.sku} />
+                <Info
+                  label="Product Type"
+                  value={formatProductType(product.product_type)}
+                />
                 <Info
                   label="Barcode"
                   value={product.barcode || "Not assigned"}

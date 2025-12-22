@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import { Expense } from "../../../types";
+import { Expense } from "../../../types/expenses";
 import { ExpenseFormValues, expenseSchema } from "./expenseSchema";
 
 import Select from "../../../components/form/Select";

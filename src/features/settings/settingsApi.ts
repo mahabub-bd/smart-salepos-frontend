@@ -1,9 +1,9 @@
+import { ApiResponse } from "../../types";
 import {
-  ApiResponse,
   ReceiptPreviewData,
   SettingsData,
   SettingsUpdateRequest,
-} from "../../types";
+} from "../../types/settings";
 import { apiSlice } from "../apiSlice";
 
 export const settingsApi = apiSlice.injectEndpoints({

@@ -4,10 +4,9 @@ import {
   CustomerBasic,
   PaginationParams,
   PaymentMethod,
-  ProductBasic,
-  Unit,
   UserBasic,
 } from ".";
+import { ProductBasic, Unit } from "./product";
 
 export enum QuotationStatus {
   DRAFT = "draft",

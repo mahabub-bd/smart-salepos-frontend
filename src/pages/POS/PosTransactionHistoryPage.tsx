@@ -10,7 +10,8 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { useGetPosTransactionHistoryQuery } from "../../features/pos/posApi";
-import { JournalTransaction, SaleDetail, TransactionEntry } from "../../types";
+import { JournalTransaction, TransactionEntry } from "../../types";
+import { SaleDetail } from "../../types/sales";
 
 import { formatCurrencyEnglish, formatDate } from "../../utlis";
 
@@ -58,7 +59,8 @@ export default function PosSaleTransactionsPage() {
                 className="mt-4 overflow-hidden rounded-lg border dark:border-white/5 dark:bg-[#1e1e1e]"
               >
                 <div className="p-3 border-b dark:border-gray-700">
-                  <Badge className="capitalize"
+                  <Badge
+                    className="capitalize"
                     size="sm"
                     color={
                       transaction.reference_type === "sale" ? "info" : "warning"

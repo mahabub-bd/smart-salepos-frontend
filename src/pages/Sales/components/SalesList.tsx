@@ -21,7 +21,7 @@ import { useGetBranchesQuery } from "../../../features/branch/branchApi";
 import { useGetCustomersQuery } from "../../../features/customer/customerApi";
 import { useGetSalesQuery } from "../../../features/sale/saleApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Sale } from "../../../types";
+import { Sale } from "../../../types/sales";
 import { formatCurrencyEnglish, formatDate } from "../../../utlis";
 import SalePaymentModal from "./SalePaymentModal";
 

@@ -36,14 +36,14 @@ import {
 import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { useGetTagsQuery } from "../../../features/tag/tagApi";
 import { useGetUnitsQuery } from "../../../features/unit/unitApi";
-import { ProductRequest } from "../../../types";
+import { ProductRequest, ProductType } from "../../../types/product";
 
-// Validation Schema
 const productSchema = z.object({
   name: z.string().min(1, "Product Name is required"),
   sku: z.string().min(1, "SKU is required"),
   barcode: z.string().optional(),
   description: z.string().optional(),
+  product_type: z.nativeEnum(ProductType).optional(),
 
   selling_price: z.coerce
     .number()
@@ -52,42 +52,34 @@ const productSchema = z.object({
     .number()
     .min(0.01, "Purchase price must be greater than 0"),
   discount_price: z.coerce.number().optional(),
-
   brand_id: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.coerce.number({ error: "Brand is required" }).min(1, "Brand is required")
   ),
-
   category_id: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.coerce
       .number({ error: "Category is required" })
       .min(1, "Category is required")
   ),
-
   subcategory_id: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.coerce
       .number({ error: "Subcategory is required" })
       .min(1, "Subcategory is required")
   ),
-
   unit_id: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z.coerce.number({ error: "Unit is required" }).min(1, "Unit is required")
   ),
-
   supplier_id: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
     z.coerce.number().optional()
   ),
-
   tag_ids: z.array(z.coerce.number()).optional(),
   image_ids: z.array(z.coerce.number()).optional(),
-
   origin: z.string().optional(),
   expire_date: z.date().optional().nullable(),
-
   status: z.boolean(),
 });
 
@@ -145,6 +137,7 @@ export default function ProductFormPage() {
       sku: "",
       barcode: "",
       description: "",
+      product_type: undefined,
       selling_price: 0,
       purchase_price: 0,
       discount_price: undefined,
@@ -176,6 +169,7 @@ export default function ProductFormPage() {
         sku: product.sku,
         barcode: product.barcode || "",
         description: product.description || "",
+        product_type: product.product_type,
         selling_price: Number(product.selling_price),
         purchase_price: Number(product.purchase_price),
         discount_price: product.discount_price
@@ -221,9 +215,9 @@ export default function ProductFormPage() {
   const generateSKU = (name?: string) => {
     const prefix = name
       ? name
-        .slice(0, 3)
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "")
+          .slice(0, 3)
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "")
       : "PRD";
     const randomNum = Math.floor(100000 + Math.random() * 900000);
     return `${prefix}-${randomNum}`;
@@ -232,6 +226,15 @@ export default function ProductFormPage() {
   const generateBarcode = () => {
     return String(Date.now()).slice(-13);
   };
+
+  // Product type options
+  const productTypeOptions = Object.values(ProductType).map((type) => ({
+    id: type,
+    name: type
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
+  }));
 
   const handleImageUpload = async () => {
     if (selectedImages.length === 0) return [];
@@ -268,6 +271,7 @@ export default function ProductFormPage() {
         purchase_price: values.purchase_price,
         discount_price: values.discount_price || 0,
         status: values.status,
+        product_type: values.product_type,
         brand_id: values.brand_id!,
         category_id: values.category_id!,
         subcategory_id: values.subcategory_id!,
@@ -323,7 +327,7 @@ export default function ProductFormPage() {
               Basic Information
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField label="Product Name *" error={errors.name?.message}>
                 <Input
                   {...register("name")}
@@ -342,6 +346,19 @@ export default function ProductFormPage() {
                   className="w-full"
                 />
               </FormField>
+              <SelectField
+                label="Product Type"
+                data={productTypeOptions}
+                value={watch("product_type")}
+                error={errors.product_type?.message}
+                onChange={(value) =>
+                  setValue("product_type", value as ProductType, {
+                    shouldValidate: true,
+                  })
+                }
+                allowEmpty={true}
+                emptyLabel="Select product type"
+              />
             </div>
           </div>
 
@@ -486,7 +503,7 @@ export default function ProductFormPage() {
               Classification
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Category */}
               <SelectField
                 label="Category *"

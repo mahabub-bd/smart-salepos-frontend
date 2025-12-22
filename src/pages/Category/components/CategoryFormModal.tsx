@@ -4,13 +4,13 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import FileInput from "../../../components/form/input/FileInput";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import Switch from "../../../components/form/switch/Switch";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 
 import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 import {
@@ -20,7 +20,7 @@ import {
   useUpdateCategoryMutation,
   useUpdateSubCategoryMutation,
 } from "../../../features/category/categoryApi";
-import { Category } from "../../../types";
+import { Category } from "../../../types/product";
 
 const CategorySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -193,8 +193,6 @@ export default function CategoryFormModal({
           : "Create Category"
       }
     >
-    
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name */}
         <FormField label="Name *" error={errors.name?.message}>

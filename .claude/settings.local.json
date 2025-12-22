@@ -4,7 +4,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm run build)",
       "Bash(mkdir:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }
