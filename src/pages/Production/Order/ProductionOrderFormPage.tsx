@@ -1,24 +1,29 @@
-import { ArrowLeft, Save, Plus, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Plus, Save, X } from "lucide-react";
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Loading from "../../../components/common/Loading";
-import PageHeader from "../../../components/common/PageHeader";
-import { SelectField, FormField } from "../../../components/form/form-elements/SelectFiled";
-import { Input } from "../../../components/form/input/InputField";
+import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
+import DatePicker from "../../../components/form/date-picker";
+import {
+  FormField,
+  SelectField,
+} from "../../../components/form/form-elements/SelectFiled";
+
+import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
+import { useGetBrandsQuery } from "../../../features/brand/brandApi";
+import { useGetProductsQuery } from "../../../features/product/productApi";
 import {
   useCreateProductionOrderMutation,
   useGetProductionOrderByIdQuery,
   useUpdateProductionOrderMutation,
-  useGetManufacturersQuery,
-  useGetWarehousesQuery,
-  useGetProductsQuery,
 } from "../../../features/production/productionApi";
-import { CreateProductionOrderDto, ProductionOrderStatus, ProductionOrderPriority } from "../../../types/production";
+import { useGetWarehousesQuery } from "../../../features/warehouse/warehouseApi";
+import { ProductionOrderPriority } from "../../../types/production";
 
 // Zod schema for production order items
 const productionOrderItemSchema = z.object({
@@ -32,13 +37,15 @@ const productionOrderItemSchema = z.object({
 const productionOrderSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  manufacturer_id: z.number("Manufacturer is required"),
+  brand_id: z.number("Brand is required"),
   warehouse_id: z.number("Warehouse is required"),
   priority: z.nativeEnum(ProductionOrderPriority),
   planned_start_date: z.string().min(1, "Start date is required"),
   planned_completion_date: z.string().min(1, "Completion date is required"),
   notes: z.string().optional(),
-  items: z.array(productionOrderItemSchema).min(1, "At least one item is required"),
+  items: z
+    .array(productionOrderItemSchema)
+    .min(1, "At least one item is required"),
 });
 
 type ProductionOrderFormData = z.infer<typeof productionOrderSchema>;
@@ -62,13 +69,20 @@ export default function ProductionOrderFormPage() {
     defaultValues: {
       title: "",
       description: "",
-      manufacturer_id: 0,
+      brand_id: 0,
       warehouse_id: 0,
       priority: ProductionOrderPriority.NORMAL,
       planned_start_date: "",
       planned_completion_date: "",
       notes: "",
-      items: [{ product_id: 0, planned_quantity: 1, estimated_unit_cost: 0, notes: "" }],
+      items: [
+        {
+          product_id: 0,
+          planned_quantity: 1,
+          estimated_unit_cost: 0,
+          notes: "",
+        },
+      ],
     },
   });
 
@@ -80,8 +94,8 @@ export default function ProductionOrderFormPage() {
   // API hooks
   const { data: productionOrderData, isLoading: isLoadingOrder } =
     useGetProductionOrderByIdQuery(id as string, { skip: !isEditing });
-  const { data: manufacturers } = useGetManufacturersQuery({ limit: 1000 });
-  const { data: warehouses } = useGetWarehousesQuery({ limit: 1000 });
+  const { data: brands } = useGetBrandsQuery();
+  const { data: warehouses } = useGetWarehousesQuery();
   const { data: products } = useGetProductsQuery({ limit: 1000 });
 
   const [createOrder] = useCreateProductionOrderMutation();
@@ -94,13 +108,24 @@ export default function ProductionOrderFormPage() {
       reset({
         title: order.title,
         description: order.description || "",
-        manufacturer_id: order.manufacturer_id,
+        brand_id: order.brand_id,
         warehouse_id: order.warehouse_id,
         priority: order.priority,
-        planned_start_date: order.planned_start_date ? new Date(order.planned_start_date).toISOString().split('T')[0] : "",
-        planned_completion_date: order.planned_completion_date ? new Date(order.planned_completion_date).toISOString().split('T')[0] : "",
+        planned_start_date: order.planned_start_date
+          ? new Date(order.planned_start_date).toISOString().split("T")[0]
+          : "",
+        planned_completion_date: order.planned_completion_date
+          ? new Date(order.planned_completion_date).toISOString().split("T")[0]
+          : "",
         notes: order.notes || "",
-        items: order.items || [{ product_id: 0, planned_quantity: 1, estimated_unit_cost: 0, notes: "" }],
+        items: order.items || [
+          {
+            product_id: 0,
+            planned_quantity: 1,
+            estimated_unit_cost: 0,
+            notes: "",
+          },
+        ],
       });
     }
   }, [isEditing, productionOrderData, reset]);
@@ -123,7 +148,12 @@ export default function ProductionOrderFormPage() {
 
   // Add new item
   const addItem = () => {
-    append({ product_id: 0, planned_quantity: 1, estimated_unit_cost: 0, notes: "" });
+    append({
+      product_id: 0,
+      planned_quantity: 1,
+      estimated_unit_cost: 0,
+      notes: "",
+    });
   };
 
   // Remove item
@@ -140,15 +170,13 @@ export default function ProductionOrderFormPage() {
 
   return (
     <>
-      <PageHeader
-        title={isEditing ? "Edit Production Order" : "Create Production Order"}
-        breadcrumb={[
-          { name: "Production Orders", href: "/production/orders" },
-          { name: isEditing ? "Edit" : "Create", href: "" },
-        ]}
+      <PageBreadcrumb
+        pageTitle={
+          isEditing ? "Edit Production Order" : "Create Production Order"
+        }
       />
 
-      <div className="max-w-6xl">
+      <div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Information */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
@@ -164,44 +192,57 @@ export default function ProductionOrderFormPage() {
                 />
               </FormField>
 
-              <FormField label="Priority" error={errors.priority?.message}>
-                <SelectField
-                  value={watch("priority")}
-                  onChange={(value) => setValue("priority", value as ProductionOrderPriority)}
-                  data={[
-                    { id: "low", name: "Low" },
-                    { id: "normal", name: "Normal" },
-                    { id: "high", name: "High" },
-                    { id: "urgent", name: "Urgent" },
-                  ]}
-                />
-              </FormField>
+              <SelectField
+                label="Priority"
+                value={watch("priority")}
+                onChange={(value) =>
+                  setValue("priority", value as ProductionOrderPriority)
+                }
+                data={[
+                  { id: "low", name: "Low" },
+                  { id: "normal", name: "Normal" },
+                  { id: "high", name: "High" },
+                  { id: "urgent", name: "Urgent" },
+                ]}
+                error={errors.priority?.message}
+              />
 
-              <FormField label="Manufacturer" error={errors.manufacturer_id?.message}>
-                <SelectField
-                  value={watch("manufacturer_id")?.toString()}
-                  onChange={(value) => setValue("manufacturer_id", parseInt(value))}
-                  data={[
-                    { id: "", name: "Select Manufacturer" },
-                    ...(manufacturers?.data || []).map((m) => ({ id: m.id.toString(), name: m.name })),
-                  ]}
-                />
-              </FormField>
+              <SelectField
+                label="Brand"
+                value={watch("brand_id")?.toString()}
+                onChange={(value) => setValue("brand_id", parseInt(value))}
+                data={[
+                  { id: "", name: "Select Brand" },
+                  ...(brands?.data || []).map((m) => ({
+                    id: m.id.toString(),
+                    name: m.name,
+                  })),
+                ]}
+                error={errors.brand_id?.message}
+              />
 
-              <FormField label="Warehouse" error={errors.warehouse_id?.message}>
-                <SelectField
-                  value={watch("warehouse_id")?.toString()}
-                  onChange={(value) => setValue("warehouse_id", parseInt(value))}
-                  data={[
-                    { id: "", name: "Select Warehouse" },
-                    ...(warehouses?.data || []).map((w) => ({ id: w.id.toString(), name: w.name })),
-                  ]}
-                />
-              </FormField>
+              <SelectField
+                label="Warehouse"
+                value={watch("warehouse_id")?.toString()}
+                onChange={(value) =>
+                  setValue("warehouse_id", parseInt(value))
+                }
+                data={[
+                  { id: "", name: "Select Warehouse" },
+                  ...(warehouses?.data || []).map((w) => ({
+                    id: w.id.toString(),
+                    name: w.name,
+                  })),
+                ]}
+                error={errors.warehouse_id?.message}
+              />
             </div>
 
             <div className="mt-6">
-              <FormField label="Description" error={errors.description?.message}>
+              <FormField
+                label="Description"
+                error={errors.description?.message}
+              >
                 <TextArea
                   {...register("description")}
                   rows={3}
@@ -211,19 +252,57 @@ export default function ProductionOrderFormPage() {
             </div>
 
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Planned Start Date" error={errors.planned_start_date?.message}>
-                <Input
-                  {...register("planned_start_date")}
-                  type="date"
+              <div>
+                <DatePicker
+                  id="planned_start_date"
+                  label="Planned Start Date"
+                  placeholder="Select start date"
+                  mode="single"
+                  disableFuture={false}
+                  value={
+                    watch("planned_start_date")
+                      ? new Date(watch("planned_start_date"))
+                      : null
+                  }
+                  onChange={(date) => {
+                    if (date instanceof Date) {
+                      setValue(
+                        "planned_start_date",
+                        date.toISOString().split("T")[0]
+                      );
+                    }
+                  }}
+                  error={!!errors.planned_start_date}
+                  hint={errors.planned_start_date?.message}
+                  isRequired
                 />
-              </FormField>
+              </div>
 
-              <FormField label="Planned Completion Date" error={errors.planned_completion_date?.message}>
-                <Input
-                  {...register("planned_completion_date")}
-                  type="date"
+              <div>
+                <DatePicker
+                  id="planned_completion_date"
+                  label="Planned Completion Date"
+                  placeholder="Select completion date"
+                  mode="single"
+                  disableFuture={false}
+                  value={
+                    watch("planned_completion_date")
+                      ? new Date(watch("planned_completion_date"))
+                      : null
+                  }
+                  onChange={(date) => {
+                    if (date instanceof Date) {
+                      setValue(
+                        "planned_completion_date",
+                        date.toISOString().split("T")[0]
+                      );
+                    }
+                  }}
+                  error={!!errors.planned_completion_date}
+                  hint={errors.planned_completion_date?.message}
+                  isRequired
                 />
-              </FormField>
+              </div>
             </div>
 
             <div className="mt-6">
@@ -254,12 +333,17 @@ export default function ProductionOrderFormPage() {
             </div>
 
             {errors.items?.message && (
-              <p className="text-red-500 text-sm mb-4">{errors.items.message}</p>
+              <p className="text-red-500 text-sm mb-4">
+                {errors.items.message}
+              </p>
             )}
 
             <div className="space-y-4">
               {fields.map((field, index) => (
-                <div key={field.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div
+                  key={field.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                >
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-medium text-gray-900 dark:text-white">
                       Item {index + 1}
@@ -276,29 +360,46 @@ export default function ProductionOrderFormPage() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <FormField label="Product" error={errors.items?.[index]?.product_id?.message}>
-                      <SelectField
-                        value={watch(`items.${index}.product_id`)?.toString()}
-                        onChange={(value) => setValue(`items.${index}.product_id`, parseInt(value))}
-                        data={[
-                          { id: "", name: "Select Product" },
-                          ...(products?.data || []).map((p) => ({ id: p.id.toString(), name: p.name })),
-                        ]}
-                      />
-                    </FormField>
+                    <SelectField
+                      label="Product"
+                      value={watch(`items.${index}.product_id`)?.toString()}
+                      onChange={(value) =>
+                        setValue(`items.${index}.product_id`, parseInt(value))
+                      }
+                      data={[
+                        { id: "", name: "Select Product" },
+                        ...(products?.data || []).map((p) => ({
+                          id: p.id.toString(),
+                          name: p.name,
+                        })),
+                      ]}
+                      error={errors.items?.[index]?.product_id?.message}
+                    />
 
-                    <FormField label="Planned Quantity" error={errors.items?.[index]?.planned_quantity?.message}>
+                    <FormField
+                      label="Planned Quantity"
+                      error={errors.items?.[index]?.planned_quantity?.message}
+                    >
                       <Input
-                        {...register(`items.${index}.planned_quantity`, { valueAsNumber: true })}
+                        {...register(`items.${index}.planned_quantity`, {
+                          valueAsNumber: true,
+                        })}
                         type="number"
                         min="1"
                         placeholder="0"
                       />
                     </FormField>
 
-                    <FormField label="Unit Cost" error={errors.items?.[index]?.estimated_unit_cost?.message}>
+                    <FormField
+                      label="Unit Cost"
+                      error={
+                        errors.items?.[index]?.estimated_unit_cost?.message
+                      }
+                    >
                       <Input
-                        {...register(`items.${index}.estimated_unit_cost`, { valueAsNumber: true })}
+                        {...register(`items.${index}.estimated_unit_cost`, {
+                          valueAsNumber: true,
+                        })}
                         type="number"
                         min="0"
                         step="0.01"
@@ -306,7 +407,10 @@ export default function ProductionOrderFormPage() {
                       />
                     </FormField>
 
-                    <FormField label="Notes" error={errors.items?.[index]?.notes?.message}>
+                    <FormField
+                      label="Notes"
+                      error={errors.items?.[index]?.notes?.message}
+                    >
                       <Input
                         {...register(`items.${index}.notes`)}
                         placeholder="Optional notes"

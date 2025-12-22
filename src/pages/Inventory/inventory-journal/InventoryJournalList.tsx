@@ -13,7 +13,7 @@ import {
 } from "../../../components/ui/table";
 import { useGetInventoryJournalQuery } from "../../../features/inventory/inventoryApi";
 import { useGetProductsQuery } from "../../../features/product/productApi";
-import { InventoryJournalEntry } from "../../../types";
+import { InventoryJournalEntry } from "../../../types/inventory";
 import { formatDateTime } from "../../../utlis";
 
 // Movement type badge component

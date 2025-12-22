@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Warehouse } from "./index";
+import { Warehouse } from "./branch";
 
 // Cart item interface (specific to POS page)
 export interface CartItem {

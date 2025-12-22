@@ -9,7 +9,7 @@ import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 
 import { useUpdatePurchaseStatusMutation } from "../../../features/purchases/purchasesApi";
-import { Purchase, PurchaseOrderStatus } from "../../../types";
+import { Purchase, PurchaseOrderStatus } from "../../../types/purchase";
 
 interface PurchaseStatusModalProps {
   isOpen: boolean;

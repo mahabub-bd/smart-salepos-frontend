@@ -1,8 +1,5 @@
-import {
-  ApiResponse,
-  Last30DaysAnalytics,
-  MonthWiseAnalytics,
-} from "../../types";
+import { ApiResponse } from "../../types";
+import { Last30DaysAnalytics, MonthWiseAnalytics } from "../../types/analytics";
 import { apiSlice } from "../apiSlice";
 
 export const salesApi = apiSlice.injectEndpoints({

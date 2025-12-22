@@ -1,5 +1,9 @@
-import { BaseEntity, BranchBasic, Customer, CustomerBasic, JournalTransaction, ListResponse, User, UserWithRoles } from ".";
+import { BaseEntity, ListResponse } from ".";
+import { JournalTransaction } from "./accounts";
+import { BranchBasic } from "./branch";
+import { Customer, CustomerBasic } from "./customer";
 import { Product } from "./product";
+import { User, UserWithRoles } from "./user";
 export type SaleStatus =
   | "held"
   | "completed"

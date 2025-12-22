@@ -22,7 +22,7 @@ import {
   PaymentHistory,
   PurchaseItem,
   PurchaseOrderStatus,
-} from "../../../types";
+} from "../../../types/purchase";
 import { formatDateTime } from "../../../utlis";
 
 import Info from "../../../components/common/Info";

@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetProductWiseReportQuery } from "../../../features/inventory/inventoryApi";
-import { ProductWiseInventoryItem } from "../../../types";
+import { ProductWiseInventoryItem } from "../../../types/inventory";
 import { StockAdjustmentModal } from "../components/StockAdjustmentModal";
 import { StockTransferModal } from "../components/StockTransferModal";
 
@@ -192,7 +192,7 @@ export default function InventoryListProductWise() {
                         <Dropdown
                           isOpen={activeDropdown === item.product_id}
                           onClose={() => setActiveDropdown(null)}
-                          className="min-w-[180px]"
+                          className="min-w-45"
                         >
                           {/* Transfer Stock */}
                           <DropdownItem

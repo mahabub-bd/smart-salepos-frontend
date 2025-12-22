@@ -1,12 +1,12 @@
+import { ApiResponse } from "../../types/index.ts";
 import {
-  ApiResponse,
   GetInventoryJournalParams,
   GetStockMovementsParams,
   Inventory,
   InventoryItem,
   InventoryJournalEntry,
   StockMovement,
-} from "../../types";
+} from "../../types/inventory.ts";
 import { apiSlice } from "../apiSlice";
 
 export interface AdjustInventoryPayload {

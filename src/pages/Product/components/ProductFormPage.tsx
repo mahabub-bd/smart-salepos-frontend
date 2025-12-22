@@ -47,10 +47,10 @@ const productSchema = z.object({
 
   selling_price: z.coerce
     .number()
-    .min(0.01, "Selling price must be greater than 0"),
+    .min(0.00, "Selling price must be greater than 0"),
   purchase_price: z.coerce
     .number()
-    .min(0.01, "Purchase price must be greater than 0"),
+    .min(0.00, "Purchase price must be greater than 0"),
   discount_price: z.coerce.number().optional(),
   brand_id: z.preprocess(
     (val) => (val === "" ? undefined : val),

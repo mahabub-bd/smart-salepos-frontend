@@ -20,7 +20,7 @@ import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 
 import Loading from "../../../components/common/Loading";
-import { User } from "../../../types";
+import { User } from "../../../types/user";
 import UserFormModal from "./UserFormModal";
 
 export default function UserList() {

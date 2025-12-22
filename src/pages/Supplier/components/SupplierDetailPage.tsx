@@ -1,14 +1,10 @@
+import { BookOpen, Pencil } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
-
+import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-
-import { useGetSupplierByIdQuery } from "../../../features/suppliers/suppliersApi";
-
-import { BookOpen, Pencil } from "lucide-react";
-import IconButton from "../../../components/common/IconButton";
 import Badge from "../../../components/ui/badge/Badge";
 import {
   Table,
@@ -17,8 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import { useGetSupplierByIdQuery } from "../../../features/suppliers/suppliersApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Purchase } from "../../../types";
+
 import {
   DetailCard,
   Info,
@@ -27,6 +24,7 @@ import {
 } from "../../Customer/components/ReuseableComponent";
 import PurchaseStatusBadge from "../../Purchase/components/PurchaseStatusBadge";
 import SupplierFormModal from "./SupplierFormModal";
+import { Purchase } from "../../../types/purchase";
 
 export default function SupplierDetailPage() {
   const { id } = useParams<{ id: string }>();

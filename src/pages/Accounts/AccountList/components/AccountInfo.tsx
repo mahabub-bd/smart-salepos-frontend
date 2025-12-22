@@ -1,4 +1,4 @@
-import { Account } from "../../../../types";
+import { Account } from "../../../../types/accounts";
 
 interface AccountInfoProps {
   account: Account;

@@ -10,19 +10,15 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
-import { useProductionOrderPriority, useProductionOrderStatus } from "../../../features/production/hooks";
 import {
   useGetProductionOrderByIdQuery,
   useGetProductionOrderLogsQuery,
 } from "../../../features/production/productionApi";
-import { useHasPermission } from "../../../hooks/useHasPermission";
+import { ProductionOrderPriority, ProductionOrderStatus } from "../../../types/production";
 
 export default function ProductionOrderDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const canEdit = useHasPermission("production.edit");
-  const canView = useHasPermission("production.view");
 
   const {
     data: orderData,
@@ -43,8 +39,69 @@ export default function ProductionOrderDetailPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
 
-  const getStatusInfo = useProductionOrderStatus();
-  const getPriorityInfo = useProductionOrderPriority();
+  // Helper function for status info
+  const getStatusInfo = (status: ProductionOrderStatus) => {
+    const statusConfig = {
+      [ProductionOrderStatus.PENDING]: {
+        color: "yellow",
+        label: "Pending",
+        isCompleted: false,
+        canStart: true,
+      },
+      [ProductionOrderStatus.IN_PROGRESS]: {
+        color: "blue",
+        label: "In Progress",
+        isCompleted: false,
+        canStart: false,
+      },
+      [ProductionOrderStatus.ON_HOLD]: {
+        color: "orange",
+        label: "On Hold",
+        isCompleted: false,
+        canStart: true,
+      },
+      [ProductionOrderStatus.COMPLETED]: {
+        color: "green",
+        label: "Completed",
+        isCompleted: true,
+        canStart: false,
+      },
+      [ProductionOrderStatus.CANCELLED]: {
+        color: "red",
+        label: "Cancelled",
+        isCompleted: true,
+        canStart: false,
+      },
+    };
+    return statusConfig[status] || statusConfig[ProductionOrderStatus.PENDING];
+  };
+
+  // Helper function for priority info
+  const getPriorityInfo = (priority: ProductionOrderPriority) => {
+    const priorityConfig = {
+      [ProductionOrderPriority.LOW]: {
+        color: "gray",
+        label: "Low",
+        level: 1,
+      },
+      [ProductionOrderPriority.NORMAL]: {
+        color: "blue",
+        label: "Normal",
+        level: 2,
+      },
+      [ProductionOrderPriority.HIGH]: {
+        color: "orange",
+        label: "High",
+        level: 3,
+      },
+      [ProductionOrderPriority.URGENT]: {
+        color: "red",
+        label: "Urgent",
+        level: 4,
+      },
+    };
+    return priorityConfig[priority] || priorityConfig[ProductionOrderPriority.NORMAL];
+  };
 
   useEffect(() => {
     if (orderData?.data) {
@@ -184,10 +241,10 @@ export default function ProductionOrderDetailPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Manufacturer
+                      Brand
                     </label>
                     <p className="text-gray-900 dark:text-white font-medium">
-                      {order.manufacturer?.name || "-"}
+                      {order.brand?.name || "-"}
                     </p>
                   </div>
 

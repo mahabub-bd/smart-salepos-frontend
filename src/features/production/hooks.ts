@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ProductionOrder, ProductionOrderStatus, ProductionOrderPriority } from "../../types/production";
+import { useEffect, useState } from "react";
+import { ProductionOrder, ProductionOrderPriority, ProductionOrderStatus } from "../../types/production";
 
 // Custom hook for production order form validation
 export const useProductionOrderForm = () => {
@@ -221,7 +221,7 @@ export const useProductionOrderProgress = (productionOrder?: ProductionOrder) =>
   useEffect(() => {
     if (!productionOrder) return;
 
-    const { summary, items } = productionOrder;
+    const { summary } = productionOrder;
     const totalPlanned = summary.total_planned_quantity;
     const totalActual = summary.total_actual_quantity;
     const totalGood = summary.total_good_quantity;

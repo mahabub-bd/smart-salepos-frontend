@@ -1,12 +1,12 @@
+import { ApiResponse } from "../../types";
 import {
-  ApiResponse,
   ApprovePurchaseReturnPayload,
   CreatePurchaseReturnPayload,
   ProcessPurchaseReturnPayload,
   PurchaseReturn,
   RefundPurchaseReturnPayload,
   UpdatePurchaseReturnPayload,
-} from "../../types";
+} from "../../types/purchase-return";
 import { apiSlice } from "../apiSlice";
 
 export const purchaseReturnApi = apiSlice.injectEndpoints({

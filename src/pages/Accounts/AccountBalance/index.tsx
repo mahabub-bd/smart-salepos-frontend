@@ -12,7 +12,6 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetAccountBalancesQuery } from "../../../features/accounts/accountsApi";
-import { Account } from "../../../types";
 
 // Lucide React Icons
 import {
@@ -23,6 +22,7 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
+import { Account } from "../../../types/accounts";
 
 export default function AccountBalancePage() {
   const today = new Date().toISOString().split("T")[0];

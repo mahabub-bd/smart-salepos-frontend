@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import TextArea from "../../../components/form/input/TextArea";
@@ -25,13 +25,16 @@ export default function CancelModal({
   purchaseReturn,
   onSuccess,
 }: CancelModalProps) {
-  const [cancelReason, setCancelReason] = useState("");
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: {
+      cancel_reason: "",
+    },
+  });
+
   const [cancelPurchaseReturn, { isLoading }] =
     useCancelPurchaseReturnMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async () => {
     if (!purchaseReturn) return;
 
     try {
@@ -39,7 +42,7 @@ export default function CancelModal({
       toast.success(
         `Purchase return ${purchaseReturn.return_no} cancelled successfully`
       );
-      setCancelReason("");
+      reset();
       onSuccess?.();
       onClose();
     } catch (error: any) {
@@ -49,7 +52,7 @@ export default function CancelModal({
 
   const handleClose = () => {
     if (!isLoading) {
-      setCancelReason("");
+      reset();
       onClose();
     }
   };
@@ -62,7 +65,7 @@ export default function CancelModal({
       title="Cancel Purchase Return"
     >
       {purchaseReturn ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* Return Information */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-semibold text-gray-900 mb-2">
@@ -93,10 +96,9 @@ export default function CancelModal({
             </Label>
             <TextArea
               rows={3}
+              {...register("cancel_reason")}
               className="w-full"
               placeholder="Enter reason for cancellation..."
-              value={cancelReason}
-              onChange={(value) => setCancelReason(value)}
               disabled={isLoading}
             />
           </div>

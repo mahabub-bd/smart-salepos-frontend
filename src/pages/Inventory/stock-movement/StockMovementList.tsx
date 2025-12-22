@@ -18,7 +18,7 @@ import {
 } from "../../../components/ui/table";
 import { useGetStockMovementsQuery } from "../../../features/inventory/inventoryApi";
 import { useGetProductsQuery } from "../../../features/product/productApi";
-import { StockMovement, StockMovementType } from "../../../types";
+import { StockMovement, StockMovementType } from "../../../types/inventory";
 import { formatDateTime } from "../../../utlis";
 
 // Movement type badge component

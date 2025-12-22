@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { useGetPosTransactionHistoryQuery } from "../../features/pos/posApi";
-import { JournalTransaction, TransactionEntry } from "../../types";
+import { JournalTransaction, TransactionEntry } from "../../types/accounts";
 import { SaleDetail } from "../../types/sales";
 
 import { formatCurrencyEnglish, formatDate } from "../../utlis";

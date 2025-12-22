@@ -103,7 +103,6 @@ import TagPage from "./pages/Tag";
 import UnitPage from "./pages/Unit";
 import UsersPage from "./pages/UserPage";
 
-import VariationTemplatePage from "./pages/VariationTemplate";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
@@ -172,10 +171,6 @@ export default function App() {
           <Route path="/products/view/:id" element={<ProductDetailPage />} />
           // For editing a product
           <Route path="/products/edit/:id" element={<ProductFormPage />} />
-          <Route
-            path="/variation-templates"
-            element={<VariationTemplatePage />}
-          />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
           <Route
@@ -297,14 +292,24 @@ export default function App() {
           <Route path="/hrm/leave-approvals" element={<LeaveApprovalsPage />} />
           <Route path="/employees" element={<EmployeePage />} />
           <Route path="/employees/:id" element={<EmployeeProfilePage />} />
-
           {/* Production Routes */}
           <Route path="/production/orders" element={<ProductionOrderList />} />
-          <Route path="/production/orders/create" element={<ProductionOrderFormPage />} />
-          <Route path="/production/orders/:id" element={<ProductionOrderDetailPage />} />
-          <Route path="/production/orders/:id/edit" element={<ProductionOrderFormPage />} />
-          <Route path="/production/recipes" element={<ProductionRecipeList />} />
-
+          <Route
+            path="/production/orders/create"
+            element={<ProductionOrderFormPage />}
+          />
+          <Route
+            path="/production/orders/:id"
+            element={<ProductionOrderDetailPage />}
+          />
+          <Route
+            path="/production/orders/:id/edit"
+            element={<ProductionOrderFormPage />}
+          />
+          <Route
+            path="/production/recipes"
+            element={<ProductionRecipeList />}
+          />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

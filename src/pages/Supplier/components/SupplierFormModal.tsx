@@ -9,7 +9,7 @@ import {
   useUpdateSupplierMutation,
 } from "../../../features/suppliers/suppliersApi";
 
-import { Supplier } from "../../../types";
+import { Supplier } from "../../../types/supplier";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

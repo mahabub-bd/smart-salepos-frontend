@@ -1,12 +1,14 @@
 import {
   BaseEntity,
-  BranchBasic,
-  CustomerBasic,
+
+
   PaginationParams,
   PaymentMethod,
-  UserBasic,
 } from ".";
+import { BranchBasic } from "./branch";
+import { CustomerBasic } from "./customer";
 import { ProductBasic, Unit } from "./product";
+import { UserBasic } from "./user";
 
 export enum QuotationStatus {
   DRAFT = "draft",

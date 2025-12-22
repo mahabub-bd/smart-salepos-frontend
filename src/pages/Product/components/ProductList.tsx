@@ -42,49 +42,52 @@ import { getProductTypeBadge } from "../../../utlis/index";
 
 // Helper function to map badge colors to Tailwind classes
 const getBadgeClasses = (color: string) => {
-  const colorMap: Record<string, { bg: string; text: string; darkBg: string; darkText: string }> = {
+  const colorMap: Record<
+    string,
+    { bg: string; text: string; darkBg: string; darkText: string }
+  > = {
     success: {
       bg: "bg-green-100",
       text: "text-green-800",
       darkBg: "dark:bg-green-900/20",
-      darkText: "dark:text-green-300"
+      darkText: "dark:text-green-300",
     },
     warning: {
       bg: "bg-yellow-100",
       text: "text-yellow-800",
       darkBg: "dark:bg-yellow-900/20",
-      darkText: "dark:text-yellow-300"
+      darkText: "dark:text-yellow-300",
     },
     info: {
       bg: "bg-blue-100",
       text: "text-blue-800",
       darkBg: "dark:bg-blue-900/20",
-      darkText: "dark:text-blue-300"
+      darkText: "dark:text-blue-300",
     },
     primary: {
       bg: "bg-indigo-100",
       text: "text-indigo-800",
       darkBg: "dark:bg-indigo-900/20",
-      darkText: "dark:text-indigo-300"
+      darkText: "dark:text-indigo-300",
     },
     secondary: {
       bg: "bg-gray-100",
       text: "text-gray-800",
       darkBg: "dark:bg-gray-900/20",
-      darkText: "dark:text-gray-300"
+      darkText: "dark:text-gray-300",
     },
     light: {
       bg: "bg-gray-100",
       text: "text-gray-800",
       darkBg: "dark:bg-gray-900/20",
-      darkText: "dark:text-gray-300"
+      darkText: "dark:text-gray-300",
     },
     dark: {
       bg: "bg-gray-100",
       text: "text-gray-800",
       darkBg: "dark:bg-gray-900/20",
-      darkText: "dark:text-gray-300"
-    }
+      darkText: "dark:text-gray-300",
+    },
   };
 
   return colorMap[color] || colorMap.light;
@@ -490,17 +493,20 @@ export default function ProductList() {
                       </div>
                     </TableCell>
                     <TableCell className="py-3">
-                      {product.product_type && (() => {
-                        const badge = getProductTypeBadge(product.product_type);
-                        const classes = getBadgeClasses(badge.color);
-                        return (
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${classes.bg} ${classes.text} ${classes.darkBg} ${classes.darkText}`}
-                          >
-                            {badge.text}
-                          </span>
-                        );
-                      })()}
+                      {product.product_type &&
+                        (() => {
+                          const badge = getProductTypeBadge(
+                            product.product_type
+                          );
+                          const classes = getBadgeClasses(badge.color);
+                          return (
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${classes.bg} ${classes.text} ${classes.darkBg} ${classes.darkText}`}
+                            >
+                              {badge.text}
+                            </span>
+                          );
+                        })()}
                     </TableCell>
                     <TableCell>
                       {product.brand?.name && (
@@ -508,8 +514,10 @@ export default function ProductList() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {product.supplier?.name && (
+                      {product.supplier?.name ? (
                         <span> {product.supplier.name}</span>
+                      ) : (
+                        <span className="text-gray-400 text-center">N/A</span>
                       )}
                     </TableCell>
                     {/* Pricing */}

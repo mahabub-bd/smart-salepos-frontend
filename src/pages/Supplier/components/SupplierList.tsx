@@ -22,7 +22,7 @@ import {
   useDeleteSupplierMutation,
   useGetSuppliersQuery,
 } from "../../../features/suppliers/suppliersApi";
-import { Supplier } from "../../../types";
+import { Supplier } from "../../../types/supplier";
 
 import {
   Table,

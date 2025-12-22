@@ -3,12 +3,12 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 
 import {
   useCreateBranchMutation,
@@ -16,7 +16,7 @@ import {
 } from "../../../features/branch/branchApi";
 import { useGetWarehousesQuery } from "../../../features/warehouse/warehouseApi";
 
-import { Branch } from "../../../types";
+import { Branch } from "../../../types/branch";
 import { BranchFormType, branchSchema } from "./branch.schema";
 
 interface Props {

@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
-  ProductionRecipe,
-  ProductionRecipeStatus,
-  ProductionRecipeType,
-  MaterialType,
-  MaterialRequirementCalculation,
-  MaterialConsumption,
   MaterialConsumptionStatus,
+  MaterialRequirementCalculation,
+  MaterialType,
+  ProductionRecipeStatus,
+  ProductionRecipeType
 } from "../../types/production-recipe";
 
 // Custom hook for production recipe form validation
@@ -106,20 +104,8 @@ export const useProductionRecipeForm = () => {
 };
 
 // Custom hook for production recipe status calculations
-export const useProductionRecipeStatus = (recipe?: ProductionRecipe) => {
-  const [statusInfo, setStatusInfo] = useState({
-    color: "gray",
-    label: "Unknown",
-    isActive: false,
-    canActivate: false,
-    canDeactivate: false,
-    canEdit: false,
-    canDelete: false,
-  });
-
-  useEffect(() => {
-    if (!recipe) return;
-
+export const useProductionRecipeStatus = () => {
+  const getStatusInfo = (status: ProductionRecipeStatus) => {
     const statusConfig = {
       [ProductionRecipeStatus.DRAFT]: {
         color: "yellow",
@@ -159,23 +145,15 @@ export const useProductionRecipeStatus = (recipe?: ProductionRecipe) => {
       },
     };
 
-    setStatusInfo(statusConfig[recipe.status] || statusConfig[ProductionRecipeStatus.DRAFT]);
-  }, [recipe]);
+    return statusConfig[status] || statusConfig[ProductionRecipeStatus.DRAFT];
+  };
 
-  return statusInfo;
+  return getStatusInfo;
 };
 
 // Custom hook for production recipe type display
-export const useProductionRecipeType = (type?: ProductionRecipeType) => {
-  const [typeInfo, setTypeInfo] = useState({
-    color: "gray",
-    label: "Unknown",
-    icon: "",
-  });
-
-  useEffect(() => {
-    if (!type) return;
-
+export const useProductionRecipeType = () => {
+  const getTypeInfo = (type: ProductionRecipeType) => {
     const typeConfig = {
       [ProductionRecipeType.MANUFACTURING]: {
         color: "blue",
@@ -209,10 +187,10 @@ export const useProductionRecipeType = (type?: ProductionRecipeType) => {
       },
     };
 
-    setTypeInfo(typeConfig[type] || typeConfig[ProductionRecipeType.MANUFACTURING]);
-  }, [type]);
+    return typeConfig[type] || typeConfig[ProductionRecipeType.MANUFACTURING];
+  };
 
-  return typeInfo;
+  return getTypeInfo;
 };
 
 // Custom hook for material type display

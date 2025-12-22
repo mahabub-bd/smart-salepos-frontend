@@ -12,18 +12,18 @@ import {
   useUpdateUserMutation,
 } from "../../../features/user/userApi";
 
-import { Branch } from "../../../types";
+import { Branch } from "../../../types/branch";
 import { Role } from "../../../types/role";
 
 // UI
 import { toast } from "react-toastify";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Checkbox from "../../../components/form/input/Checkbox";
 import Input from "../../../components/form/input/InputField";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Select from "../../../components/form/Select";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
-import { User } from "../../../types";
+import { User } from "../../../types/user";
 
 interface UserFormModalProps {
   isOpen: boolean;

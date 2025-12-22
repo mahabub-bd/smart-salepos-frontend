@@ -3,10 +3,9 @@ import {
   BaseEntity,
   BaseEntityWithStatus,
   Brand,
-  ProductInventory,
-  StockByWarehouse,
-  Supplier,
 } from ".";
+import { ProductInventory, StockByWarehouse } from "./inventory";
+import { Supplier } from "./supplier";
 
 export interface Unit {
   id: number;
@@ -115,7 +114,6 @@ export interface ProductRequest {
   expire_date?: string | null;
 }
 
-// Simplified product type for nested objects
 export interface ProductBasic {
   id: number;
   name: string;

@@ -34,8 +34,10 @@ import { useGetWarehouseWiseReportQuery } from "../../features/inventory/invento
 import { useCreatePosSaleMutation } from "../../features/pos/posApi";
 import { useGetReceiptPreviewQuery } from "../../features/settings/settingsApi";
 import { useGetWarehousesQuery } from "../../features/warehouse/warehouseApi";
-import { Account, Customer, Warehouse } from "../../types";
+import { Account } from "../../types/accounts";
+import { Warehouse } from "../../types/branch";
 import { CashRegister } from "../../types/cashregister";
+import { Customer } from "../../types/customer";
 import {
   CartItem,
   CloseCounterFormData,
@@ -48,8 +50,8 @@ import {
   SaleReceiptData,
   WarehouseReport,
 } from "../../types/posPage";
-import CustomerFormModal from "../Customer/components/CustomerFormModal";
 import { ReceiptPreviewData } from "../../types/settings";
+import CustomerFormModal from "../Customer/components/CustomerFormModal";
 
 export default function POSPage() {
   const [searchProduct, setSearchProduct] = useState("");

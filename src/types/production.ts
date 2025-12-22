@@ -1,4 +1,5 @@
-import { BaseEntity, Warehouse } from "./index";
+import { Warehouse } from "./branch";
+import { BaseEntity, Brand,  } from "./index";
 
 // Production Order Status
 export enum ProductionOrderStatus {
@@ -36,18 +37,6 @@ export enum ProductionLogType {
   QUALITY_CHECK = "quality_check",
 }
 
-// Base Manufacturer/Warehouse interfaces
-export interface Manufacturer {
-  id: number;
-  name: string;
-  contact_person?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  status: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 // Production Order Item
 export interface ProductionOrderItem extends BaseEntity {
@@ -104,8 +93,8 @@ export interface ProductionOrder extends BaseEntity {
   order_number: string;
   title: string;
   description?: string;
-  manufacturer_id: number;
-  manufacturer: Manufacturer;
+  brand_id: number;
+  brand: Brand;
   warehouse_id: number;
   warehouse: Warehouse;
   status: ProductionOrderStatus;
@@ -135,7 +124,7 @@ export interface ProductionOrderStats {
 export interface CreateProductionOrderDto {
   title: string;
   description?: string;
-  manufacturer_id: number;
+  brand_id: number;
   warehouse_id: number;
   priority: ProductionOrderPriority;
   planned_start_date: string;
@@ -152,7 +141,7 @@ export interface CreateProductionOrderDto {
 export interface UpdateProductionOrderDto {
   title?: string;
   description?: string;
-  manufacturer_id?: number;
+  brand_id?: number;
   warehouse_id?: number;
   status?: ProductionOrderStatus;
   priority?: ProductionOrderPriority;
@@ -182,7 +171,7 @@ export interface ProductionQueryDto {
   search?: string;
   status?: ProductionOrderStatus;
   priority?: ProductionOrderPriority;
-  manufacturer_id?: number;
+  brand_id?: number;
   warehouse_id?: number;
   start_date?: string;
   end_date?: string;

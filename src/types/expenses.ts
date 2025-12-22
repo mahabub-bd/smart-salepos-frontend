@@ -1,4 +1,6 @@
-import { BaseEntity, Branch, User } from ".";
+import { BaseEntity } from ".";
+import { Branch } from "./branch";
+import { User } from "./user";
 
 export interface ExpenseCategory extends BaseEntity {
   name: string;

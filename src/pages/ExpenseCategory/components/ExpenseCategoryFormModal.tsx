@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Checkbox from "../../../components/form/input/Checkbox";
@@ -18,6 +19,12 @@ interface Props {
   category: ExpenseCategory | null;
 }
 
+interface FormData {
+  name: string;
+  description: string;
+  is_active: boolean;
+}
+
 export default function ExpenseCategoryFormModal({
   isOpen,
   onClose,
@@ -28,49 +35,40 @@ export default function ExpenseCategoryFormModal({
 
   const isEdit = !!category;
 
-  const [formData, setFormData] = useState({
-    name: category?.name || "",
-    description: category?.description || "",
-    is_active: category?.is_active ?? true,
+  const { register, handleSubmit, setValue, watch, reset } = useForm<FormData>({
+    defaultValues: {
+      name: "",
+      description: "",
+      is_active: true,
+    },
   });
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isEdit && category) {
-      setFormData({
-        name: category.name,
-        description: category.description,
-        is_active: category.is_active,
-      });
+      setValue("name", category.name);
+      setValue("description", category.description);
+      setValue("is_active", category.is_active);
     } else {
-      setFormData({
-        name: "",
-        description: "",
-        is_active: true,
-      });
+      reset();
     }
-  }, [isEdit, category]);
+  }, [isEdit, category, setValue, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const payload = {
-      ...formData,
-    };
-
-    console.log("Submitting payload:", payload);
+  const onSubmit = async (data: FormData) => {
+    console.log("Submitting payload:", data);
 
     try {
       if (isEdit && category) {
         await updateExpenseCategory({
           id: category.id,
-          body: payload,
+          body: data,
         }).unwrap();
         toast.success("Expense category updated successfully!");
       } else {
-        await createExpenseCategory(payload).unwrap();
+        await createExpenseCategory(data).unwrap();
         toast.success("Expense category created successfully!");
       }
+      reset();
       onClose();
     } catch (err: any) {
       console.error("Error submitting expense category:", err);
@@ -87,12 +85,11 @@ export default function ExpenseCategoryFormModal({
     >
   
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {/* Category Name */}
         <FormField label="Category Name">
           <Input
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            {...register("name", { required: true })}
             placeholder="Office Supplies"
             required
           />
@@ -101,10 +98,7 @@ export default function ExpenseCategoryFormModal({
         {/* Description */}
         <FormField label="Description">
           <TextArea
-            value={formData.description}
-            onChange={(value) =>
-              setFormData({ ...formData, description: value })
-            }
+            {...register("description")}
             placeholder="Expenses related to office items"
             rows={3}
           />
@@ -114,10 +108,8 @@ export default function ExpenseCategoryFormModal({
         <div className="flex items-center gap-2">
           <Checkbox
             label="Active"
-            checked={formData.is_active}
-            onChange={(checked) =>
-              setFormData({ ...formData, is_active: checked })
-            }
+            checked={watch("is_active")}
+            onChange={(checked) => setValue("is_active", checked)}
           />
         </div>
 

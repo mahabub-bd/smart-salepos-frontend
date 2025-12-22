@@ -1,23 +1,26 @@
 import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
   Eye,
   MoreVertical,
+  Package,
+  Pause,
   Pencil,
   Plus,
   Search,
   Trash2,
-  X,
   Wrench,
-  Clock,
-  CheckCircle,
+  X,
   XCircle,
-  AlertCircle,
-  Pause,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import Loading from "../../../components/common/Loading";
+import PageHeader from "../../../components/common/PageHeader";
+import StatCard from "../../../components/common/stat-card";
 import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
@@ -32,11 +35,14 @@ import {
 import {
   useDeleteProductionOrderMutation,
   useGetProductionOrdersQuery,
+  useGetProductionOrderStatsQuery,
 } from "../../../features/production/productionApi";
-import { ProductionOrderFilters, ProductionOrderStatus, ProductionOrderPriority } from "../../../types/production";
-import { useProductionOrderStatus, useProductionOrderPriority } from "../../../features/production/hooks";
-import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import {
+  ProductionFilters,
+  ProductionOrderPriority,
+  ProductionOrderStatus,
+} from "../../../types/production";
 
 export default function ProductionOrderList() {
   const navigate = useNavigate();
@@ -46,8 +52,12 @@ export default function ProductionOrderList() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [selectedStatus, setSelectedStatus] = useState<ProductionOrderStatus | undefined>();
-  const [selectedPriority, setSelectedPriority] = useState<ProductionOrderPriority | undefined>();
+  const [selectedStatus, setSelectedStatus] = useState<
+    ProductionOrderStatus | undefined
+  >();
+  const [selectedPriority, setSelectedPriority] = useState<
+    ProductionOrderPriority | undefined
+  >();
   const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search
@@ -60,7 +70,7 @@ export default function ProductionOrderList() {
   }, [searchInput]);
 
   // Build filter object
-  const filters: ProductionOrderFilters = {
+  const filters: ProductionFilters = {
     page,
     limit,
     search: debouncedSearch,
@@ -69,17 +79,18 @@ export default function ProductionOrderList() {
   };
 
   const { data, isLoading, isError } = useGetProductionOrdersQuery(filters);
+  const { data: statsData } = useGetProductionOrderStatsQuery();
   const [deleteProductionOrder] = useDeleteProductionOrderMutation();
 
   const productionOrders = data?.data || [];
   const meta = data?.meta;
+  const stats = statsData?.data;
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<any>(null);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
 
-  const canCreate = useHasPermission("production.add");
-  const canEdit = useHasPermission("production.edit");
+  const canEdit = useHasPermission("production.update");
   const canDelete = useHasPermission("production.delete");
 
   // Reset page when filters change
@@ -164,11 +175,10 @@ export default function ProductionOrderList() {
 
   // 🔹 Loading & Error States
   if (isLoading) return <Loading message="Loading Production Orders..." />;
-  if (isError) return <p className="p-6 text-red-500">Failed to fetch production orders.</p>;
-
-  // Status and Priority helpers
-  const getStatusInfo = useProductionOrderStatus();
-  const getPriorityInfo = useProductionOrderPriority();
+  if (isError)
+    return (
+      <p className="p-6 text-red-500">Failed to fetch production orders.</p>
+    );
 
   return (
     <>
@@ -178,8 +188,56 @@ export default function ProductionOrderList() {
         icon={<Plus size={16} />}
         addLabel="Create Order"
         onAdd={openCreatePage}
-        permission="production.add"
+        permission="production.create"
       />
+
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          <StatCard
+            icon={Package}
+            title="Total Orders"
+            value={stats.totalOrders}
+            bgColor="blue"
+            compact
+          />
+          <StatCard
+            icon={Clock}
+            title="Pending"
+            value={stats.pendingOrders}
+            bgColor="orange"
+            compact
+          />
+          <StatCard
+            icon={Wrench}
+            title="In Progress"
+            value={stats.inProgressOrders}
+            bgColor="indigo"
+            compact
+          />
+          <StatCard
+            icon={Pause}
+            title="On Hold"
+            value={stats.onHoldOrders}
+            bgColor="purple"
+            compact
+          />
+          <StatCard
+            icon={CheckCircle}
+            title="Completed"
+            value={stats.completedOrders}
+            bgColor="green"
+            compact
+          />
+          <StatCard
+            icon={XCircle}
+            title="Cancelled"
+            value={stats.cancelledOrders}
+            bgColor="default"
+            compact
+          />
+        </div>
+      )}
 
       {/* Search & Filters */}
       <div className="mb-4 space-y-4">
@@ -192,7 +250,7 @@ export default function ProductionOrderList() {
             />
             <input
               type="text"
-              placeholder="Search by order number, title, manufacturer..."
+              placeholder="Search by order number, title, brand..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
@@ -209,11 +267,8 @@ export default function ProductionOrderList() {
             Filters{" "}
             {hasActiveFilters &&
               `(${
-                [
-                  searchInput,
-                  selectedStatus,
-                  selectedPriority,
-                ].filter(Boolean).length
+                [searchInput, selectedStatus, selectedPriority].filter(Boolean)
+                  .length
               })`}
           </button>
           {hasActiveFilters && (
@@ -243,7 +298,9 @@ export default function ProductionOrderList() {
                   { id: "cancelled", name: "Cancelled" },
                 ]}
                 value={selectedStatus || ""}
-                onChange={(value) => setSelectedStatus(value as ProductionOrderStatus)}
+                onChange={(value) =>
+                  setSelectedStatus(value as ProductionOrderStatus)
+                }
               />
 
               {/* Priority Filter */}
@@ -257,7 +314,9 @@ export default function ProductionOrderList() {
                   { id: "urgent", name: "Urgent" },
                 ]}
                 value={selectedPriority || ""}
-                onChange={(value) => setSelectedPriority(value as ProductionOrderPriority)}
+                onChange={(value) =>
+                  setSelectedPriority(value as ProductionOrderPriority)
+                }
               />
             </div>
           </div>
@@ -272,7 +331,7 @@ export default function ProductionOrderList() {
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
                 <TableCell isHeader>Order Details</TableCell>
-                <TableCell isHeader>Manufacturer</TableCell>
+                <TableCell isHeader>Brand</TableCell>
                 <TableCell isHeader>Status</TableCell>
                 <TableCell isHeader>Priority</TableCell>
                 <TableCell isHeader>Progress</TableCell>
@@ -285,11 +344,68 @@ export default function ProductionOrderList() {
             <TableBody>
               {productionOrders.length > 0 ? (
                 productionOrders.map((order: any) => {
+                  // Calculate progress
+                  const progress =
+                    order.summary?.total_planned_quantity > 0
+                      ? Math.round(
+                          (order.summary.total_actual_quantity /
+                            order.summary.total_planned_quantity) *
+                            100
+                        )
+                      : 0;
+
+                  // Status info
+                  const getStatusInfo = (status: ProductionOrderStatus) => {
+                    const statusConfig = {
+                      pending: {
+                        color: "yellow",
+                        label: "Pending",
+                        isCompleted: false,
+                        canStart: true,
+                      },
+                      in_progress: {
+                        color: "blue",
+                        label: "In Progress",
+                        isCompleted: false,
+                        canStart: false,
+                      },
+                      on_hold: {
+                        color: "orange",
+                        label: "On Hold",
+                        isCompleted: false,
+                        canStart: true,
+                      },
+                      completed: {
+                        color: "green",
+                        label: "Completed",
+                        isCompleted: true,
+                        canStart: false,
+                      },
+                      cancelled: {
+                        color: "red",
+                        label: "Cancelled",
+                        isCompleted: true,
+                        canStart: false,
+                      },
+                    };
+                    return statusConfig[status] || statusConfig.pending;
+                  };
+
+                  // Priority info
+                  const getPriorityInfo = (
+                    priority: ProductionOrderPriority
+                  ) => {
+                    const priorityConfig = {
+                      low: { color: "gray", label: "Low", level: 1 },
+                      normal: { color: "blue", label: "Normal", level: 2 },
+                      high: { color: "orange", label: "High", level: 3 },
+                      urgent: { color: "red", label: "Urgent", level: 4 },
+                    };
+                    return priorityConfig[priority] || priorityConfig.normal;
+                  };
+
                   const statusInfo = getStatusInfo(order.status);
                   const priorityInfo = getPriorityInfo(order.priority);
-                  const progress = order.summary?.total_planned_quantity > 0
-                    ? Math.round((order.summary.total_actual_quantity / order.summary.total_planned_quantity) * 100)
-                    : 0;
 
                   return (
                     <TableRow
@@ -309,37 +425,54 @@ export default function ProductionOrderList() {
 
                       <TableCell className="py-3">
                         <div className="text-gray-900 dark:text-white">
-                          {order.manufacturer?.name || "-"}
+                          {order.brand?.name || "-"}
                         </div>
                       </TableCell>
 
                       <TableCell className="py-3">
                         <div className="flex items-center gap-2">
                           {statusInfo.isCompleted ? (
-                            <CheckCircle size={16} className={statusInfo.color === "green" ? "text-green-600" : "text-red-600"} />
+                            <CheckCircle
+                              size={16}
+                              className={
+                                statusInfo.color === "green"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }
+                            />
                           ) : statusInfo.canStart ? (
                             <Clock size={16} className="text-yellow-600" />
                           ) : (
                             <AlertCircle size={16} className="text-blue-600" />
                           )}
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            statusInfo.color === "green" ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300" :
-                            statusInfo.color === "yellow" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300" :
-                            statusInfo.color === "red" ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300" :
-                            "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
-                          }`}>
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              statusInfo.color === "green"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+                                : statusInfo.color === "yellow"
+                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300"
+                                : statusInfo.color === "red"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+                                : "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                            }`}
+                          >
                             {statusInfo.label}
                           </span>
                         </div>
                       </TableCell>
 
                       <TableCell className="py-3">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          priorityInfo.level === 4 ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300" :
-                          priorityInfo.level === 3 ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300" :
-                          priorityInfo.level === 2 ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300" :
-                          "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            priorityInfo.level === 4
+                              ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+                              : priorityInfo.level === 3
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300"
+                              : priorityInfo.level === 2
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+                          }`}
+                        >
                           {priorityInfo.label}
                         </span>
                       </TableCell>
@@ -348,15 +481,21 @@ export default function ProductionOrderList() {
                         <div className="w-full">
                           <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                             <span>{progress}%</span>
-                            <span>{order.summary?.total_actual_quantity || 0} / {order.summary?.total_planned_quantity || 0}</span>
+                            <span>
+                              {order.summary?.total_actual_quantity || 0} /{" "}
+                              {order.summary?.total_planned_quantity || 0}
+                            </span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${
-                                progress === 100 ? "bg-green-500" :
-                                progress >= 75 ? "bg-blue-500" :
-                                progress >= 50 ? "bg-yellow-500" :
-                                "bg-red-500"
+                                progress === 100
+                                  ? "bg-green-500"
+                                  : progress >= 75
+                                  ? "bg-blue-500"
+                                  : progress >= 50
+                                  ? "bg-yellow-500"
+                                  : "bg-red-500"
                               }`}
                               style={{ width: `${progress}%` }}
                             />
@@ -366,8 +505,22 @@ export default function ProductionOrderList() {
 
                       <TableCell className="py-3">
                         <div className="text-sm">
-                          <div>Start: {order.planned_start_date ? new Date(order.planned_start_date).toLocaleDateString() : "-"}</div>
-                          <div>End: {order.planned_completion_date ? new Date(order.planned_completion_date).toLocaleDateString() : "-"}</div>
+                          <div>
+                            Start:{" "}
+                            {order.planned_start_date
+                              ? new Date(
+                                  order.planned_start_date
+                                ).toLocaleDateString()
+                              : "-"}
+                          </div>
+                          <div>
+                            End:{" "}
+                            {order.planned_completion_date
+                              ? new Date(
+                                  order.planned_completion_date
+                                ).toLocaleDateString()
+                              : "-"}
+                          </div>
                         </div>
                       </TableCell>
 
@@ -442,7 +595,9 @@ export default function ProductionOrderList() {
                   >
                     <div className="flex flex-col items-center gap-2 w-full justify-center">
                       <Wrench size={48} className="text-gray-300" />
-                      <p className="text-lg font-medium">No production orders found</p>
+                      <p className="text-lg font-medium">
+                        No production orders found
+                      </p>
                       <p className="text-sm">
                         Get started by creating your first production order
                       </p>
@@ -475,7 +630,9 @@ export default function ProductionOrderList() {
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
           title="Delete Production Order"
-          message={`Are you sure you want to delete "${orderToDelete?.order_number || orderToDelete?.title}"? This action cannot be undone.`}
+          message={`Are you sure you want to delete "${
+            orderToDelete?.order_number || orderToDelete?.title
+          }"? This action cannot be undone.`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}

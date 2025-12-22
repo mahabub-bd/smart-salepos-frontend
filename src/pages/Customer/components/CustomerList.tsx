@@ -20,7 +20,7 @@ import {
   useGetCustomersQuery,
 } from "../../../features/customer/customerApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Customer } from "../../../types";
+import { Customer } from "../../../types/customer";
 
 export default function CustomerList() {
   const navigate = useNavigate();

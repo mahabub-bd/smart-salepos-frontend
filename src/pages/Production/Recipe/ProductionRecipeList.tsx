@@ -1,4 +1,5 @@
 import {
+  ChefHat,
   Eye,
   MoreVertical,
   Pencil,
@@ -6,13 +7,13 @@ import {
   Search,
   Trash2,
   X,
-  ChefHat,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import Loading from "../../../components/common/Loading";
+import PageHeader from "../../../components/common/PageHeader";
 import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
@@ -28,10 +29,16 @@ import {
   useDeleteProductionRecipeMutation,
   useGetProductionRecipesQuery,
 } from "../../../features/production/productionRecipeApi";
-import { RecipeFilters, ProductionRecipeStatus, ProductionRecipeType } from "../../../types/production-recipe";
-import { useProductionRecipeStatus, useProductionRecipeType } from "../../../features/production/recipe-hooks";
-import PageHeader from "../../../components/common/PageHeader";
+import {
+  useProductionRecipeStatus,
+  useProductionRecipeType,
+} from "../../../features/production/recipe-hooks";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import {
+  ProductionRecipeStatus,
+  ProductionRecipeType,
+  RecipeFilters,
+} from "../../../types/production-recipe";
 
 export default function ProductionRecipeList() {
   const navigate = useNavigate();
@@ -41,8 +48,12 @@ export default function ProductionRecipeList() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [selectedStatus, setSelectedStatus] = useState<ProductionRecipeStatus | undefined>();
-  const [selectedType, setSelectedType] = useState<ProductionRecipeType | undefined>();
+  const [selectedStatus, setSelectedStatus] = useState<
+    ProductionRecipeStatus | undefined
+  >();
+  const [selectedType, setSelectedType] = useState<
+    ProductionRecipeType | undefined
+  >();
   const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search
@@ -73,7 +84,6 @@ export default function ProductionRecipeList() {
   const [recipeToDelete, setRecipeToDelete] = useState<any>(null);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
 
-  const canCreate = useHasPermission("production.add");
   const canEdit = useHasPermission("production.edit");
   const canDelete = useHasPermission("production.delete");
 
@@ -97,9 +107,7 @@ export default function ProductionRecipeList() {
 
   // Check if any filters are active
   const hasActiveFilters =
-    searchInput ||
-    selectedStatus !== undefined ||
-    selectedType !== undefined;
+    searchInput || selectedStatus !== undefined || selectedType !== undefined;
 
   // 🔹 Route Handlers
   const canView = useHasPermission("production.view");
@@ -159,7 +167,10 @@ export default function ProductionRecipeList() {
 
   // 🔹 Loading & Error States
   if (isLoading) return <Loading message="Loading Production Recipes..." />;
-  if (isError) return <p className="p-6 text-red-500">Failed to fetch production recipes.</p>;
+  if (isError)
+    return (
+      <p className="p-6 text-red-500">Failed to fetch production recipes.</p>
+    );
 
   // Status and Type helpers
   const getStatusInfo = useProductionRecipeStatus();
@@ -204,11 +215,8 @@ export default function ProductionRecipeList() {
             Filters{" "}
             {hasActiveFilters &&
               `(${
-                [
-                  searchInput,
-                  selectedStatus,
-                  selectedType,
-                ].filter(Boolean).length
+                [searchInput, selectedStatus, selectedType].filter(Boolean)
+                  .length
               })`}
           </button>
           {hasActiveFilters && (
@@ -237,7 +245,9 @@ export default function ProductionRecipeList() {
                   { id: "archived", name: "Archived" },
                 ]}
                 value={selectedStatus || ""}
-                onChange={(value) => setSelectedStatus(value as ProductionRecipeStatus)}
+                onChange={(value) =>
+                  setSelectedStatus(value as ProductionRecipeStatus)
+                }
               />
 
               {/* Type Filter */}
@@ -253,7 +263,9 @@ export default function ProductionRecipeList() {
                   { id: "packaging", name: "Packaging" },
                 ]}
                 value={selectedType || ""}
-                onChange={(value) => setSelectedType(value as ProductionRecipeType)}
+                onChange={(value) =>
+                  setSelectedType(value as ProductionRecipeType)
+                }
               />
             </div>
           </div>
@@ -307,15 +319,23 @@ export default function ProductionRecipeList() {
                       <TableCell className="py-3">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">{typeInfo.icon}</span>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            typeInfo.color === "blue" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300" :
-                            typeInfo.color === "green" ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300" :
-                            typeInfo.color === "purple" ? "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300" :
-                            typeInfo.color === "orange" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300" :
-                            typeInfo.color === "teal" ? "bg-teal-100 text-teal-800 dark:bg-teal-900/20 dark:text-teal-300" :
-                            typeInfo.color === "indigo" ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300" :
-                            "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
-                          }`}>
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              typeInfo.color === "blue"
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                                : typeInfo.color === "green"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+                                : typeInfo.color === "purple"
+                                ? "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300"
+                                : typeInfo.color === "orange"
+                                ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300"
+                                : typeInfo.color === "teal"
+                                ? "bg-teal-100 text-teal-800 dark:bg-teal-900/20 dark:text-teal-300"
+                                : typeInfo.color === "indigo"
+                                ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+                            }`}
+                          >
                             {typeInfo.label}
                           </span>
                         </div>
@@ -331,14 +351,21 @@ export default function ProductionRecipeList() {
                       </TableCell>
 
                       <TableCell className="py-3">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          statusInfo.color === "green" ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300" :
-                          statusInfo.color === "yellow" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300" :
-                          statusInfo.color === "blue" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300" :
-                          statusInfo.color === "gray" ? "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300" :
-                          statusInfo.color === "orange" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300" :
-                          "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            statusInfo.color === "green"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+                              : statusInfo.color === "yellow"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300"
+                              : statusInfo.color === "blue"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                              : statusInfo.color === "gray"
+                              ? "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+                              : statusInfo.color === "orange"
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300"
+                          }`}
+                        >
                           {statusInfo.label}
                         </span>
                       </TableCell>
@@ -360,7 +387,11 @@ export default function ProductionRecipeList() {
 
                       <TableCell className="py-3">
                         <div className="text-sm">
-                          {recipe.estimated_time_minutes ? `${Math.round(recipe.estimated_time_minutes / 60)}h` : "-"}
+                          {recipe.estimated_time_minutes
+                            ? `${Math.round(
+                                recipe.estimated_time_minutes / 60
+                              )}h`
+                            : "-"}
                         </div>
                       </TableCell>
 
@@ -435,7 +466,9 @@ export default function ProductionRecipeList() {
                   >
                     <div className="flex flex-col items-center gap-2 w-full justify-center">
                       <ChefHat size={48} className="text-gray-300" />
-                      <p className="text-lg font-medium">No production recipes found</p>
+                      <p className="text-lg font-medium">
+                        No production recipes found
+                      </p>
                       <p className="text-sm">
                         Get started by creating your first production recipe
                       </p>

@@ -1,11 +1,11 @@
 import { ApiResponse } from "../../types";
 import {
-  ProductionOrder,
-  ProductionOrderStats,
-  ProductionOrderLog,
   CreateProductionOrderPayload,
-  UpdateProductionOrderPayload,
   ProductionFilters,
+  ProductionOrder,
+  ProductionOrderLog,
+  ProductionOrderStats,
+  UpdateProductionOrderPayload,
 } from "../../types/production";
 import { apiSlice } from "../apiSlice";
 
@@ -24,8 +24,8 @@ export const productionApi = apiSlice.injectEndpoints({
         if (params.search) searchParams.append("search", params.search);
         if (params.status) searchParams.append("status", params.status);
         if (params.priority) searchParams.append("priority", params.priority);
-        if (params.manufacturer_id)
-          searchParams.append("manufacturer_id", params.manufacturer_id.toString());
+        if (params.brand_id)
+          searchParams.append("brand_id", params.brand_id.toString());
         if (params.warehouse_id)
           searchParams.append("warehouse_id", params.warehouse_id.toString());
         if (params.start_date) searchParams.append("start_date", params.start_date);

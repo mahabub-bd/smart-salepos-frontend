@@ -192,11 +192,6 @@ const navItems: NavItem[] = [
         path: "/production/material-consumption",
         requiredPermission: "production.view",
       },
-      {
-        name: "Production Statistics",
-        path: "/production/statistics",
-        requiredPermission: "production.view",
-      },
     ],
   },
 

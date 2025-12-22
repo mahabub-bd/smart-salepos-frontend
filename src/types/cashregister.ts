@@ -1,11 +1,11 @@
 import {
-    BaseEntity,
-    Branch,
-    PaginationParams,
-    PaymentMethod,
-    TransactionType,
-    User,
+  BaseEntity,
+  PaginationParams,
+  PaymentMethod,
+  TransactionType,
 } from ".";
+import { Branch } from "./branch";
+import { User } from "./user";
 
 export interface CashRegister extends BaseEntity {
   register_code?: string;
