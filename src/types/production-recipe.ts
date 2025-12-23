@@ -301,7 +301,8 @@ export interface MaterialConsumptionQueryDto {
 }
 
 // API Payload interfaces
-export interface CreateProductionRecipePayload extends CreateProductionRecipeDto {}
+export interface CreateProductionRecipePayload
+  extends CreateProductionRecipeDto {}
 export interface UpdateProductionRecipePayload {
   id: string | number;
   body: UpdateProductionRecipeDto;
@@ -341,3 +342,24 @@ export interface MaterialConsumptionListResponse {
 export interface MaterialRequirementCalculationResponse {
   data: MaterialRequirementCalculation;
 }
+
+// Material type options
+export const materialTypeOptions = [
+  { id: MaterialType.RAW_MATERIAL, name: "Raw Material" },
+  { id: MaterialType.COMPONENT, name: "Component" },
+  { id: MaterialType.SUBASSEMBLY, name: "Subassembly" },
+  { id: MaterialType.CONSUMABLE, name: "Consumable" },
+  { id: MaterialType.PACKAGING, name: "Packaging" },
+  { id: MaterialType.CHEMICAL, name: "Chemical" },
+  { id: MaterialType.ADDITIVE, name: "Additive" },
+];
+
+// Recipe type options
+export const recipeTypeOptions = [
+  { id: ProductionRecipeType.MANUFACTURING, name: "Manufacturing" },
+  { id: ProductionRecipeType.ASSEMBLY, name: "Assembly" },
+  { id: ProductionRecipeType.FORMULATION, name: "Formulation" },
+  { id: ProductionRecipeType.MIXING, name: "Mixing" },
+  { id: ProductionRecipeType.PROCESSING, name: "Processing" },
+  { id: ProductionRecipeType.PACKAGING, name: "Packaging" },
+];

@@ -104,6 +104,42 @@ export const productApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Products", "Suppliers"],
     }),
+
+    // 🔹 GET COMPONENT PRODUCTS
+    getComponentProducts: builder.query<
+      ApiResponse<Product[]>,
+      { page?: number; limit?: number }
+    >({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        searchParams.append("page", (params.page || 1).toString());
+        searchParams.append("limit", (params.limit || 20).toString());
+
+        return {
+          url: `/product/type/component?${searchParams.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Products"],
+    }),
+
+    // 🔹 GET FINISHED GOOD PRODUCTS
+    getFinishedGoodProducts: builder.query<
+      ApiResponse<Product[]>,
+      { page?: number; limit?: number }
+    >({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        searchParams.append("page", (params.page || 1).toString());
+        searchParams.append("limit", (params.limit || 20).toString());
+
+        return {
+          url: `/product/type/finished-good?${searchParams.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Products"],
+    }),
   }),
 });
 
@@ -114,4 +150,6 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetComponentProductsQuery,
+  useGetFinishedGoodProductsQuery,
 } = productApi;

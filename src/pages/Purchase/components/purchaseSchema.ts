@@ -1,6 +1,6 @@
 import { z } from "zod";
-import {  PurchaseOrderStatus } from "../../../types/purchase";
 import { PaymentTerm } from "../../../types";
+import { PurchaseOrderStatus } from "../../../types/purchase";
 
 export const purchaseItemSchema = z.object({
   product_id: z.coerce.number().min(0, "Product is required"),
