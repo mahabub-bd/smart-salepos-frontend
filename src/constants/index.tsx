@@ -120,6 +120,11 @@ const navItems: NavItem[] = [
         requiredPermission: "inventory.view",
       },
       {
+        name: "Stock - Material Wise",
+        path: "/inventory/stock-material-wise",
+        requiredPermission: "inventory.view",
+      },
+      {
         name: "Stock - Batch Wise",
         path: "/inventory/stock-batch-wise",
         requiredPermission: "inventory.view",

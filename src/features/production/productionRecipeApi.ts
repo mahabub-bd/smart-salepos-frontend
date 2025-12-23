@@ -1,13 +1,13 @@
 import { ApiResponse } from "../../types";
 import {
-  ProductionRecipe,
-  MaterialConsumption,
-  MaterialRequirementCalculation,
-  CreateProductionRecipePayload,
-  UpdateProductionRecipePayload,
-  RecipeFilters,
-  MaterialConsumptionQueryDto,
   CalculateMaterialRequirementsParams,
+  CreateProductionRecipePayload,
+  MaterialConsumption,
+  MaterialConsumptionQueryDto,
+  MaterialRequirementCalculation,
+  ProductionRecipe,
+  RecipeFilters,
+  UpdateProductionRecipePayload,
 } from "../../types/production-recipe";
 import { apiSlice } from "../apiSlice";
 
@@ -33,7 +33,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
           searchParams.append("include_inactive", params.include_inactive.toString());
 
         return {
-          url: `/production/recipe?${searchParams.toString()}`,
+          url: `/production-recipe?${searchParams.toString()}`,
           method: "GET",
         };
       },
@@ -46,7 +46,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
       string | number
     >({
       query: (id) => ({
-        url: `/production/recipe/${id}`,
+        url: `/production-recipe/${id}`,
         method: "GET",
       }),
       providesTags: (_result, _error, id) => [{ type: "ProductionRecipes", id }],
@@ -58,7 +58,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
       CalculateMaterialRequirementsParams
     >({
       query: ({ id, quantity }) => ({
-        url: `/production/recipe/calculate/${id}?quantity=${quantity}`,
+        url: `/production-recipe/calculate/${id}?quantity=${quantity}`,
         method: "GET",
       }),
       providesTags: (_result, _error, { id }) => [{ type: "ProductionRecipes", id: `${id}-calculation` }],
@@ -85,7 +85,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
           searchParams.append("consumption_date_to", params.consumption_date_to);
 
         return {
-          url: `/production/recipe/consumption?${searchParams.toString()}`,
+          url: `/production-recipe/consumption?${searchParams.toString()}`,
           method: "GET",
         };
       },
@@ -98,7 +98,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
       CreateProductionRecipePayload
     >({
       query: (body) => ({
-        url: "/production/recipe",
+        url: "/production-recipe",
         method: "POST",
         body,
       }),
@@ -111,7 +111,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
       UpdateProductionRecipePayload
     >({
       query: ({ id, body }) => ({
-        url: `/production/recipe/${id}`,
+        url: `/production-recipe/${id}`,
         method: "PATCH",
         body,
       }),
@@ -128,7 +128,7 @@ export const productionRecipeApi = apiSlice.injectEndpoints({
       string | number
     >({
       query: (id) => ({
-        url: `/production/recipe/${id}`,
+        url: `/production-recipe/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["ProductionRecipes"],

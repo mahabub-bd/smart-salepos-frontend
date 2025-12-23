@@ -27,6 +27,12 @@ export interface TransferPayload {
 interface WarehouseReportParams {
   warehouse_id?: number;
   search?: string;
+  product_type?: string;
+}
+
+interface ProductReportParams {
+  search?: string;
+  product_type?: string;
 }
 export const inventoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -90,10 +96,17 @@ export const inventoryApi = apiSlice.injectEndpoints({
     }),
 
     // 🔹 PRODUCT-WISE REPORT
-    getProductWiseReport: builder.query<ApiResponse<any>, void>({
-      query: () => ({
+    getProductWiseReport: builder.query<
+      ApiResponse<any>,
+      ProductReportParams
+    >({
+      query: ({ search, product_type }) => ({
         url: "/inventory/report/product-wise",
         method: "GET",
+        params: {
+          search,
+          product_type,
+        },
       }),
       providesTags: ["Inventory"],
     }),
@@ -103,12 +116,13 @@ export const inventoryApi = apiSlice.injectEndpoints({
       ApiResponse<any>,
       WarehouseReportParams
     >({
-      query: ({ warehouse_id, search }) => ({
+      query: ({ warehouse_id, search, product_type }) => ({
         url: "/inventory/report/warehouse-wise",
         method: "GET",
         params: {
           warehouse_id,
           search,
+          product_type,
         },
       }),
       providesTags: ["Inventory"],

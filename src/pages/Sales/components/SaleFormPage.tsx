@@ -52,7 +52,7 @@ export default function SaleFormPage() {
     const navigate = useNavigate();
     const [createSale, { isLoading: isCreating }] = useCreateSaleMutation();
 
-    const { data: productData } = useGetProductsQuery({}, { skip: false })
+    const { data: productData } = useGetProductsQuery({ product_type: "finished_good,resale" }, { skip: false })
     const { data: warehouseData } = useGetWarehousesQuery();
     const { data: customerData } = useGetCustomersQuery();
     const { data: accountsData } = useGetAccountsQuery({

@@ -57,11 +57,15 @@ export interface ProductionRecipeItem extends BaseEntity {
   consumption_rate: number;
   waste_percentage: number;
   specifications?: string;
+  supplier_requirements?: string;
+  storage_requirements?: string;
   quality_notes?: string;
   priority: number;
   is_optional: boolean;
   is_substitutable: boolean;
   substitution_notes?: string;
+  alternative_materials?: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -101,6 +105,8 @@ export interface ProductionRecipe extends BaseEntity {
   quality_requirements?: string;
   safety_notes?: string;
   yield_percentage?: number;
+  effective_date?: string | null;
+  expiry_date?: string | null;
   recipe_items: ProductionRecipeItem[];
   summary: ProductionRecipeSummary;
   created_at: string;
@@ -198,8 +204,10 @@ export interface MaterialRequirementCalculation {
 // DTOs for API requests
 export interface CreateProductionRecipeDto {
   name: string;
+  recipe_code: string;
   finished_product_id: number;
   description?: string;
+  version?: string;
   recipe_type: ProductionRecipeType;
   standard_quantity: number;
   unit_of_measure: string;
@@ -208,6 +216,8 @@ export interface CreateProductionRecipeDto {
   quality_requirements?: string;
   safety_notes?: string;
   yield_percentage?: number;
+  effective_date?: string;
+  expiry_date?: string;
   recipe_items: {
     material_product_id: number;
     material_type: MaterialType;
@@ -215,17 +225,23 @@ export interface CreateProductionRecipeDto {
     unit_of_measure: string;
     consumption_rate?: number;
     waste_percentage?: number;
+    unit_cost?: number;
     specifications?: string;
+    supplier_requirements?: string;
+    storage_requirements?: string;
     quality_notes?: string;
     priority: number;
     is_optional: boolean;
     is_substitutable?: boolean;
     substitution_notes?: string;
+    alternative_materials?: string;
+    notes?: string;
   }[];
 }
 
 export interface UpdateProductionRecipeDto {
   name?: string;
+  recipe_code?: string;
   finished_product_id?: number;
   description?: string;
   version?: string;
@@ -238,6 +254,8 @@ export interface UpdateProductionRecipeDto {
   quality_requirements?: string;
   safety_notes?: string;
   yield_percentage?: number;
+  effective_date?: string;
+  expiry_date?: string;
   recipe_items?: {
     id?: number;
     material_product_id?: number;
@@ -246,12 +264,17 @@ export interface UpdateProductionRecipeDto {
     unit_of_measure?: string;
     consumption_rate?: number;
     waste_percentage?: number;
+    unit_cost?: number;
     specifications?: string;
+    supplier_requirements?: string;
+    storage_requirements?: string;
     quality_notes?: string;
     priority?: number;
     is_optional?: boolean;
     is_substitutable?: boolean;
     substitution_notes?: string;
+    alternative_materials?: string;
+    notes?: string;
     _delete?: boolean; // For removing items
   }[];
 }

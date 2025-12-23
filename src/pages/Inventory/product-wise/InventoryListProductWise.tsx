@@ -33,10 +33,16 @@ interface AdjustmentModalState {
   currentStock: number;
 }
 
-export default function InventoryListProductWise() {
+interface InventoryListProductWiseProps {
+  productType: string;
+}
+
+export default function InventoryListProductWise({
+  productType,
+}: InventoryListProductWiseProps) {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useGetProductWiseReportQuery({
-    product_type: "finished_good,resale",
+    product_type: productType,
   });
 
   const inventory: ProductWiseInventoryItem[] = data?.data || [];

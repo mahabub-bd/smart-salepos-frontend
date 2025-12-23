@@ -1,7 +1,12 @@
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import InventoryListProductWise from "./InventoryList";
+import InventoryListProductWise from "./InventoryListProductWise";
 
+// Individual page components
+export { default as InventoryMaterialPage } from "./InventoryMaterialPage";
+export { default as InventoryProductPage } from "./InventoryProductPage";
+
+// Default page (products with finished_good,resale)
 export default function InventoryProductWisePage() {
   return (
     <div>
@@ -9,7 +14,7 @@ export default function InventoryProductWisePage() {
       <PageBreadcrumb pageTitle="Inventory" />
 
       <div className="flex flex-col gap-5 min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/3">
-        <InventoryListProductWise />
+        <InventoryListProductWise productType="finished_good,resale" />
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ export interface ProductFilters {
   isVariable?: boolean;
   hasExpiry?: boolean;
   status?: boolean;
+  product_type?: string;
 }
 
 export const productApi = apiSlice.injectEndpoints({
@@ -46,6 +47,8 @@ export const productApi = apiSlice.injectEndpoints({
           searchParams.append("hasExpiry", params.hasExpiry.toString());
         if (params.status !== undefined)
           searchParams.append("status", params.status.toString());
+        if (params.product_type)
+          searchParams.append("product_type", params.product_type);
 
         return {
           url: `/product?${searchParams.toString()}`,

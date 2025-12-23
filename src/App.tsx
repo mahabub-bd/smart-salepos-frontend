@@ -79,7 +79,9 @@ import EmployeePage from "./pages/Employees";
 import EmployeeProfilePage from "./pages/Employees/EmployeeProfilePage";
 import InventoryPageBatchWise from "./pages/Inventory/batch-wise";
 import InventoryJournalPage from "./pages/Inventory/inventory-journal";
-import InventoryProductWisePage from "./pages/Inventory/product-wise";
+import InventoryProductWisePage, {
+  InventoryMaterialPage,
+} from "./pages/Inventory/product-wise";
 import StockMovementPage from "./pages/Inventory/stock-movement";
 import InventoryProductWarehouseWise from "./pages/Inventory/warehouse-wise";
 import LeaveRequestPage from "./pages/Leave";
@@ -90,6 +92,7 @@ import LeaveApprovalsPage from "./pages/LeaveApprovals";
 import ProductionOrderList from "./pages/Production/Order";
 import ProductionOrderDetailPage from "./pages/Production/Order/ProductionOrderDetailPage";
 import ProductionOrderFormPage from "./pages/Production/Order/ProductionOrderFormPage";
+import { ProductionRecipeFormPage } from "./pages/Production/Recipe";
 import ProductionRecipeList from "./pages/Production/Recipe";
 
 import PurchaseReturnPage from "./pages/Purchase-Return";
@@ -195,6 +198,10 @@ export default function App() {
           <Route
             path="/inventory/stock-product-wise"
             element={<InventoryProductWisePage />}
+          />
+          <Route
+            path="/inventory/stock-material-wise"
+            element={<InventoryMaterialPage />}
           />
           <Route
             path="/inventory/stock-warehouse-wise"
@@ -309,6 +316,14 @@ export default function App() {
           <Route
             path="/production/recipes"
             element={<ProductionRecipeList />}
+          />
+          <Route
+            path="/production/recipes/create"
+            element={<ProductionRecipeFormPage />}
+          />
+          <Route
+            path="/production/recipes/:id/edit"
+            element={<ProductionRecipeFormPage />}
           />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />

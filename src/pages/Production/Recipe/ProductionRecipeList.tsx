@@ -184,7 +184,7 @@ export default function ProductionRecipeList() {
         icon={<Plus size={16} />}
         addLabel="Create Recipe"
         onAdd={openCreatePage}
-        permission="production.add"
+        permission="production.create"
       />
 
       {/* Search & Filters */}
