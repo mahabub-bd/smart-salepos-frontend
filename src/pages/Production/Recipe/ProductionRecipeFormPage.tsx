@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
-import DatePicker from "../../../components/form/date-picker";
 import {
   FormField,
   SelectField,
@@ -14,10 +13,7 @@ import {
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
 import Button from "../../../components/ui/button";
-import {
-  useGetComponentProductsQuery,
-  useGetProductsQuery,
-} from "../../../features/product/productApi";
+import { useGetProductsQuery } from "../../../features/product/productApi";
 import {
   useCreateProductionRecipeMutation,
   useGetProductionRecipeByIdQuery,
@@ -27,17 +23,26 @@ import { useGetUnitsQuery } from "../../../features/unit/unitApi";
 import {
   MaterialType,
   materialTypeOptions,
-  ProductionRecipeType,
-  recipeTypeOptions,
 } from "../../../types/production-recipe";
 import { ProductionRecipeFormData, productionRecipeSchema } from "./formSchema";
+
+const defaultItem = {
+  material_product_id: 1,
+  material_type: MaterialType.COMPONENT,
+  required_quantity: 1,
+  unit_id: 1,
+  consumption_rate: 1,
+  waste_percentage: 0,
+  description: "",
+  priority: 1,
+  is_optional: false,
+};
 
 export default function ProductionRecipeFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
 
-  // React Hook Form
   const {
     register,
     handleSubmit,
@@ -50,39 +55,13 @@ export default function ProductionRecipeFormPage() {
     resolver: zodResolver(productionRecipeSchema),
     defaultValues: {
       name: "",
-      recipe_code: "",
-      finished_product_id: 1, // Placeholder, will be validated
+      finished_product_id: 1,
       description: "",
-      version: "1.0",
-      recipe_type: ProductionRecipeType.MANUFACTURING,
       standard_quantity: 1,
-      unit_of_measure: "units",
+      unit_id: 1,
       estimated_time_minutes: 0,
-      instructions: "",
-      quality_requirements: "",
-      safety_notes: "",
       yield_percentage: 100,
-      effective_date: "",
-      expiry_date: "",
-      recipe_items: [
-        {
-          material_product_id: 1, // Placeholder, will be validated
-          material_type: MaterialType.COMPONENT,
-          required_quantity: 1,
-          unit_of_measure: "pcs",
-          consumption_rate: 1,
-          waste_percentage: 0,
-          unit_cost: 0,
-          specifications: "",
-          supplier_requirements: "",
-          storage_requirements: "",
-          quality_notes: "",
-          priority: 1,
-          is_optional: false,
-          alternative_materials: "",
-          notes: "",
-        },
-      ],
+      recipe_items: [defaultItem],
     },
   });
 
@@ -91,104 +70,58 @@ export default function ProductionRecipeFormPage() {
     name: "recipe_items",
   });
 
-  // API hooks
   const { data: recipeData, isLoading: isLoadingRecipe } =
     useGetProductionRecipeByIdQuery(id as string, { skip: !isEditing });
-  const { data: componentProducts } = useGetComponentProductsQuery({
-    page: 1,
-    limit: 20,
+  const { data: componentProducts } = useGetProductsQuery({
+    product_type: "raw_material,component,consumable,packaging",
   });
-
-  const { data: finishedGoodProducts } = useGetProductsQuery(
-    { product_type: "finished_good" },
-    { skip: false }
-  );
+  const { data: finishedGoodProducts } = useGetProductsQuery({
+    product_type: "finished_good",
+  });
   const { data: units } = useGetUnitsQuery();
-  const unitOptions = units
-    ? units.data.map((unit) => ({ id: unit.name, name: unit.name }))
-    : [];
+  const unitOptions =
+    units?.data.map((unit) => ({ id: unit.id.toString(), name: unit.name })) ||
+    [];
 
   const [createRecipe] = useCreateProductionRecipeMutation();
   const [updateRecipe] = useUpdateProductionRecipeMutation();
 
-  // Load recipe data for editing
   useEffect(() => {
     if (isEditing && recipeData?.data) {
       const recipe = recipeData.data;
-
       reset({
         name: recipe.name || "",
-        recipe_code: recipe.recipe_code || "",
         finished_product_id: recipe.finished_product_id || 0,
         description: recipe.description || "",
-        version: recipe.version || "1.0",
-        recipe_type: recipe.recipe_type || ProductionRecipeType.MANUFACTURING,
         standard_quantity: recipe.standard_quantity || 1,
-        unit_of_measure: recipe.unit_of_measure || "units",
+        unit_id: recipe.unit_id || 1,
         estimated_time_minutes: recipe.estimated_time_minutes || 0,
-        instructions: recipe.instructions || "",
-        quality_requirements: recipe.quality_requirements || "",
-        safety_notes: recipe.safety_notes || "",
         yield_percentage: recipe.yield_percentage || 100,
-        effective_date: recipe.effective_date
-          ? new Date(recipe.effective_date).toISOString().split("T")[0]
-          : "",
-        expiry_date: recipe.expiry_date
-          ? new Date(recipe.expiry_date).toISOString().split("T")[0]
-          : "",
         recipe_items: recipe.recipe_items?.map((item: any) => ({
           id: item.id,
           material_product_id: item.material_product_id || 0,
           material_type: item.material_type || MaterialType.COMPONENT,
           required_quantity: item.required_quantity || 1,
-          unit_of_measure: item.unit_of_measure || "pcs",
+          unit_id: item.unit_id || 1,
           consumption_rate: item.consumption_rate || 1,
           waste_percentage: item.waste_percentage || 0,
-          unit_cost: item.unit_cost || 0,
-          specifications: item.specifications || "",
-          supplier_requirements: item.supplier_requirements || "",
-          storage_requirements: item.storage_requirements || "",
-          quality_notes: item.quality_notes || "",
+          description: item.description || "",
           priority: item.priority || 1,
           is_optional: item.is_optional || false,
-          alternative_materials: item.alternative_materials || "",
-          notes: item.notes || "",
-        })) || [
-          {
-            material_product_id: 1, // Placeholder, will be validated
-            material_type: MaterialType.COMPONENT,
-            required_quantity: 1,
-            unit_of_measure: "pcs",
-            consumption_rate: 1,
-            waste_percentage: 0,
-            unit_cost: 0,
-            specifications: "",
-            supplier_requirements: "",
-            storage_requirements: "",
-            quality_notes: "",
-            priority: 1,
-            is_optional: false,
-            alternative_materials: "",
-            notes: "",
-          },
-        ],
+        })) || [defaultItem],
       });
     }
   }, [isEditing, recipeData, reset]);
 
-  // Handle form submission
   const onSubmit = async (data: ProductionRecipeFormData) => {
     try {
-      // Prepare the payload
       const payload = {
         ...data,
         recipe_items: data.recipe_items.map((item) => ({
           ...item,
-          // Only include id for existing items when editing
           ...(isEditing && item.id ? { id: item.id } : {}),
         })),
       };
-
       if (isEditing && id) {
         await updateRecipe({ id, body: payload }).unwrap();
         toast.success("Production recipe updated successfully");
@@ -202,38 +135,11 @@ export default function ProductionRecipeFormPage() {
     }
   };
 
-  // Add new item
-  const addItem = () => {
-    append({
-      material_product_id: 1, // Placeholder, will be validated
-      material_type: MaterialType.COMPONENT,
-      required_quantity: 1,
-      unit_of_measure: "pcs",
-      consumption_rate: 1,
-      waste_percentage: 0,
-      unit_cost: 0,
-      specifications: "",
-      supplier_requirements: "",
-      storage_requirements: "",
-      quality_notes: "",
-      priority: fields.length + 1,
-      is_optional: false,
-      alternative_materials: "",
-      notes: "",
-    });
-  };
+  const addItem = () => append({ ...defaultItem, priority: fields.length + 1 });
+  const removeItem = (index: number) => fields.length > 1 && remove(index);
 
-  // Remove item
-  const removeItem = (index: number) => {
-    if (fields.length > 1) {
-      remove(index);
-    }
-  };
-
-  // Loading state
-  if (isEditing && isLoadingRecipe) {
+  if (isEditing && isLoadingRecipe)
     return <Loading message="Loading production recipe details..." />;
-  }
 
   return (
     <>
@@ -242,7 +148,6 @@ export default function ProductionRecipeFormPage() {
           isEditing ? "Edit Production Recipe" : "Create Production Recipe"
         }
       />
-
       <div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Basic Information */}
@@ -250,25 +155,13 @@ export default function ProductionRecipeFormPage() {
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
               Basic Information
             </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
               <FormField label="Recipe Name" error={errors.name?.message}>
                 <Input
                   {...register("name")}
                   placeholder="e.g., Samsung Galaxy S24 Manufacturing Recipe"
                 />
               </FormField>
-
-              <FormField
-                label="Recipe Code"
-                error={errors.recipe_code?.message}
-              >
-                <Input
-                  {...register("recipe_code")}
-                  placeholder="e.g., RECIPE-SG-S24-001"
-                />
-              </FormField>
-
               <SelectField
                 label="Finished Product"
                 value={watch("finished_product_id")?.toString()}
@@ -284,21 +177,6 @@ export default function ProductionRecipeFormPage() {
                 ]}
                 error={errors.finished_product_id?.message}
               />
-
-              <SelectField
-                label="Recipe Type"
-                value={watch("recipe_type")}
-                onChange={(value) =>
-                  setValue("recipe_type", value as ProductionRecipeType)
-                }
-                data={recipeTypeOptions}
-                error={errors.recipe_type?.message}
-              />
-
-              <FormField label="Version" error={errors.version?.message}>
-                <Input {...register("version")} placeholder="1.0" />
-              </FormField>
-
               <FormField
                 label="Standard Quantity"
                 error={errors.standard_quantity?.message}
@@ -311,15 +189,13 @@ export default function ProductionRecipeFormPage() {
                   placeholder="1000"
                 />
               </FormField>
-
               <SelectField
                 label="Unit of Measure"
-                value={watch("unit_of_measure")}
-                onChange={(value) => setValue("unit_of_measure", value)}
+                value={watch("unit_id")?.toString()}
+                onChange={(value) => setValue("unit_id", parseInt(value))}
                 data={unitOptions}
-                error={errors.unit_of_measure?.message}
+                error={errors.unit_id?.message}
               />
-
               <FormField
                 label="Estimated Time (minutes)"
                 error={errors.estimated_time_minutes?.message}
@@ -333,7 +209,6 @@ export default function ProductionRecipeFormPage() {
                   placeholder="480"
                 />
               </FormField>
-
               <FormField
                 label="Yield Percentage (%)"
                 error={errors.yield_percentage?.message}
@@ -347,54 +222,7 @@ export default function ProductionRecipeFormPage() {
                   placeholder="95.5"
                 />
               </FormField>
-              <div>
-                <DatePicker
-                  id="effective_date"
-                  label="Effective Date"
-                  placeholder="Select effective date"
-                  mode="single"
-                  disableFuture={false}
-                  value={
-                    watch("effective_date")
-                      ? new Date(watch("effective_date")!)
-                      : null
-                  }
-                  onChange={(date) => {
-                    if (date instanceof Date) {
-                      setValue(
-                        "effective_date",
-                        date.toISOString().split("T")[0]
-                      );
-                    }
-                  }}
-                  error={!!errors.effective_date}
-                  hint={errors.effective_date?.message}
-                />
-              </div>
-
-              <div>
-                <DatePicker
-                  id="expiry_date"
-                  label="Expiry Date"
-                  placeholder="Select expiry date"
-                  mode="single"
-                  disableFuture={false}
-                  value={
-                    watch("expiry_date")
-                      ? new Date(watch("expiry_date")!)
-                      : null
-                  }
-                  onChange={(date) => {
-                    if (date instanceof Date) {
-                      setValue("expiry_date", date.toISOString().split("T")[0]);
-                    }
-                  }}
-                  error={!!errors.expiry_date}
-                  hint={errors.expiry_date?.message}
-                />
-              </div>
             </div>
-
             <div className="mt-3">
               <FormField
                 label="Description"
@@ -404,48 +232,6 @@ export default function ProductionRecipeFormPage() {
                   {...register("description")}
                   rows={2}
                   placeholder="Complete manufacturing process for Samsung Galaxy S24"
-                />
-              </FormField>
-            </div>
-          </div>
-
-          {/* Instructions & Requirements */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
-              Instructions & Requirements
-            </h3>
-
-            <div className="grid grid-cols-3 gap-3">
-              <FormField
-                label="Instructions"
-                error={errors.instructions?.message}
-              >
-                <TextArea
-                  {...register("instructions")}
-                  rows={3}
-                  placeholder="1. Prepare PCB&#10;2. Mount components&#10;3. Test functionality"
-                />
-              </FormField>
-
-              <FormField
-                label="Quality Requirements"
-                error={errors.quality_requirements?.message}
-              >
-                <TextArea
-                  {...register("quality_requirements")}
-                  rows={3}
-                  placeholder="All components must pass QC inspection"
-                />
-              </FormField>
-
-              <FormField
-                label="Safety Notes"
-                error={errors.safety_notes?.message}
-              >
-                <TextArea
-                  {...register("safety_notes")}
-                  rows={3}
-                  placeholder="Use ESD protection when handling components"
                 />
               </FormField>
             </div>
@@ -464,17 +250,14 @@ export default function ProductionRecipeFormPage() {
                 size="sm"
                 className="gap-2"
               >
-                <Plus size={16} />
-                Add Material
+                <Plus size={16} /> Add Material
               </Button>
             </div>
-
             {errors.recipe_items?.message && (
               <p className="text-red-500 text-sm mb-3">
                 {errors.recipe_items.message}
               </p>
             )}
-
             <div className="space-y-3">
               {fields.map((field, index) => (
                 <div
@@ -491,7 +274,7 @@ export default function ProductionRecipeFormPage() {
                           type="checkbox"
                           {...register(`recipe_items.${index}.is_optional`)}
                           className="rounded border-gray-300"
-                        />
+                        />{" "}
                         Optional
                       </label>
                       {fields.length > 1 && (
@@ -507,8 +290,7 @@ export default function ProductionRecipeFormPage() {
                       )}
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
                     <SelectField
                       label="Material Product"
                       value={watch(
@@ -532,7 +314,6 @@ export default function ProductionRecipeFormPage() {
                           ?.message
                       }
                     />
-
                     <SelectField
                       label="Material Type"
                       value={watch(`recipe_items.${index}.material_type`)}
@@ -547,7 +328,6 @@ export default function ProductionRecipeFormPage() {
                         errors.recipe_items?.[index]?.material_type?.message
                       }
                     />
-
                     <FormField
                       label="Priority"
                       error={errors.recipe_items?.[index]?.priority?.message}
@@ -562,8 +342,7 @@ export default function ProductionRecipeFormPage() {
                       />
                     </FormField>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
                     <FormField
                       label="Required Quantity"
                       error={
@@ -573,9 +352,7 @@ export default function ProductionRecipeFormPage() {
                       <Input
                         {...register(
                           `recipe_items.${index}.required_quantity`,
-                          {
-                            valueAsNumber: true,
-                          }
+                          { valueAsNumber: true }
                         )}
                         type="number"
                         min="0.0001"
@@ -583,34 +360,18 @@ export default function ProductionRecipeFormPage() {
                         placeholder="5"
                       />
                     </FormField>
-
                     <SelectField
                       label="Unit of Measure"
-                      value={watch(`recipe_items.${index}.unit_of_measure`)}
+                      value={watch(`recipe_items.${index}.unit_id`)?.toString()}
                       onChange={(value) =>
-                        setValue(`recipe_items.${index}.unit_of_measure`, value)
+                        setValue(
+                          `recipe_items.${index}.unit_id`,
+                          parseInt(value)
+                        )
                       }
                       data={unitOptions}
-                      error={
-                        errors.recipe_items?.[index]?.unit_of_measure?.message
-                      }
+                      error={errors.recipe_items?.[index]?.unit_id?.message}
                     />
-
-                    <FormField
-                      label="Unit Cost"
-                      error={errors.recipe_items?.[index]?.unit_cost?.message}
-                    >
-                      <Input
-                        {...register(`recipe_items.${index}.unit_cost`, {
-                          valueAsNumber: true,
-                        })}
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="15.50"
-                      />
-                    </FormField>
-
                     <FormField
                       label="Waste %"
                       error={
@@ -629,10 +390,9 @@ export default function ProductionRecipeFormPage() {
                       />
                     </FormField>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                  <div className="mb-3">
                     <FormField
-                      label="Consumption Rate (0-1)"
+                      label="Consumption Rate"
                       error={
                         errors.recipe_items?.[index]?.consumption_rate?.message
                       }
@@ -643,99 +403,22 @@ export default function ProductionRecipeFormPage() {
                         })}
                         type="number"
                         min="0"
-                        max="1"
                         step="0.01"
                         placeholder="2.5"
                       />
                     </FormField>
-
+                  </div>
+                  <div className="mb-3">
                     <FormField
-                      label="Alternative Materials (comma-separated IDs)"
-                      error={
-                        errors.recipe_items?.[index]?.alternative_materials
-                          ?.message
-                      }
+                      label="Description"
+                      error={errors.recipe_items?.[index]?.description?.message}
                     >
-                      <Input
-                        {...register(
-                          `recipe_items.${index}.alternative_materials`
-                        )}
-                        placeholder="123,124,125"
+                      <TextArea
+                        {...register(`recipe_items.${index}.description`)}
+                        rows={2}
+                        placeholder="Grade A electronic components"
                       />
                     </FormField>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <FormField
-                        label="Supplier Requirements"
-                        error={
-                          errors.recipe_items?.[index]?.supplier_requirements
-                            ?.message
-                        }
-                      >
-                        <TextArea
-                          {...register(
-                            `recipe_items.${index}.supplier_requirements`
-                          )}
-                          rows={2}
-                          placeholder="Must source from approved suppliers"
-                        />
-                      </FormField>
-
-                      <FormField
-                        label="Storage Requirements"
-                        error={
-                          errors.recipe_items?.[index]?.storage_requirements
-                            ?.message
-                        }
-                      >
-                        <TextArea
-                          {...register(
-                            `recipe_items.${index}.storage_requirements`
-                          )}
-                          rows={2}
-                          placeholder="Store in temperature-controlled environment"
-                        />
-                      </FormField>
-                      <FormField
-                        label="Specifications"
-                        error={
-                          errors.recipe_items?.[index]?.specifications?.message
-                        }
-                      >
-                        <TextArea
-                          {...register(`recipe_items.${index}.specifications`)}
-                          rows={2}
-                          placeholder="Grade A electronic components"
-                        />
-                      </FormField>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <FormField
-                        label="Quality Notes"
-                        error={
-                          errors.recipe_items?.[index]?.quality_notes?.message
-                        }
-                      >
-                        <TextArea
-                          {...register(`recipe_items.${index}.quality_notes`)}
-                          rows={2}
-                          placeholder="Must pass incoming inspection"
-                        />
-                      </FormField>
-
-                      <FormField
-                        label="Notes"
-                        error={errors.recipe_items?.[index]?.notes?.message}
-                      >
-                        <TextArea
-                          {...register(`recipe_items.${index}.notes`)}
-                          rows={2}
-                          placeholder="Handle with care"
-                        />
-                      </FormField>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -743,24 +426,22 @@ export default function ProductionRecipeFormPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-6 pt-4">
             <Button
               type="button"
               onClick={() => navigate("/production/recipes")}
               variant="outline"
               className="gap-2"
             >
-              <ArrowLeft size={16} />
-              Cancel
+              <ArrowLeft size={16} /> Cancel
             </Button>
-
             <Button
               type="submit"
               disabled={isSubmitting}
               variant="primary"
               className="gap-2"
             >
-              <Save size={16} />
+              <Save size={16} />{" "}
               {isSubmitting
                 ? "Saving..."
                 : isEditing

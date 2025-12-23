@@ -96,7 +96,7 @@ const getBadgeClasses = (color: string) => {
   return colorMap[color] || colorMap.light;
 };
 
-export default function ProductList() {
+export default function ComponentList() {
   const navigate = useNavigate();
 
   // Filter states
@@ -131,7 +131,7 @@ export default function ProductList() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  // Build filter object
+  // Build filter object with component product types
   const filters: ProductFilters = {
     page,
     limit,
@@ -144,6 +144,7 @@ export default function ProductList() {
     isVariable: selectedVariable,
     hasExpiry: selectedExpiry,
     status: selectedStatus,
+    product_type: "raw_material,component,consumable,packaging",
   };
 
   const { data, isLoading, isError } = useGetProductsQuery(filters);
@@ -276,18 +277,18 @@ export default function ProductList() {
   }, []);
 
   // 🔹 Loading & Error States
-  if (isLoading) return <Loading message="Loading Products..." />;
+  if (isLoading) return <Loading message="Loading Components..." />;
   if (isError)
-    return <p className="p-6 text-red-500">Failed to fetch products.</p>;
+    return <p className="p-6 text-red-500">Failed to fetch components.</p>;
 
   return (
     <>
       {/* Header Section */}
 
       <PageHeader
-        title="Product Management"
+        title="Component Management"
         icon={<Plus size={16} />}
-        addLabel="Add"
+        addLabel="Add Component"
         onAdd={openCreatePage}
         permission="product.create"
       />
@@ -453,7 +454,7 @@ export default function ProductList() {
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
                 <TableCell isHeader colSpan={2}>
-                  Product
+                  Component
                 </TableCell>
                 <TableCell isHeader>Type</TableCell>
                 <TableCell isHeader>Brand</TableCell>
@@ -647,13 +648,13 @@ export default function ProductList() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={9}
+                    colSpan={8}
                     className="py-12 text-center text-gray-500 dark:text-gray-400"
                   >
                     <div className="flex flex-col items-center gap-2 w-full justify-center">
-                      <p className="text-lg font-medium">No products found</p>
+                      <p className="text-lg font-medium">No components found</p>
                       <p className="text-sm">
-                        Get started by adding your first product
+                        Get started by adding your first component
                       </p>
                     </div>
                   </TableCell>
@@ -683,7 +684,7 @@ export default function ProductList() {
       {canDelete && (
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
-          title="Delete Product"
+          title="Delete Component"
           message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"

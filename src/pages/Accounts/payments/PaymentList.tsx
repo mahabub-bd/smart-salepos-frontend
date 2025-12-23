@@ -140,7 +140,7 @@ export default function PaymentList() {
 
                       {/* Amount */}
                       <TableCell className="font-medium">
-                        ${Number(payment.amount).toFixed(2)}
+                        {Number(payment.amount).toFixed(2)}
                       </TableCell>
 
                       {/* Method Badge */}

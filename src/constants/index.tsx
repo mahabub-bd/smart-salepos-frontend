@@ -154,6 +154,11 @@ const navItems: NavItem[] = [
         requiredPermission: "product.view",
       },
       {
+        name: "Components List",
+        path: "/components",
+        requiredPermission: "product.view",
+      },
+      {
         name: "Categories",
         path: "/categories",
         requiredPermission: "category.view",

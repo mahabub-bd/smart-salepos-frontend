@@ -26,6 +26,7 @@ import BrandsPage from "./pages/Brand";
 import CategoryPage from "./pages/Category";
 import PermissionAssignPage from "./pages/PermissionAssignPage";
 import ProductPage from "./pages/Product";
+import ComponentPage from "./pages/Product/ComponentPage";
 import ProductDetailPage from "./pages/Product/components/ProductDetailPage";
 import ProductFormPage from "./pages/Product/components/ProductFormPage";
 import PurchasePage from "./pages/Purchase";
@@ -79,9 +80,7 @@ import EmployeePage from "./pages/Employees";
 import EmployeeProfilePage from "./pages/Employees/EmployeeProfilePage";
 import InventoryPageBatchWise from "./pages/Inventory/batch-wise";
 import InventoryJournalPage from "./pages/Inventory/inventory-journal";
-import InventoryProductWisePage, {
-  InventoryMaterialPage,
-} from "./pages/Inventory/product-wise";
+
 import StockMovementPage from "./pages/Inventory/stock-movement";
 import InventoryProductWarehouseWise from "./pages/Inventory/warehouse-wise";
 import LeaveRequestPage from "./pages/Leave";
@@ -92,8 +91,7 @@ import LeaveApprovalsPage from "./pages/LeaveApprovals";
 import ProductionOrderList from "./pages/Production/Order";
 import ProductionOrderDetailPage from "./pages/Production/Order/ProductionOrderDetailPage";
 import ProductionOrderFormPage from "./pages/Production/Order/ProductionOrderFormPage";
-import { ProductionRecipeFormPage } from "./pages/Production/Recipe";
-import ProductionRecipeList from "./pages/Production/Recipe";
+import ProductionRecipeList, { ProductionRecipeFormPage } from "./pages/Production/Recipe";
 
 import PurchaseReturnPage from "./pages/Purchase-Return";
 import PurchaseReturnDetailPage from "./pages/Purchase-Return/components/PurchaseReturnDetailPage";
@@ -109,6 +107,8 @@ import UsersPage from "./pages/UserPage";
 import WarehousePage from "./pages/Warehouse";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
+import InventoryProductPage from "./pages/Inventory/product-wise/InventoryProductPage";
+import InventoryMaterialPage from "./pages/Inventory/product-wise/InventoryMaterialPage";
 
 export default function App() {
   return (
@@ -168,6 +168,7 @@ export default function App() {
           <Route path="/tags" element={<TagPage />} />
           <Route path="/warehouses" element={<WarehousePage />} />
           <Route path="/products" element={<ProductPage />} />
+          <Route path="/components" element={<ComponentPage />} />
           // For creating a product
           <Route path="/products/create" element={<ProductFormPage />} />
           // For viewing a product
@@ -197,7 +198,7 @@ export default function App() {
           />
           <Route
             path="/inventory/stock-product-wise"
-            element={<InventoryProductWisePage />}
+            element={<InventoryProductPage />}
           />
           <Route
             path="/inventory/stock-material-wise"
