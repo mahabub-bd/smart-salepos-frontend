@@ -30,7 +30,7 @@ const recipeItemSchema = z.object({
   id: z.number().optional(),
   material_product_id: z.number("Material product is required").min(1),
   material_type: z.nativeEnum(MaterialType, {
-    errorMap: () => ({ message: "Material type is required" }),
+    message: "Material type is required",
   }),
   required_quantity: z
     .number("Quantity must be greater than 0")
@@ -43,8 +43,8 @@ const recipeItemSchema = z.object({
   supplier_requirements: z.string().optional(),
   storage_requirements: z.string().optional(),
   quality_notes: z.string().optional(),
-  priority: z.number().min(1).default(1),
-  is_optional: z.boolean().default(false),
+  priority: z.number().min(1),
+  is_optional: z.boolean(),
   alternative_materials: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -57,7 +57,7 @@ const productionRecipeSchema = z.object({
   description: z.string().optional(),
   version: z.string().optional(),
   recipe_type: z.nativeEnum(ProductionRecipeType, {
-    errorMap: () => ({ message: "Recipe type is required" }),
+    message: "Recipe type is required",
   }),
   standard_quantity: z
     .number("Standard quantity must be greater than 0")
@@ -224,24 +224,24 @@ export default function ProductionRecipeFormPage() {
           alternative_materials: item.alternative_materials || "",
           notes: item.notes || "",
         })) || [
-          {
-            material_product_id: 1, // Placeholder, will be validated
-            material_type: MaterialType.COMPONENT,
-            required_quantity: 1,
-            unit_of_measure: "pcs",
-            consumption_rate: 1,
-            waste_percentage: 0,
-            unit_cost: 0,
-            specifications: "",
-            supplier_requirements: "",
-            storage_requirements: "",
-            quality_notes: "",
-            priority: 1,
-            is_optional: false,
-            alternative_materials: "",
-            notes: "",
-          },
-        ],
+            {
+              material_product_id: 1, // Placeholder, will be validated
+              material_type: MaterialType.COMPONENT,
+              required_quantity: 1,
+              unit_of_measure: "pcs",
+              consumption_rate: 1,
+              waste_percentage: 0,
+              unit_cost: 0,
+              specifications: "",
+              supplier_requirements: "",
+              storage_requirements: "",
+              quality_notes: "",
+              priority: 1,
+              is_optional: false,
+              alternative_materials: "",
+              notes: "",
+            },
+          ],
       });
     }
   }, [isEditing, recipeData, reset]);
@@ -442,7 +442,7 @@ export default function ProductionRecipeFormPage() {
                   disableFuture={false}
                   value={
                     watch("effective_date")
-                      ? new Date(watch("effective_date"))
+                      ? new Date(watch("effective_date")!)
                       : null
                   }
                   onChange={(date) => {
@@ -466,7 +466,7 @@ export default function ProductionRecipeFormPage() {
                   mode="single"
                   disableFuture={false}
                   value={
-                    watch("expiry_date") ? new Date(watch("expiry_date")) : null
+                    watch("expiry_date") ? new Date(watch("expiry_date")!) : null
                   }
                   onChange={(date) => {
                     if (date instanceof Date) {
@@ -830,8 +830,8 @@ export default function ProductionRecipeFormPage() {
               {isSubmitting
                 ? "Saving..."
                 : isEditing
-                ? "Update Recipe"
-                : "Create Recipe"}
+                  ? "Update Recipe"
+                  : "Create Recipe"}
             </button>
           </div>
         </form>
