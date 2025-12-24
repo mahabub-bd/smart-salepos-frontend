@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
+
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import {
@@ -64,119 +65,154 @@ export default function InventoryListProductWise() {
     return <p className="p-6 text-red-500">Failed to load inventory</p>;
 
   return (
-    <div>
-      <div className="rounded-xl border bg-white mt-5">
+    <div className="p-6">
+      <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <Table className="w-full text-sm">
             <TableHeader>
-              <TableRow>
-                <TableCell isHeader>Product</TableCell>
-                <TableCell isHeader>SKU</TableCell>
-                <TableCell isHeader>Purchased</TableCell>
-                <TableCell isHeader>Sold</TableCell>
-                <TableCell isHeader>Remaining</TableCell>
-                <TableCell isHeader>Purchase Value</TableCell>
-                <TableCell isHeader>Sale Value</TableCell>
-                <TableCell isHeader>Warehouses</TableCell>
-                <TableCell isHeader>Actions</TableCell>
+              <TableRow className="bg-gray-50">
+                <TableCell isHeader className="font-semibold">
+                  Product
+                </TableCell>
+                <TableCell isHeader className="font-semibold">
+                  SKU
+                </TableCell>
+                <TableCell isHeader className="font-semibold text-center">
+                  Purchased
+                </TableCell>
+                <TableCell isHeader className="font-semibold text-center">
+                  Sold
+                </TableCell>
+                <TableCell isHeader className="font-semibold text-center">
+                  Remaining
+                </TableCell>
+                <TableCell isHeader className="font-semibold text-right">
+                  Purchase Value
+                </TableCell>
+                <TableCell isHeader className="font-semibold text-right">
+                  Sale Value
+                </TableCell>
+                <TableCell isHeader className="font-semibold">
+                  Warehouses
+                </TableCell>
+                <TableCell isHeader className="font-semibold text-center">
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {inventory ? (
+              {inventory.length > 0 ? (
                 inventory.map((item) => (
-                  <TableRow key={item.product_id} className="border-b">
+                  <TableRow key={item.product_id} className="hover:bg-gray-50">
                     {/* Product Name */}
-                    <TableCell className="align-middle ">
+                    <TableCell className="align-top font-medium">
                       {item.product.name}
                     </TableCell>
 
                     {/* SKU */}
-                    <TableCell className="align-middle ">
-                      {item.product.sku}
+                    <TableCell className="align-top">
+                      <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                        {item.product.sku}
+                      </span>
                     </TableCell>
 
                     {/* Purchased (Total Stock) */}
-                    <TableCell className="align-middle ">
-                      {item.total_stock}
+                    <TableCell className="align-top text-center">
+                      <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.total_stock}
+                      </span>
                     </TableCell>
 
                     {/* Sold */}
-                    <TableCell className="text-red-500 align-middle ">
-                      {item.total_sold_quantity}
+                    <TableCell className="align-top text-center">
+                      <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.total_sold_quantity}
+                      </span>
                     </TableCell>
 
                     {/* Remaining */}
-                    <TableCell className="text-green-600 align-middle ">
-                      {item.remaining_stock}
+                    <TableCell className="align-top text-center">
+                      <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.remaining_stock}
+                      </span>
                     </TableCell>
 
                     {/* Purchase Value */}
-                    <TableCell className="text-blue-600 align-middle ">
+                    <TableCell className="align-top text-right font-medium">
                       ৳{item.purchase_value.toLocaleString()}
                     </TableCell>
 
                     {/* Sale Value */}
-                    <TableCell className="text-purple-600 align-middle ">
+                    <TableCell className="align-top text-right font-medium">
                       ৳{item.sale_value.toLocaleString()}
                     </TableCell>
 
                     {/* Warehouse Details */}
-                    <TableCell className="table-body align-middle ">
-                      {item.warehouses.map((warehouse, index) => (
-                        <div
-                          key={index}
-                          className="text-sm mb-3 pb-3 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1">
-                              <span className="font-medium">
-                                {warehouse.warehouse.name}
-                              </span>{" "}
-                              —
-                              <span className="text-blue-500">
-                                {" "}
-                                {warehouse.purchased_quantity} purchased
-                              </span>
-                              ,
-                              <span className="text-red-500">
-                                {" "}
-                                {warehouse.sold_quantity} sold
-                              </span>
-                              ,
-                              <span className="text-green-600">
-                                {" "}
-                                {warehouse.remaining_quantity} left
-                              </span>
-                              <br />
-                              <span className="text-xs text-gray-500">
-                                {warehouse.batch_no}
-                              </span>
-                            </div>
-                            <div>
-                              <IconButton
-                                icon={Edit}
-                                size={16}
-                                color="gray"
-                                tooltip="Adjust Stock"
-                                onClick={() =>
-                                  setAdjustmentModal({
-                                    isOpen: true,
-                                    inventoryId: warehouse.id,
-                                    productName: item.product.name,
-                                    warehouseName: warehouse.warehouse.name,
-                                    currentStock: warehouse.remaining_quantity,
-                                  })
-                                }
-                              />
+                    <TableCell className="align-top">
+                      <div className="space-y-2">
+                        {item.warehouses.map((warehouse, index) => (
+                          <div
+                            key={index}
+                            className="border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-gray-900 mb-1">
+                                  {warehouse.warehouse.name}
+                                </div>
+                                <div className="flex flex-wrap gap-2 text-xs mb-1">
+                                  <span className="text-blue-600">
+                                    Purchased:{" "}
+                                    <span className="font-semibold">
+                                      {warehouse.purchased_quantity}
+                                    </span>
+                                  </span>
+                                  <span className="text-red-600">
+                                    Sold:{" "}
+                                    <span className="font-semibold">
+                                      {warehouse.sold_quantity}
+                                    </span>
+                                  </span>
+                                  <span className="text-green-600">
+                                    Left:{" "}
+                                    <span className="font-semibold">
+                                      {warehouse.remaining_quantity}
+                                    </span>
+                                  </span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  <span className="font-mono bg-gray-200 px-2 py-0.5 rounded">
+                                    {warehouse.batch_no}
+                                  </span>
+                                </div>
+                              </div>
+                              <div>
+                                <IconButton
+                                  icon={Edit}
+                                  size={16}
+                                  color="gray"
+                                  tooltip="Adjust Stock"
+                                  onClick={() =>
+                                    setAdjustmentModal({
+                                      isOpen: true,
+                                      inventoryId: warehouse.id,
+                                      productName: item.product.name,
+                                      warehouseName: warehouse.warehouse.name,
+                                      currentStock:
+                                        warehouse.remaining_quantity,
+                                    })
+                                  }
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </TableCell>
 
                     {/* Action */}
-                    <TableCell className="table-body align-middle text-center">
+                    <TableCell className="align-top text-center">
                       <div className="relative inline-block">
                         <button
                           onClick={() =>
@@ -186,7 +222,7 @@ export default function InventoryListProductWise() {
                                 : item.product_id
                             )
                           }
-                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                           <MoreVertical size={16} className="text-gray-600" />
                         </button>
@@ -234,7 +270,7 @@ export default function InventoryListProductWise() {
                 <TableRow>
                   <TableCell
                     colSpan={9}
-                    className="py-6 text-center text-gray-500"
+                    className="py-8 text-center text-gray-500"
                   >
                     No inventory records found
                   </TableCell>
