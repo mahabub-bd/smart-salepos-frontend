@@ -20,7 +20,7 @@ import {
   useGetExpensesQuery,
 } from "../../../features/expenses/expensesApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Expense } from "../../../types";
+import { Expense } from "../../../types/expenses";
 import ExpenseFormModal from "./ExpenseFormModal";
 
 export default function ExpenseList() {
@@ -139,7 +139,11 @@ export default function ExpenseList() {
 
                     <TableCell className="table-body">
                       {expense.payment_method ? (
-                        <Badge size="sm" color="primary" className="text-gray-900 dark:text-white capitalize">
+                        <Badge
+                          size="sm"
+                          color="primary"
+                          className="text-gray-900 dark:text-white capitalize"
+                        >
                           {expense.payment_method}
                         </Badge>
                       ) : (
@@ -187,12 +191,7 @@ export default function ExpenseList() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={9}
-                   
-                  >
-                    No expenses found
-                  </TableCell>
+                  <TableCell colSpan={9}>No expenses found</TableCell>
                 </TableRow>
               )}
             </TableBody>

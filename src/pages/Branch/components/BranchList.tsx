@@ -18,7 +18,7 @@ import {
   useGetBranchesQuery,
 } from "../../../features/branch/branchApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Branch } from "../../../types";
+import { Branch } from "../../../types/branch";
 import BranchFormModal from "./BranchFormModal";
 
 export default function BranchList() {

@@ -1,4 +1,5 @@
-import { Account, ApiResponse, JournalEntry } from "../../types";
+import { ApiResponse } from "../../types";
+import { Account, JournalEntry } from "../../types/accounts";
 import { apiSlice } from "../apiSlice";
 interface GetAccountsQueryArg {
   type?: string;

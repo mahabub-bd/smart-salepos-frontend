@@ -1,4 +1,4 @@
-import { InventoryItem } from "../../../types";
+import { InventoryItem } from "../../../types/inventory";
 
 export default function InventoryCard({ item }: { item: InventoryItem }) {
   return (

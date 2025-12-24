@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loading from "../../../components/common/Loading";
 import Button from "../../../components/ui/button/Button";
 import {
   Table,
@@ -18,13 +19,13 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
 import {
   useDeleteQuotationMutation,
   useGetQuotationByIdQuery,
   useUpdateQuotationStatusMutation,
 } from "../../../features/quotation/quotationApi";
-import { useLazyGetInvoicePdfQuery } from "../../../features/invoice/invoiceApi";
-import { QuotationItem, QuotationStatus } from "../../../types";
+import { QuotationItem, QuotationStatus } from "../../../types/quotation";
 import {
   formatCurrencyEnglish as formatCurrency,
   formatDateTime,
@@ -40,7 +41,8 @@ export default function QuotationDetail({ id }: { id: string }) {
   } = useGetQuotationByIdQuery(Number(id));
   const navigate = useNavigate();
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
-  const [getInvoicePdf, { isLoading: isDownloadingPdf }] = useLazyGetInvoicePdfQuery();
+  const [getInvoicePdf, { isLoading: isDownloadingPdf }] =
+    useLazyGetInvoicePdfQuery();
 
   const [updateQuotationStatus, { isLoading: isSending }] =
     useUpdateQuotationStatusMutation();
@@ -49,9 +51,12 @@ export default function QuotationDetail({ id }: { id: string }) {
 
   const handleDownloadPdf = async () => {
     try {
-      const blob = await getInvoicePdf({ type: "quotation", id: Number(id) }).unwrap();
+      const blob = await getInvoicePdf({
+        type: "quotation",
+        id: Number(id),
+      }).unwrap();
       const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      window.open(url, "_blank");
       // Clean up the object URL after a short delay
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
@@ -62,7 +67,7 @@ export default function QuotationDetail({ id }: { id: string }) {
     }
   };
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <Loading message="Loading Quotation Details" />;
   if (error)
     return <div className="p-6 text-red-500">Error loading quotation</div>;
   if (!quotation?.data) return <div className="p-6">Quotation not found</div>;

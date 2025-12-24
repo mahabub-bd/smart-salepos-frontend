@@ -1,4 +1,5 @@
-import { ApiResponse, Tag } from "../../types";
+import { ApiResponse,  } from "../../types";
+import { Tag } from "../../types/product";
 import { apiSlice } from "../apiSlice";
 
 export interface UpdateTagPayload {

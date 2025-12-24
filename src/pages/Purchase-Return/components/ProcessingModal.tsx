@@ -149,11 +149,10 @@ export default function ProcessingModal({
               Processing Notes (Optional)
             </Label>
             <TextArea
+              {...register("processing_notes")}
               rows={3}
               className="w-full"
               placeholder="Add any notes about this processing..."
-              value={watch("processing_notes")}
-              onChange={(value) => setValue("processing_notes", value)}
               disabled={isLoading}
             />
           </div>

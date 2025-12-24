@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { Tag } from "../../../types";
+import { Tag } from "../../../types/product";
 import TagFormModal from "./TagFormModal";
 
 export default function TagList() {

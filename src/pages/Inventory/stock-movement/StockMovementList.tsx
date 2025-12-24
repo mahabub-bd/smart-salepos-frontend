@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import Loading from "../../../components/common/Loading";
 import { SelectField } from "../../../components/form/form-elements/SelectFiled";
+import Button from "../../../components/ui/button/Button";
 import {
   Table,
   TableBody,
@@ -17,7 +18,7 @@ import {
 } from "../../../components/ui/table";
 import { useGetStockMovementsQuery } from "../../../features/inventory/inventoryApi";
 import { useGetProductsQuery } from "../../../features/product/productApi";
-import { StockMovement, StockMovementType } from "../../../types";
+import { StockMovement, StockMovementType } from "../../../types/inventory";
 import { formatDateTime } from "../../../utlis";
 
 // Movement type badge component
@@ -75,7 +76,7 @@ export default function StockMovementList() {
     type: undefined as StockMovementType | undefined,
   });
 
-  const { data: productsData } = useGetProductsQuery();
+  const { data: productsData } = useGetProductsQuery({});
   const products = productsData?.data || [];
 
   const { data, isLoading, isError } = useGetStockMovementsQuery(filters);
@@ -113,7 +114,7 @@ export default function StockMovementList() {
             onChange={(value) =>
               setFilters((prev) => ({
                 ...prev,
-                type: value === "" ? undefined : value as StockMovementType,
+                type: value === "" ? undefined : (value as StockMovementType),
               }))
             }
             placeholder="Select movement type"
@@ -122,7 +123,8 @@ export default function StockMovementList() {
           />
 
           <div className="flex items-end">
-            <button
+            <Button
+              size="sm"
               onClick={() =>
                 setFilters({
                   product_id: undefined,
@@ -130,10 +132,10 @@ export default function StockMovementList() {
                   type: undefined,
                 })
               }
-              className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              variant="primary"
             >
-              Clear Filters
-            </button>
+              Reset
+            </Button>
           </div>
         </div>
       </div>

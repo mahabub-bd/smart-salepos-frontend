@@ -4,16 +4,16 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod"; // 🔹 FIXED import
 
-import Input from "../../../components/form/input/InputField";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Input from "../../../components/form/input/InputField";
 import Switch from "../../../components/form/switch/Switch";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 import {
   useCreateWarehouseMutation,
   useUpdateWarehouseMutation,
 } from "../../../features/warehouse/warehouseApi";
-import { Warehouse } from "../../../types";
+import { Warehouse } from "../../../types/branch";
 
 const warehouseSchema = z.object({
   name: z.string().min(1, "Name is required"),

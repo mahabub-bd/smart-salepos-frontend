@@ -1,5 +1,10 @@
+import { ApiResponse } from "../../types";
+import {
+  CreateUnitRequest,
+  Unit,
+  UpdateUnitRequest,
+} from "../../types/product";
 import { apiSlice } from "../apiSlice";
-import { Unit, CreateUnitRequest, UpdateUnitRequest, ApiResponse } from "../../types";
 
 export const unitApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

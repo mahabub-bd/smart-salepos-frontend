@@ -41,7 +41,7 @@ import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
 import { useGetEmployeesQuery } from "../../../../features/employee/employeeApi";
 import { useHasPermission } from "../../../../hooks/useHasPermission";
 import { AttendanceRecord } from "../../../../types";
-import { getStatusColorAttendence } from "../../../../utlis";
+import { formatDate, getStatusColorAttendence } from "../../../../utlis";
 
 import StatCard from "../../../../components/common/stat-card";
 import Button from "../../../../components/ui/button/Button";
@@ -323,7 +323,8 @@ export default function AttendanceList() {
                         ID: {r.employee?.employee_code || "N/A"}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {r.employee?.department?.name || "N/A"} • {r.employee?.designation?.title || "N/A"}
+                        {r.employee?.department?.name || "N/A"} •{" "}
+                        {r.employee?.designation?.title || "N/A"}
                       </div>
                     </div>
                   </TableCell>
@@ -342,19 +343,22 @@ export default function AttendanceList() {
                   <TableCell>
                     <div className="space-y-1">
                       <div className="text-sm">
-                        <span className="text-gray-500">Regular:</span> {r.regular_hours || "-"}
+                        <span className="text-gray-500">Regular:</span>{" "}
+                        {r.regular_hours || "-"}
                       </div>
                       <div className="text-sm">
-                        <span className="text-gray-500">Overtime:</span> {r.overtime_hours || "-"}
+                        <span className="text-gray-500">Overtime:</span>{" "}
+                        {r.overtime_hours || "-"}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div className="text-sm">
-                        {new Date(r.date).toLocaleDateString()}
-                      </div>
-                      <Badge color={getStatusColorAttendence(r.status)} size="sm">
+                      <div className="text-sm">{formatDate(r.date)}</div>
+                      <Badge
+                        color={getStatusColorAttendence(r.status)}
+                        size="sm"
+                      >
                         {r.status}
                       </Badge>
                     </div>

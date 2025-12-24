@@ -1,10 +1,10 @@
 import { Control, Controller, FieldErrors } from "react-hook-form";
-import { QuotationFormValues } from "../quotationSchema";
+import DatePicker from "../../../../components/form/date-picker";
 import { FormField, SelectField } from "../../../../components/form/form-elements/SelectFiled";
 import { useGetBranchesQuery } from "../../../../features/branch/branchApi";
 import { useGetCustomersQuery } from "../../../../features/customer/customerApi";
-import { QuotationStatus, QuotationStatusDescription } from "../../../../types";
-import DatePicker from "../../../../components/form/date-picker";
+import { QuotationStatus, QuotationStatusDescription } from "../../../../types/quotation";
+import { QuotationFormValues } from "../quotationSchema";
 
 interface BasicInfoFieldsProps {
   control: Control<QuotationFormValues>;

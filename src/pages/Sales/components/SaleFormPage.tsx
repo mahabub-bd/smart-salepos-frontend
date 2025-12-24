@@ -8,8 +8,8 @@ import { z } from "zod";
 import IconButton from "../../../components/common/IconButton";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import Input from "../../../components/form/input/InputField";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import Button from "../../../components/ui/button/Button";
 
@@ -52,7 +52,7 @@ export default function SaleFormPage() {
     const navigate = useNavigate();
     const [createSale, { isLoading: isCreating }] = useCreateSaleMutation();
 
-    const { data: productData } = useGetProductsQuery(undefined, { skip: false })
+    const { data: productData } = useGetProductsQuery({ product_type: "finished_good,resale" }, { skip: false })
     const { data: warehouseData } = useGetWarehousesQuery();
     const { data: customerData } = useGetCustomersQuery();
     const { data: accountsData } = useGetAccountsQuery({

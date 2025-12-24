@@ -1,32 +1,10 @@
 
-import { ApiResponse, User } from "../../types";
+import { ApiResponse, } from "../../types";
+import { CreateUserPayload, UpdateUserPayload, User } from "../../types/user";
 import { apiSlice } from "../apiSlice";
 import { updateUser as updateAuthUser } from "../auth/authSlice";
 
-export interface CreateUserPayload {
-  username: string;
-  email: string;
-  full_name: string;
-  phone: string;
-  password: string;
-  roles: string[];
-  branch_ids?: number[];
-}
 
-export interface UpdateUserDto {
-  username?: string;
-  email?: string;
-  full_name?: string;
-  phone?: string;
-  password?: string;
-  roles?: string[];
-  branch_ids?: number[];
-}
-
-export interface UpdateUserPayload {
-  id: number | string;
-  body: UpdateUserDto;
-}
 
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

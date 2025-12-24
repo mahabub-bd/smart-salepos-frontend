@@ -1,4 +1,5 @@
-import { ApiResponse, Warehouse } from "../../types";
+import { ApiResponse } from "../../types";
+import { Warehouse } from "../../types/branch";
 import { apiSlice } from "../apiSlice";
 export interface UpdateWarehousePayload {
   id: number | string;

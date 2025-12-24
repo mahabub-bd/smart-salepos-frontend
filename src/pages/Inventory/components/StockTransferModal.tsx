@@ -9,7 +9,7 @@ import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useTransferInventoryMutation } from "../../../features/inventory/inventoryApi";
 import { useGetWarehousesQuery } from "../../../features/warehouse/warehouseApi";
-import { Warehouse } from "../../../types";
+import { Warehouse } from "../../../types/branch";
 
 interface StockTransferModalProps {
   isOpen: boolean;

@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import Button from "../ui/button";
 
-/* ------------------ Types ------------------ */
 interface BaseEntity {
   name: string;
   code: string;
@@ -179,7 +178,7 @@ export default function LedgerSummaryCard({
           </div>
         </div>
 
-        <Button variant="outline" size="sm" onClick={onBack}>
+        <Button variant="primary" size="sm" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </Button>

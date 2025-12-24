@@ -1,11 +1,9 @@
-import { ApiResponse, Branch } from "../../types";
+import { ApiResponse } from "../../types";
+import { Branch, UpdateBranchPayload } from "../../types/branch";
 import { apiSlice } from "../apiSlice";
 
 // For Branch Update
-export interface UpdateBranchPayload {
-    id: string | number;
-    body: Partial<Branch>;
-}
+
 
 export const branchesApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({

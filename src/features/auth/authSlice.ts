@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "../../types";
-
+import { User } from "../../types/user";
 
 interface AuthState {
   user: User | null;
@@ -14,7 +13,6 @@ const initialState: AuthState = {
   token: null,
   permissions: [],
   expiresAt: null,
-  
 };
 
 const authSlice = createSlice({
@@ -36,10 +34,7 @@ const authSlice = createSlice({
       state.expiresAt = action.payload.expiresAt;
     },
 
-    updateUser: (
-      state,
-      action: PayloadAction<Partial<User>>
-    ) => {
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }

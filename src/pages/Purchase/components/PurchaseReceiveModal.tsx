@@ -4,7 +4,7 @@ import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import { useReceivePurchaseMutation } from "../../../features/purchases/purchasesApi";
-import { Purchase } from "../../../types";
+import { Purchase } from "../../../types/purchase";
 
 interface Props {
   isOpen: boolean;
@@ -80,7 +80,9 @@ export default function PurchaseReceiveModal({
                   <td className="p-3">
                     <div>
                       <p className="font-medium">{item.product?.name}</p>
-                      <p className="text-xs text-gray-500">{item.product?.sku}</p>
+                      <p className="text-xs text-gray-500">
+                        {item.product?.sku}
+                      </p>
                     </div>
                   </td>
                   <td className="p-3">
@@ -92,7 +94,9 @@ export default function PurchaseReceiveModal({
                       min="0"
                       max={item.quantity}
                       value={items[idx].quantity}
-                      onChange={(e) => handleQtyChange(idx, Number(e.target.value))}
+                      onChange={(e) =>
+                        handleQtyChange(idx, Number(e.target.value))
+                      }
                       className="w-24"
                     />
                   </td>

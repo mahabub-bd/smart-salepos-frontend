@@ -27,7 +27,7 @@ export default function PaymentDetailsPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-xl font-semibold">Payment #{payment.id}</h1>
-          <Link to="/accounts/payment">
+          <Link to="/payments">
             <Button size="sm">
               <ArrowLeft size={16} /> Back to payments
             </Button>

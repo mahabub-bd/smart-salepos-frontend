@@ -1,5 +1,5 @@
+import { ApiResponse } from "../../types";
 import {
-  ApiResponse,
   ConvertQuotationToSalePayload,
   CreateQuotationPayload,
   GetQuotationsParams,
@@ -7,7 +7,7 @@ import {
   QuotationAnalytics,
   UpdateQuotationPayload,
   UpdateQuotationStatusPayload,
-} from "../../types";
+} from "../../types/quotation";
 import { apiSlice } from "../apiSlice";
 
 export const quotationsApi = apiSlice.injectEndpoints({

@@ -1,13 +1,13 @@
 import {
+  Document,
+  Font,
+  Image,
   Page,
+  StyleSheet,
   Text,
   View,
-  Document,
-  StyleSheet,
-  Image,
-  Font,
 } from "@react-pdf/renderer";
-import {ReceiptPreviewData} from "../../types";
+import { ReceiptPreviewData } from "../../types/settings";
 
 // Register fonts (you can use custom fonts if needed)
 Font.register({
@@ -15,7 +15,6 @@ Font.register({
   src: "https://fonts.googleapis.com/css2?family=Helvetica:wght@400;700&display=swap",
 });
 
-// Sample sale data structure
 interface SaleData {
   invoice_no: string;
   items: Array<{
@@ -187,7 +186,10 @@ const styles = StyleSheet.create({
   },
 });
 
-const ReceiptPDF: React.FC<ReceiptPDFProps> = ({ receiptSettings, saleData }) => {
+const ReceiptPDF: React.FC<ReceiptPDFProps> = ({
+  receiptSettings,
+  saleData,
+}) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
@@ -215,7 +217,14 @@ const ReceiptPDF: React.FC<ReceiptPDFProps> = ({ receiptSettings, saleData }) =>
             <Text style={styles.businessInfo}>{receiptSettings.address}</Text>
           )}
 
-          <View style={{ flexDirection: "row", justifyContent: "center", gap: 20, marginTop: 5 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 20,
+              marginTop: 5,
+            }}
+          >
             {receiptSettings.phone && (
               <Text style={styles.businessInfo}>{receiptSettings.phone}</Text>
             )}
@@ -249,13 +258,17 @@ const ReceiptPDF: React.FC<ReceiptPDFProps> = ({ receiptSettings, saleData }) =>
         {/* Invoice Information */}
         <View style={styles.invoiceInfo}>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontWeight: "bold", marginBottom: 4 }}>Invoice Information</Text>
+            <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+              Invoice Information
+            </Text>
             <Text>Invoice #: {saleData.invoice_no}</Text>
             <Text>Date: {formatDate(saleData.created_at)}</Text>
             <Text>Time: {formatTime(saleData.created_at)}</Text>
           </View>
           <View style={{ alignItems: "flex-end", flex: 1 }}>
-            <Text style={{ fontWeight: "bold", marginBottom: 4 }}>Branch & Staff</Text>
+            <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+              Branch & Staff
+            </Text>
             <Text>Branch: {saleData.branch.name}</Text>
             <Text>Served by: {saleData.served_by.full_name}</Text>
           </View>
@@ -263,13 +276,21 @@ const ReceiptPDF: React.FC<ReceiptPDFProps> = ({ receiptSettings, saleData }) =>
 
         {receiptSettings.include_customer_details && (
           <View style={styles.section}>
-            <Text style={{ fontWeight: "bold", marginBottom: 8, fontSize: 13 }}>Customer Details</Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={{ fontWeight: "bold", marginBottom: 8, fontSize: 13 }}>
+              Customer Details
+            </Text>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
               <View style={{ flex: 1 }}>
                 <Text>Name: {saleData.customer.name}</Text>
                 <Text>Phone: {saleData.customer.phone}</Text>
-                {saleData.customer.email && <Text>Email: {saleData.customer.email}</Text>}
-                {saleData.customer.address && <Text>Address: {saleData.customer.address}</Text>}
+                {saleData.customer.email && (
+                  <Text>Email: {saleData.customer.email}</Text>
+                )}
+                {saleData.customer.address && (
+                  <Text>Address: {saleData.customer.address}</Text>
+                )}
               </View>
             </View>
           </View>
@@ -296,10 +317,12 @@ const ReceiptPDF: React.FC<ReceiptPDFProps> = ({ receiptSettings, saleData }) =>
               </Text>
               <Text style={styles.colQty}>{item.quantity}</Text>
               <Text style={styles.colPrice}>
-                {receiptSettings.currency_symbol}{item.unit_price}
+                {receiptSettings.currency_symbol}
+                {item.unit_price}
               </Text>
               <Text style={styles.colTotal}>
-                {receiptSettings.currency_symbol}{item.line_total}
+                {receiptSettings.currency_symbol}
+                {item.line_total}
               </Text>
             </View>
           ))}
@@ -309,41 +332,62 @@ const ReceiptPDF: React.FC<ReceiptPDFProps> = ({ receiptSettings, saleData }) =>
         <View style={styles.totals}>
           <View style={styles.totalRow}>
             <Text>Subtotal:</Text>
-            <Text>{receiptSettings.currency_symbol}{saleData.subtotal}</Text>
+            <Text>
+              {receiptSettings.currency_symbol}
+              {saleData.subtotal}
+            </Text>
           </View>
 
           <View style={styles.totalRow}>
             <Text>Discount:</Text>
-            <Text>-{receiptSettings.currency_symbol}{saleData.discount}</Text>
+            <Text>
+              -{receiptSettings.currency_symbol}
+              {saleData.discount}
+            </Text>
           </View>
 
           {parseFloat(saleData.manual_discount) > 0 && (
             <View style={styles.totalRow}>
               <Text>Manual Discount:</Text>
-              <Text>-{receiptSettings.currency_symbol}{saleData.manual_discount}</Text>
+              <Text>
+                -{receiptSettings.currency_symbol}
+                {saleData.manual_discount}
+              </Text>
             </View>
           )}
 
           {parseFloat(saleData.group_discount) > 0 && (
             <View style={styles.totalRow}>
               <Text>Group Discount:</Text>
-              <Text>-{receiptSettings.currency_symbol}{saleData.group_discount}</Text>
+              <Text>
+                -{receiptSettings.currency_symbol}
+                {saleData.group_discount}
+              </Text>
             </View>
           )}
 
           <View style={styles.totalRow}>
             <Text>Tax:</Text>
-            <Text>{receiptSettings.currency_symbol}{saleData.tax}</Text>
+            <Text>
+              {receiptSettings.currency_symbol}
+              {saleData.tax}
+            </Text>
           </View>
 
           <View style={styles.grandTotal}>
             <Text>TOTAL:</Text>
-            <Text>{receiptSettings.currency_symbol}{saleData.total}</Text>
+            <Text>
+              {receiptSettings.currency_symbol}
+              {saleData.total}
+            </Text>
           </View>
 
           <View style={styles.totalRow}>
             <Text>Paid Amount:</Text>
-            <Text>{receiptSettings.currency_symbol}{saleData.paid_amount}</Text>
+            <Text>
+              {receiptSettings.currency_symbol}
+              {saleData.paid_amount}
+            </Text>
           </View>
         </View>
 

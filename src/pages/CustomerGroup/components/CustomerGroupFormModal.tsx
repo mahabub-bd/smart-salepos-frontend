@@ -1,22 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import InputField from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
-import { Modal } from "../../../components/ui/modal";
 import Button from "../../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
 
 import Checkbox from "../../../components/form/input/Checkbox";
 import {
   useCreateCustomerGroupMutation,
   useUpdateCustomerGroupMutation,
 } from "../../../features/customer-group/customerGroupApi";
-import { CustomerGroup } from "../../../types";
+import { CustomerGroup } from "../../../types/customer";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   group: CustomerGroup | null;
+}
+
+interface FormData {
+  name: string;
+  description: string;
+  discount_percentage: number;
+  is_active: boolean;
 }
 
 export default function CustomerGroupFormModal({
@@ -32,41 +40,36 @@ export default function CustomerGroupFormModal({
   const isEdit = !!group;
   const isLoading = isCreating || isUpdating;
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    discount_percentage: 0,
-    is_active: true,
+  const { register, handleSubmit, setValue, watch, reset } = useForm<FormData>({
+    defaultValues: {
+      name: "",
+      description: "",
+      discount_percentage: 0,
+      is_active: true,
+    },
   });
 
   useEffect(() => {
     if (isEdit && group) {
-      setFormData({
-        name: group.name,
-        description: group.description || "",
-        discount_percentage: Number(group.discount_percentage) || 0,
-        is_active: group.is_active,
-      });
+      setValue("name", group.name);
+      setValue("description", group.description || "");
+      setValue("discount_percentage", Number(group.discount_percentage) || 0);
+      setValue("is_active", group.is_active);
     } else {
-      setFormData({
-        name: "",
-        description: "",
-        discount_percentage: 0,
-        is_active: true,
-      });
+      reset();
     }
-  }, [isEdit, group]);
+  }, [isEdit, group, setValue, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormData) => {
     try {
       if (isEdit && group) {
-        await updateGroup({ id: group.id, body: formData }).unwrap();
+        await updateGroup({ id: group.id, body: data }).unwrap();
         toast.success("Customer group updated successfully!");
       } else {
-        await createGroup(formData).unwrap();
+        await createGroup(data).unwrap();
         toast.success("Customer group created successfully!");
       }
+      reset();
       onClose();
     } catch {
       toast.error("Failed to save group");
@@ -80,47 +83,33 @@ export default function CustomerGroupFormModal({
       className="p-6 max-w-lg"
       title={isEdit ? "Update Customer Group" : "Create Customer Group"}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormField label="Group Name *">
           <InputField
-            value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            {...register("name", { required: true })}
             required
           />
         </FormField>
 
         <FormField label="Description">
           <TextArea
-            value={formData.description}
-            onChange={(value) =>
-              setFormData({ ...formData, description: value })
-            }
+            {...register("description")}
             rows={3}
           />
         </FormField>
 
         <FormField label="Discount (%)">
           <InputField
+            {...register("discount_percentage", { valueAsNumber: true })}
             type="number"
-            value={formData.discount_percentage}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                discount_percentage: Number(e.target.value),
-              })
-            }
           />
         </FormField>
 
         <div className="flex items-center gap-2">
           <Checkbox
             label="Active"
-            checked={formData.is_active}
-            onChange={(checked) =>
-              setFormData({ ...formData, is_active: checked })
-            }
+            checked={watch("is_active")}
+            onChange={(checked) => setValue("is_active", checked)}
           />
         </div>
 

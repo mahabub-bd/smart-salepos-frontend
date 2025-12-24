@@ -1,12 +1,12 @@
+import { ApiResponse } from "../../types";
 import {
-  ApiResponse,
   Purchase,
   PurchasePaymentPayload,
   PurchaseResponseData,
   ReceivePurchasePayload,
   UpdatePurchasePayload,
   UpdatePurchaseStatusPayload,
-} from "../../types";
+} from "../../types/purchase";
 import { apiSlice } from "../apiSlice";
 
 export const purchasesApi = apiSlice.injectEndpoints({

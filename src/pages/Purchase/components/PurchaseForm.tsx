@@ -15,7 +15,13 @@ import {
 } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import Button from "../../../components/ui/button/Button";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../../components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 
 import {
   useCreatePurchaseMutation,
@@ -26,13 +32,12 @@ import {
 import { useGetProductsQuery } from "../../../features/product/productApi";
 import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { useGetWarehousesQuery } from "../../../features/warehouse/warehouseApi";
+import { PaymentTerm, PaymentTermDescription } from "../../../types";
 import {
-  PaymentTerm,
-  PaymentTermDescription,
   PurchaseOrderStatus,
   PurchaseOrderStatusDescription,
   PurchaseStatus,
-} from "../../../types";
+} from "../../../types/purchase";
 
 interface Props {
   mode: "create" | "edit";
@@ -48,7 +53,7 @@ export default function PurchaseForm({ mode, purchaseId }: Props) {
   const { data: supplierData, isLoading: isLoadingSuppliers } =
     useGetSuppliersQuery();
   const { data: productData, isLoading: isLoadingProducts } =
-    useGetProductsQuery();
+    useGetProductsQuery({});
   const { data: warehouseData, isLoading: isLoadingWarehouses } =
     useGetWarehousesQuery();
 

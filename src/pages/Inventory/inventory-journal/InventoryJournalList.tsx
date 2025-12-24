@@ -3,6 +3,7 @@ import { useState } from "react";
 import Loading from "../../../components/common/Loading";
 import DatePicker from "../../../components/form/date-picker";
 import { SelectField } from "../../../components/form/form-elements/SelectFiled";
+import Button from "../../../components/ui/button/Button";
 import {
   Table,
   TableBody,
@@ -12,7 +13,7 @@ import {
 } from "../../../components/ui/table";
 import { useGetInventoryJournalQuery } from "../../../features/inventory/inventoryApi";
 import { useGetProductsQuery } from "../../../features/product/productApi";
-import { InventoryJournalEntry } from "../../../types";
+import { InventoryJournalEntry } from "../../../types/inventory";
 import { formatDateTime } from "../../../utlis";
 
 // Movement type badge component
@@ -20,7 +21,8 @@ const MovementTypeBadge = ({ type }: { type: string }) => {
   const config: Record<string, { label: string; className: string }> = {
     IN: {
       label: "Stock In",
-      className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+      className:
+        "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
     },
     OUT: {
       label: "Stock Out",
@@ -28,7 +30,8 @@ const MovementTypeBadge = ({ type }: { type: string }) => {
     },
     ADJUST: {
       label: "Adjustment",
-      className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+      className:
+        "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
     },
     TRANSFER: {
       label: "Transfer",
@@ -59,7 +62,7 @@ export default function InventoryJournalList() {
     end_date: undefined as string | undefined,
   });
 
-  const { data: productsData } = useGetProductsQuery();
+  const { data: productsData } = useGetProductsQuery({});
   const products = productsData?.data || [];
 
   const { data, isLoading, isError } = useGetInventoryJournalQuery(filters);
@@ -73,18 +76,16 @@ export default function InventoryJournalList() {
     <div>
       {/* Filters Section */}
       <div className="mb-6 rounded-xl border bg-white p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Filters
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <SelectField
             label="Product"
             data={products}
             value={filters.product_id?.toString() || ""}
             onChange={(value) =>
-              setFilters(prev => ({
+              setFilters((prev) => ({
                 ...prev,
-                product_id: value === "" ? undefined : parseInt(value)
+                product_id: value === "" ? undefined : parseInt(value),
               }))
             }
             placeholder="Select a product"
@@ -97,9 +98,11 @@ export default function InventoryJournalList() {
             label="From Date"
             value={filters.start_date ? new Date(filters.start_date) : null}
             onChange={(value) =>
-              setFilters(prev => ({
+              setFilters((prev) => ({
                 ...prev,
-                start_date: value ? (value as Date).toISOString().split('T')[0] : undefined
+                start_date: value
+                  ? (value as Date).toISOString().split("T")[0]
+                  : undefined,
               }))
             }
             placeholder="Start date"
@@ -110,26 +113,31 @@ export default function InventoryJournalList() {
             label="To Date"
             value={filters.end_date ? new Date(filters.end_date) : null}
             onChange={(value) =>
-              setFilters(prev => ({
+              setFilters((prev) => ({
                 ...prev,
-                end_date: value ? (value as Date).toISOString().split('T')[0] : undefined
+                end_date: value
+                  ? (value as Date).toISOString().split("T")[0]
+                  : undefined,
               }))
             }
             placeholder="End date"
           />
 
           <div className="flex items-end">
-            <button
-              onClick={() => setFilters({
-                product_id: undefined,
-                warehouse_id: undefined,
-                start_date: undefined,
-                end_date: undefined,
-              })}
-              className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            <Button
+              size="sm"
+              onClick={() =>
+                setFilters({
+                  product_id: undefined,
+                  warehouse_id: undefined,
+                  start_date: undefined,
+                  end_date: undefined,
+                })
+              }
+              variant="primary"
             >
-              Clear Filters
-            </button>
+              Reset
+            </Button>
           </div>
         </div>
       </div>
@@ -141,10 +149,8 @@ export default function InventoryJournalList() {
               <TableRow>
                 <TableCell isHeader>Date</TableCell>
                 <TableCell isHeader>Product</TableCell>
-                <TableCell isHeader>Warehouse</TableCell>
                 <TableCell isHeader>Type</TableCell>
                 <TableCell isHeader>Description</TableCell>
-                <TableCell isHeader>Reference</TableCell>
                 <TableCell isHeader className="text-right">
                   Debit (In)
                 </TableCell>
@@ -161,58 +167,51 @@ export default function InventoryJournalList() {
             <TableBody>
               {journal.length > 0 ? (
                 journal.map((entry) => (
-                  <TableRow key={entry.id} className="border-b hover:bg-gray-50">
-                    {/* Date */}
+                  <TableRow
+                    key={entry.id}
+                    className="border-b hover:bg-gray-50"
+                  >
+                    {/* First line: Date, Product, Type, Description */}
                     <TableCell className="align-middle">
                       <span className="text-xs text-gray-600">
                         {formatDateTime(entry.date)}
                       </span>
                     </TableCell>
-
-                    {/* Product */}
                     <TableCell className="align-middle">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         {entry.product.image && (
                           <img
                             src={entry.product.image}
                             alt={entry.product.name}
-                            className="h-10 w-10 rounded-lg object-cover"
+                            className="h-8 w-8 rounded object-cover"
                           />
                         )}
                         <div className="flex flex-col">
-                          <span className="font-medium">
+                          <span className="font-medium text-sm">
                             {entry.product.name}
                           </span>
                           <span className="text-xs text-gray-500">
-                            SKU: {entry.product.sku}
+                            SKU: {entry.product.sku} • {entry.warehouse.name}
                           </span>
                         </div>
                       </div>
                     </TableCell>
-
-                    {/* Warehouse */}
-                    <TableCell className="align-middle">
-                      <span className="font-medium">{entry.warehouse.name}</span>
-                    </TableCell>
-
-                    {/* Type */}
                     <TableCell className="align-middle">
                       <MovementTypeBadge type={entry.type} />
                     </TableCell>
-
-                    {/* Description */}
                     <TableCell className="align-middle">
-                      <span className="text-gray-700">{entry.description}</span>
+                      <div className="flex flex-col">
+                        <span className="text-gray-700 text-sm truncate max-w-xs">
+                          {entry.description}
+                        </span>
+                        {entry.reference && (
+                          <span className="text-xs text-gray-500">
+                            Ref: {entry.reference}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
-
-                    {/* Reference */}
-                    <TableCell className="align-middle">
-                      <span className="text-xs text-gray-600">
-                        {entry.reference}
-                      </span>
-                    </TableCell>
-
-                    {/* Debit (In) */}
+                    {/* Second line: Debit, Credit, Balance, Created By */}
                     <TableCell className="align-middle text-right">
                       {entry.debit > 0 ? (
                         <span className="font-semibold text-green-600">
@@ -222,8 +221,6 @@ export default function InventoryJournalList() {
                         <span className="text-gray-400">—</span>
                       )}
                     </TableCell>
-
-                    {/* Credit (Out) */}
                     <TableCell className="align-middle text-right">
                       {entry.credit > 0 ? (
                         <span className="font-semibold text-red-600">
@@ -233,22 +230,18 @@ export default function InventoryJournalList() {
                         <span className="text-gray-400">—</span>
                       )}
                     </TableCell>
-
-                    {/* Balance */}
                     <TableCell className="align-middle text-right">
                       <span className="font-bold text-blue-600">
                         {entry.balance}
                       </span>
                     </TableCell>
-
-                    {/* Created By */}
                     <TableCell className="align-middle">
                       {entry.created_by ? (
-                        <span className="text-sm font-medium">
+                        <span className="text-xs font-medium text-gray-600">
                           {entry.created_by.name}
                         </span>
                       ) : (
-                        <span className="text-gray-400">—</span>
+                        <span className="text-gray-400 text-xs">—</span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -256,7 +249,7 @@ export default function InventoryJournalList() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={10}
+                    colSpan={8}
                     className="py-6 text-center text-gray-500"
                   >
                     No journal entries found

@@ -8,6 +8,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import Loading from "../../../components/common/Loading";
@@ -44,14 +45,36 @@ const statusLabels = {
   cancelled: "Cancelled",
 };
 
+interface ApprovalFormData {
+  approver_notes: string;
+}
+
+interface RejectionFormData {
+  rejection_reason: string;
+}
+
 export default function LeaveRequestDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [leaveRequest, setLeaveRequest] = useState<any>(null);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState("");
-  const [approverNotes, setApproverNotes] = useState("");
+
+  const { register: registerApproval, handleSubmit: handleSubmitApproval, reset: resetApproval } =
+    useForm<ApprovalFormData>({
+      defaultValues: {
+        approver_notes: "",
+      },
+    });
+
+  const { register: registerRejection, handleSubmit: handleSubmitRejection, reset: resetRejection, watch } =
+    useForm<RejectionFormData>({
+      defaultValues: {
+        rejection_reason: "",
+      },
+    });
+
+  const rejectionReason = watch("rejection_reason");
 
   const { data, isLoading, isError } = useGetLeaveRequestByIdQuery(id || "", {
     skip: !id,
@@ -77,24 +100,24 @@ export default function LeaveRequestDetail() {
     }
   }, [data]);
 
-  const handleApprove = async () => {
+  const handleApprove = async (data: ApprovalFormData) => {
     if (!id) return;
 
     try {
       await approveLeaveRequest({
         leaveRequestId: Number(id),
-        body: { approverNotes: approverNotes || undefined },
+        body: { approverNotes: data.approver_notes || undefined },
       }).unwrap();
       toast.success("Leave request approved successfully");
       setShowApprovalModal(false);
-      setApproverNotes("");
+      resetApproval();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to approve leave request");
     }
   };
 
-  const handleReject = async () => {
-    if (!id || !rejectionReason.trim()) {
+  const handleReject = async (data: RejectionFormData) => {
+    if (!id || !data.rejection_reason.trim()) {
       toast.error("Please provide a rejection reason");
       return;
     }
@@ -102,11 +125,11 @@ export default function LeaveRequestDetail() {
     try {
       await rejectLeaveRequest({
         leaveRequestId: Number(id),
-        body: { rejectionReason },
+        body: { rejectionReason: data.rejection_reason },
       }).unwrap();
       toast.success("Leave request rejected successfully");
       setShowRejectionModal(false);
-      setRejectionReason("");
+      resetRejection();
       navigate("/hrm/leave-approvals");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to reject leave request");
@@ -622,43 +645,43 @@ export default function LeaveRequestDetail() {
         isOpen={showApprovalModal}
         onClose={() => {
           setShowApprovalModal(false);
-          setApproverNotes("");
+          resetApproval();
         }}
         title="Approve Leave Request"
         description="Are you sure you want to approve this leave request?"
         className="max-w-md"
       >
-        <div className="space-y-4">
+        <form onSubmit={handleSubmitApproval(handleApprove)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Approver Notes (Optional)
             </label>
             <TextArea
-              value={approverNotes}
-              onChange={setApproverNotes}
+              {...registerApproval("approver_notes")}
               rows={3}
               placeholder="Add any notes for this approval..."
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button
+              type="button"
               variant="outline"
               onClick={() => {
                 setShowApprovalModal(false);
-                setApproverNotes("");
+                resetApproval();
               }}
             >
               Cancel
             </Button>
             <Button
-              onClick={handleApprove}
+              type="submit"
               disabled={isApproving}
               className="bg-green-600 hover:bg-green-700"
             >
               {isApproving ? "Approving..." : "Approve"}
             </Button>
           </div>
-        </div>
+        </form>
       </Modal>
 
       {/* Rejection Modal */}
@@ -666,20 +689,19 @@ export default function LeaveRequestDetail() {
         isOpen={showRejectionModal}
         onClose={() => {
           setShowRejectionModal(false);
-          setRejectionReason("");
+          resetRejection();
         }}
         title="Reject Leave Request"
         description="Please provide a reason for rejecting this leave request"
         className="max-w-md"
       >
-        <div className="space-y-4">
+        <form onSubmit={handleSubmitRejection(handleReject)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Rejection Reason <span className="text-red-500">*</span>
             </label>
             <TextArea
-              value={rejectionReason}
-              onChange={setRejectionReason}
+              {...registerRejection("rejection_reason")}
               rows={4}
               placeholder="Please provide a reason for rejection..."
               error={!rejectionReason.trim()}
@@ -692,23 +714,24 @@ export default function LeaveRequestDetail() {
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button
+              type="button"
               variant="outline"
               onClick={() => {
                 setShowRejectionModal(false);
-                setRejectionReason("");
+                resetRejection();
               }}
             >
               Cancel
             </Button>
             <Button
-              onClick={handleReject}
+              type="submit"
               disabled={isRejecting || !rejectionReason.trim()}
               className="bg-red-600 hover:bg-red-700"
             >
               {isRejecting ? "Rejecting..." : "Reject"}
             </Button>
           </div>
-        </div>
+        </form>
       </Modal>
     </div>
   );

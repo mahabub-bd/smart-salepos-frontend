@@ -12,6 +12,7 @@ import FileInput from "../../../components/form/input/FileInput";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
+import { useUploadSingleAttachmentMutation } from "../../../features/attachment/attachmentApi";
 import {
   useGetSettingsQuery,
   useUpdateSettingsMutation,
@@ -62,6 +63,7 @@ const BusinessSettings = () => {
     useUpdateSettingsMutation();
   const [uploadLogo, { isLoading: isUploadingLogo }] =
     useUploadSettingsLogoMutation();
+  const [uploadSingleAttachment] = useUploadSingleAttachmentMutation();
   const [selectedLogo, setSelectedLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
@@ -101,17 +103,22 @@ const BusinessSettings = () => {
         receipt_header: data.receipt_header || "",
         include_barcode: data.include_barcode || false,
         include_qr_code: data.include_qr_code || false,
-        qr_code_type: (data.qr_code_type as "business_info" | "invoice_info" | "custom") || "business_info",
+        qr_code_type:
+          (data.qr_code_type as "business_info" | "invoice_info" | "custom") ||
+          "business_info",
         qr_code_custom_content: data.qr_code_custom_content || "",
         include_customer_details: data.include_customer_details || false,
         enable_auto_backup: data.enable_auto_backup || false,
         backup_retention_days: data.backup_retention_days || 30,
-        default_invoice_layout: (data.default_invoice_layout as "standard" | "detailed") || "standard",
+        default_invoice_layout:
+          (data.default_invoice_layout as "standard" | "detailed") ||
+          "standard",
         show_product_images: data.show_product_images || false,
         show_product_skus: data.show_product_skus || true,
         show_item_tax_details: data.show_item_tax_details || false,
         show_payment_breakdown: data.show_payment_breakdown || true,
-        invoice_paper_size: (data.invoice_paper_size as "A4" | "A5" | "Thermal") || "A4",
+        invoice_paper_size:
+          (data.invoice_paper_size as "A4" | "A5" | "Thermal") || "A4",
         print_duplicate_copy: data.print_duplicate_copy || false,
         invoice_footer_message: data.invoice_footer_message || "",
         use_thermal_printer: data.use_thermal_printer || false,
@@ -166,10 +173,20 @@ const BusinessSettings = () => {
     if (!selectedLogo || !settingsData?.data?.id) return;
 
     try {
+      // Step 1: Upload file to get attachment ID
+      const formData = new FormData();
+      formData.append("file", selectedLogo);
+
+      const attachmentResponse = await uploadSingleAttachment(
+        formData
+      ).unwrap();
+      const attachmentId = attachmentResponse.data.id;
+
+      // Step 2: Send attachment ID to settings logo endpoint
       await uploadLogo({
-        id: settingsData.data.id,
-        logo: selectedLogo,
+        attachment_id: attachmentId,
       }).unwrap();
+
       toast.success("Logo uploaded successfully");
       setSelectedLogo(null);
     } catch (error: any) {
@@ -266,7 +283,10 @@ const BusinessSettings = () => {
               Business Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Business Name" error={errors.business_name?.message}>
+              <FormField
+                label="Business Name"
+                error={errors.business_name?.message}
+              >
                 <Input
                   {...register("business_name")}
                   id="business_name"
@@ -306,9 +326,8 @@ const BusinessSettings = () => {
                 <FormField label="Address">
                   <TextArea
                     placeholder="Enter business address"
+                    {...register("address")}
                     rows={3}
-                    value={watch("address") || ""}
-                    onChange={(value) => setValue("address", value)}
                   />
                 </FormField>
               </div>
@@ -371,7 +390,10 @@ const BusinessSettings = () => {
                 </select>
               </FormField>
 
-              <FormField label="Currency Symbol *" error={errors.currency_symbol?.message}>
+              <FormField
+                label="Currency Symbol *"
+                error={errors.currency_symbol?.message}
+              >
                 <Input
                   {...register("currency_symbol")}
                   id="currency_symbol"
@@ -380,7 +402,10 @@ const BusinessSettings = () => {
                 />
               </FormField>
 
-              <FormField label="Default Tax Percentage" error={errors.default_tax_percentage?.message}>
+              <FormField
+                label="Default Tax Percentage"
+                error={errors.default_tax_percentage?.message}
+              >
                 <Input
                   {...register("default_tax_percentage", {
                     valueAsNumber: true,
@@ -456,16 +481,17 @@ const BusinessSettings = () => {
               <div className="md:col-span-2">
                 <FormField label="Footer Text">
                   <TextArea
+                    {...register("footer_text")}
                     placeholder="Additional footer text for receipts"
                     rows={2}
-                    value={watch("footer_text") || ""}
-                    onChange={(value) => setValue("footer_text", value)}
                   />
                 </FormField>
               </div>
 
               <div className="md:col-span-2 space-y-3">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Display Options</h3>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                  Display Options
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className="flex items-center space-x-3">
                     <input
@@ -542,7 +568,9 @@ const BusinessSettings = () => {
                       {...register("qr_code_type")}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     >
-                      <option value="business_info">Business Information</option>
+                      <option value="business_info">
+                        Business Information
+                      </option>
                       <option value="invoice_info">Invoice Information</option>
                       <option value="custom">Custom Content</option>
                     </select>
@@ -615,7 +643,10 @@ const BusinessSettings = () => {
                 </span>
               </label>
 
-              <FormField label="Backup Retention Days" error={errors.backup_retention_days?.message}>
+              <FormField
+                label="Backup Retention Days"
+                error={errors.backup_retention_days?.message}
+              >
                 <Input
                   {...register("backup_retention_days", {
                     valueAsNumber: true,

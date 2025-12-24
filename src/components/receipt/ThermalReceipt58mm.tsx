@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import { ReceiptPreviewData } from "../../types";
-import { Modal } from "../ui/modal";
+import { ReceiptPreviewData } from "../../types/settings";
 import Button from "../ui/button/Button";
+import { Modal } from "../ui/modal";
 
 interface ThermalReceiptItem {
   product_name: string;

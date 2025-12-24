@@ -23,7 +23,7 @@ import {
 } from "../../../components/ui/table";
 
 import PageHeader from "../../../components/common/PageHeader";
-import { CategoryWithChildren } from "../../../types";
+import { CategoryWithChildren } from "../../../types/product";
 import CategoryFormModal from "./CategoryFormModal";
 
 // Flattened item type

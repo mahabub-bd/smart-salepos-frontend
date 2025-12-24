@@ -1,4 +1,4 @@
-# Build stage
+gi# Build stage
 FROM node:22-alpine AS builder
 
 # Update packages to patch vulnerabilities

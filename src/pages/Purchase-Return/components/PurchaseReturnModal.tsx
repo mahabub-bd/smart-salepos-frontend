@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
@@ -49,6 +50,17 @@ interface PurchaseReturnModalProps {
   purchase: Purchase | null;
 }
 
+interface FormData {
+  reason: string;
+  items: Array<{
+    purchase_item_id: number;
+    product_id: number;
+    returned_quantity: number;
+    price: number;
+    max_quantity: number;
+  }>;
+}
+
 export default function PurchaseReturnModal({
   isOpen,
   onClose,
@@ -56,21 +68,21 @@ export default function PurchaseReturnModal({
 }: PurchaseReturnModalProps) {
   const [createPurchaseReturn, { isLoading }] =
     useCreatePurchaseReturnMutation();
-  const [returnItems, setReturnItems] = useState<
-    Array<{
-      purchase_item_id: number;
-      product_id: number;
-      returned_quantity: number;
-      price: number;
-      max_quantity: number;
-    }>
-  >([]);
-  const [reason, setReason] = useState("");
+
+  const { register, handleSubmit, setValue, watch, reset } = useForm<FormData>({
+    defaultValues: {
+      reason: "",
+      items: [],
+    },
+  });
+
+  const returnItems = watch("items");
 
   // Initialize return items when purchase changes
   useEffect(() => {
     if (purchase && isOpen) {
-      setReturnItems(
+      setValue(
+        "items",
         purchase.items.map((item) => ({
           purchase_item_id: item.id,
           product_id: item.product_id,
@@ -79,20 +91,20 @@ export default function PurchaseReturnModal({
           max_quantity: item.quantity,
         }))
       );
-      setReason("");
+      setValue("reason", "");
     }
-  }, [purchase, isOpen]);
+  }, [purchase, isOpen, setValue]);
 
   if (!isOpen) return null;
 
   const handleQuantityChange = (index: number, value: string) => {
     const qty = parseInt(value) || 0;
-    const newItems = [...returnItems];
-    newItems[index].returned_quantity = Math.min(
+    const currentItems = [...returnItems];
+    currentItems[index].returned_quantity = Math.min(
       qty,
-      newItems[index].max_quantity
+      currentItems[index].max_quantity
     );
-    setReturnItems(newItems);
+    setValue("items", currentItems);
   };
 
   const getTotalReturnAmount = () => {
@@ -102,12 +114,10 @@ export default function PurchaseReturnModal({
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: FormData) => {
     if (!purchase) return;
 
-    const itemsToReturn = returnItems.filter(
+    const itemsToReturn = data.items.filter(
       (item) => item.returned_quantity > 0
     );
 
@@ -116,7 +126,7 @@ export default function PurchaseReturnModal({
       return;
     }
 
-    if (!reason.trim()) {
+    if (!data.reason.trim()) {
       toast.error("Please provide a reason for return");
       return;
     }
@@ -126,7 +136,7 @@ export default function PurchaseReturnModal({
         purchase_id: purchase.id,
         supplier_id: purchase.supplier_id,
         warehouse_id: purchase.warehouse_id,
-        reason: reason.trim(),
+        reason: data.reason.trim(),
         items: itemsToReturn.map((item) => ({
           product_id: item.product_id,
           purchase_item_id: item.purchase_item_id,
@@ -137,6 +147,7 @@ export default function PurchaseReturnModal({
       }).unwrap();
 
       toast.success("Purchase return created successfully");
+      reset();
       onClose();
     } catch (error: any) {
       toast.error(error.data?.message || "Failed to create purchase return");
@@ -152,7 +163,7 @@ export default function PurchaseReturnModal({
       description={`Po No ${purchase?.po_no}`}
     >
       {purchase ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* Purchase Info */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="flex gap-2 items-center">
@@ -172,10 +183,9 @@ export default function PurchaseReturnModal({
             <FormField label="Reason for Return *">
               <TextArea
                 rows={3}
+                {...register("reason")}
                 className="w-full"
                 placeholder="Enter reason for return..."
-                value={reason}
-                onChange={(value) => setReason(value)}
               />
             </FormField>
           </div>

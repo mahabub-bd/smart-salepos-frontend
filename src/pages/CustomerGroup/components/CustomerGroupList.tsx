@@ -19,7 +19,7 @@ import {
   useGetCustomerGroupsQuery,
 } from "../../../features/customer-group/customerGroupApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { CustomerGroup } from "../../../types";
+import { CustomerGroup } from "../../../types/customer";
 import CustomerGroupFormModal from "./CustomerGroupFormModal";
 
 export default function CustomerGroupList() {

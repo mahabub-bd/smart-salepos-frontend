@@ -1,11 +1,4 @@
-import {
-  Eye,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  BookOpen,
-} from "lucide-react";
+import { BookOpen, Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -27,14 +20,14 @@ import {
   useGetCustomersQuery,
 } from "../../../features/customer/customerApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Customer } from "../../../types";
+import { Customer } from "../../../types/customer";
 
 export default function CustomerList() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
@@ -220,30 +213,6 @@ export default function CustomerList() {
         {/* Pagination */}
         {totalItems > 0 && (
           <div className="px-6 py-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Show
-                </span>
-                <select
-                  value={limit}
-                  onChange={(e) => {
-                    setLimit(Number(e.target.value));
-                    setPage(1);
-                  }}
-                  className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  per page
-                </span>
-              </div>
-            </div>
             <Pagination
               meta={{
                 currentPage: page,

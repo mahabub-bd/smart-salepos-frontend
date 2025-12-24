@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 import { useUpdateUserMutation } from "../../features/user/userApi";
 import { useModal } from "../../hooks/useModal";
-import { User } from "../../types";
+import { User } from "../../types/user";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Button from "../ui/button/Button";
@@ -110,8 +110,8 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
       </div>
 
       {/* 📝 Edit Modal */}
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
-        <div className="no-scrollbar relative w-full max-w-[500px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-175 m-4">
+        <div className="no-scrollbar relative w-full max-w-125 overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
             <div className="custom-scrollbar  overflow-y-auto px-2 pb-3">
               <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">

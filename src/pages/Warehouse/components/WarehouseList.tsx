@@ -20,9 +20,9 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
-import { Warehouse } from "../../../types";
-import WarehouseFormModal from "./WarehouseFormModal";
 import Loading from "../../../components/common/Loading";
+import { Warehouse } from "../../../types/branch";
+import WarehouseFormModal from "./WarehouseFormModal";
 
 export default function WarehouseList() {
   const { data, isLoading, isError } = useGetWarehousesQuery();

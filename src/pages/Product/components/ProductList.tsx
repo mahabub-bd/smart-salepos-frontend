@@ -1,12 +1,22 @@
-import { Eye, MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import {
+  Eye,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import Loading from "../../../components/common/Loading";
+import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
+import Pagination from "../../../components/ui/pagination/Pagination";
 import {
   Table,
   TableBody,
@@ -15,20 +25,143 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 
+import { useGetBrandsQuery } from "../../../features/brand/brandApi";
 import {
+  useGetCategoriesQuery,
+  useGetSubCategoriesByCategoryIdQuery,
+} from "../../../features/category/categoryApi";
+import {
+  ProductFilters,
   useDeleteProductMutation,
   useGetProductsQuery,
 } from "../../../features/product/productApi";
+import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 
+import { Link } from "react-router-dom";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Product } from "../../../types";
+import { Product } from "../../../types/product";
+import { getProductTypeBadge } from "../../../utlis/index";
+
+// Helper function to map badge colors to Tailwind classes
+const getBadgeClasses = (color: string) => {
+  const colorMap: Record<
+    string,
+    { bg: string; text: string; darkBg: string; darkText: string }
+  > = {
+    success: {
+      bg: "bg-green-100",
+      text: "text-green-800",
+      darkBg: "dark:bg-green-900/20",
+      darkText: "dark:text-green-300",
+    },
+    warning: {
+      bg: "bg-yellow-100",
+      text: "text-yellow-800",
+      darkBg: "dark:bg-yellow-900/20",
+      darkText: "dark:text-yellow-300",
+    },
+    info: {
+      bg: "bg-blue-100",
+      text: "text-blue-800",
+      darkBg: "dark:bg-blue-900/20",
+      darkText: "dark:text-blue-300",
+    },
+    primary: {
+      bg: "bg-indigo-100",
+      text: "text-indigo-800",
+      darkBg: "dark:bg-indigo-900/20",
+      darkText: "dark:text-indigo-300",
+    },
+    secondary: {
+      bg: "bg-gray-100",
+      text: "text-gray-800",
+      darkBg: "dark:bg-gray-900/20",
+      darkText: "dark:text-gray-300",
+    },
+    light: {
+      bg: "bg-gray-100",
+      text: "text-gray-800",
+      darkBg: "dark:bg-gray-900/20",
+      darkText: "dark:text-gray-300",
+    },
+    dark: {
+      bg: "bg-gray-100",
+      text: "text-gray-800",
+      darkBg: "dark:bg-gray-900/20",
+      darkText: "dark:text-gray-300",
+    },
+  };
+
+  return colorMap[color] || colorMap.light;
+};
 
 export default function ProductList() {
   const navigate = useNavigate();
 
-  const { data, isLoading, isError } = useGetProductsQuery();
+  // Filter states
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [selectedBrand, setSelectedBrand] = useState<number | undefined>();
+  const [selectedSupplier, setSelectedSupplier] = useState<
+    number | undefined
+  >();
+  const [selectedCategory, setSelectedCategory] = useState<
+    number | undefined
+  >();
+  const [selectedSubcategory, setSelectedSubcategory] = useState<
+    number | undefined
+  >();
+  const [selectedOrigin, setSelectedOrigin] = useState<string>("");
+  const [selectedVariable, setSelectedVariable] = useState<
+    boolean | undefined
+  >();
+  const [selectedExpiry, setSelectedExpiry] = useState<boolean | undefined>();
+  const [selectedStatus, setSelectedStatus] = useState<boolean | undefined>();
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Build filter object
+  const filters: ProductFilters = {
+    page,
+    limit,
+    search: debouncedSearch,
+    brandId: selectedBrand,
+    supplierId: selectedSupplier,
+    categoryId: selectedCategory,
+    subcategoryId: selectedSubcategory,
+    origin: selectedOrigin || undefined,
+    isVariable: selectedVariable,
+    hasExpiry: selectedExpiry,
+    status: selectedStatus,
+  };
+
+  const { data, isLoading, isError } = useGetProductsQuery(filters);
   const [deleteProduct] = useDeleteProductMutation();
+
+  // Fetch filter options
+  const { data: brandsData } = useGetBrandsQuery();
+  const { data: suppliersData } = useGetSuppliersQuery();
+  const { data: categoriesData } = useGetCategoriesQuery();
+  const { data: subcategoriesData } = useGetSubCategoriesByCategoryIdQuery(
+    selectedCategory!,
+    { skip: !selectedCategory }
+  );
+
+  const brands = brandsData?.data || [];
+  const suppliers = suppliersData?.data || [];
+  const categories = categoriesData?.data || [];
+  const subcategories = subcategoriesData?.data || [];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
@@ -38,6 +171,52 @@ export default function ProductList() {
   const canDelete = useHasPermission("product.delete");
 
   const products = data?.data || [];
+  const meta = data?.meta;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [
+    selectedBrand,
+    selectedSupplier,
+    selectedCategory,
+    selectedSubcategory,
+    selectedOrigin,
+    selectedVariable,
+    selectedExpiry,
+    selectedStatus,
+  ]);
+
+  // Handle pagination
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchInput("");
+    setSelectedBrand(undefined);
+    setSelectedSupplier(undefined);
+    setSelectedCategory(undefined);
+    setSelectedSubcategory(undefined);
+    setSelectedOrigin("");
+    setSelectedVariable(undefined);
+    setSelectedExpiry(undefined);
+    setSelectedStatus(undefined);
+    setPage(1);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters =
+    searchInput ||
+    selectedBrand ||
+    selectedSupplier ||
+    selectedCategory ||
+    selectedSubcategory ||
+    selectedOrigin ||
+    selectedVariable !== undefined ||
+    selectedExpiry !== undefined ||
+    selectedStatus !== undefined;
 
   // 🔹 Route Handlers
 
@@ -112,6 +291,160 @@ export default function ProductList() {
         onAdd={openCreatePage}
         permission="product.create"
       />
+
+      {/* Search & Filters */}
+      <div className="mb-4 space-y-4">
+        {/* Search Bar */}
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search by name, SKU, or barcode..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-4 py-2 rounded-lg border transition-colors ${
+              showFilters || hasActiveFilters
+                ? "bg-brand-50 border-brand-300 text-brand-700 dark:bg-brand-900/20 dark:border-brand-700 dark:text-brand-300"
+                : "border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+            }`}
+          >
+            Filters{" "}
+            {hasActiveFilters &&
+              `(${
+                [
+                  searchInput,
+                  selectedBrand,
+                  selectedSupplier,
+                  selectedCategory,
+                  selectedSubcategory,
+                  selectedOrigin,
+                  selectedVariable,
+                  selectedExpiry,
+                  selectedStatus,
+                ].filter(Boolean).length
+              })`}
+          </button>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="px-3 py-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
+            >
+              <X size={16} />
+              Clear all
+            </button>
+          )}
+        </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-8 gap-4">
+              {/* Brand Filter */}
+              <SelectField
+                label="Brand"
+                data={brands}
+                value={selectedBrand || ""}
+                onChange={(value) =>
+                  setSelectedBrand(value ? Number(value) : undefined)
+                }
+                allowEmpty
+                emptyLabel="All Brands"
+              />
+
+              {/* Supplier Filter */}
+              <SelectField
+                label="Supplier"
+                data={suppliers}
+                value={selectedSupplier || ""}
+                onChange={(value) =>
+                  setSelectedSupplier(value ? Number(value) : undefined)
+                }
+                allowEmpty
+                emptyLabel="All Suppliers"
+              />
+
+              {/* Category Filter */}
+              <SelectField
+                label="Category"
+                data={categories}
+                value={selectedCategory || ""}
+                onChange={(value) =>
+                  setSelectedCategory(value ? Number(value) : undefined)
+                }
+                allowEmpty
+                emptyLabel="All Categories"
+              />
+
+              {/* Subcategory Filter */}
+              <SelectField
+                label="Subcategory"
+                data={subcategories}
+                value={selectedSubcategory || ""}
+                onChange={(value) =>
+                  setSelectedSubcategory(value ? Number(value) : undefined)
+                }
+                allowEmpty
+                emptyLabel="All Subcategories"
+              />
+
+              {/* Origin Filter */}
+              <SelectField
+                label="Origin"
+                data={[
+                  { id: "", name: "All Origins" },
+                  { id: "china", name: "China" },
+                  { id: "usa", name: "USA" },
+                  { id: "japan", name: "Japan" },
+                ]}
+                value={selectedOrigin}
+                onChange={setSelectedOrigin}
+              />
+
+              {/* Has Expiry Filter */}
+              <SelectField
+                label="Has Expiry"
+                data={[
+                  { id: "", name: "All" },
+                  { id: "true", name: "Has Expiry" },
+                  { id: "false", name: "No Expiry" },
+                ]}
+                value={
+                  selectedExpiry === undefined ? "" : selectedExpiry.toString()
+                }
+                onChange={(value) =>
+                  setSelectedExpiry(value === "" ? undefined : value === "true")
+                }
+              />
+
+              {/* Status Filter */}
+              <SelectField
+                label="Status"
+                data={[
+                  { id: "", name: "All Status" },
+                  { id: "true", name: "Active" },
+                  { id: "false", name: "Inactive" },
+                ]}
+                value={
+                  selectedStatus === undefined ? "" : selectedStatus.toString()
+                }
+                onChange={(value) =>
+                  setSelectedStatus(value === "" ? undefined : value === "true")
+                }
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Table Section */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-[#1e1e1e]">
         <div className="max-w-full overflow-x-auto">
@@ -122,6 +455,7 @@ export default function ProductList() {
                 <TableCell isHeader colSpan={2}>
                   Product
                 </TableCell>
+                <TableCell isHeader>Type</TableCell>
                 <TableCell isHeader>Brand</TableCell>
                 <TableCell isHeader>Supplier</TableCell>
                 <TableCell isHeader>Unit Price</TableCell>
@@ -160,7 +494,12 @@ export default function ProductList() {
                     <TableCell className="py-3">
                       <div className="flex flex-col gap-1">
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {product.name}
+                          <Link
+                            to={`/products/view/${product.id}`}
+                            className=" hover:underline"
+                          >
+                            {product.name}
+                          </Link>
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
                           <div>
@@ -181,14 +520,32 @@ export default function ProductList() {
                         </div>
                       </div>
                     </TableCell>
+                    <TableCell className="py-3">
+                      {product.product_type &&
+                        (() => {
+                          const badge = getProductTypeBadge(
+                            product.product_type
+                          );
+                          const classes = getBadgeClasses(badge.color);
+                          return (
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${classes.bg} ${classes.text} ${classes.darkBg} ${classes.darkText}`}
+                            >
+                              {badge.text}
+                            </span>
+                          );
+                        })()}
+                    </TableCell>
                     <TableCell>
                       {product.brand?.name && (
                         <span className="mr-2">{product.brand.name}</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {product.supplier?.name && (
+                      {product.supplier?.name ? (
                         <span> {product.supplier.name}</span>
+                      ) : (
+                        <span className="text-gray-400 text-center">N/A</span>
                       )}
                     </TableCell>
                     {/* Pricing */}
@@ -290,7 +647,7 @@ export default function ProductList() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={9}
                     className="py-12 text-center text-gray-500 dark:text-gray-400"
                   >
                     <div className="flex flex-col items-center gap-2 w-full justify-center">
@@ -306,6 +663,21 @@ export default function ProductList() {
           </Table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {meta && meta.totalPages > 1 && (
+        <Pagination
+          meta={{
+            currentPage: meta.page,
+            totalPages: meta.totalPages,
+            total: meta.total,
+          }}
+          currentPage={page}
+          onPageChange={handlePageChange}
+          currentPageItems={products.length}
+          itemsPerPage={limit}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       {canDelete && (

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
+import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import TextArea from "../../../components/form/input/TextArea";
-import { FormField } from "../../../components/form/form-elements/SelectFiled";
 import Button from "../../../components/ui/button/Button";
 import { Modal } from "../../../components/ui/modal";
 import {
@@ -17,16 +18,21 @@ import {
   useCancelPurchaseReturnMutation,
   useUpdatePurchaseReturnMutation,
 } from "../../../features/purchase-return/purchaseReturnApi";
+import { PurchaseReturn, PurchaseReturnItem } from "../../../types/purchase-return";
 import ApprovalModal from "./ApprovalModal";
 import ProcessingModal from "./ProcessingModal";
 import PurchaseReturnStatusBadge from "./PurchaseReturnStatusBadge";
-import { PurchaseReturn, PurchaseReturnItem } from "../../../types";
 
 interface PurchaseReturnEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   purchaseReturn: PurchaseReturn | null;
   onUpdated?: () => void;
+}
+
+interface FormData {
+  reason: string;
+  items: PurchaseReturnItem[];
 }
 
 export default function PurchaseReturnEditModal({
@@ -40,34 +46,41 @@ export default function PurchaseReturnEditModal({
   const [cancelPurchaseReturn, { isLoading: isCancelling }] =
     useCancelPurchaseReturnMutation();
 
-  const [returnItems, setReturnItems] = useState<PurchaseReturnItem[]>([]);
-  const [reason, setReason] = useState("");
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
   const [isProcessingModalOpen, setIsProcessingModalOpen] = useState(false);
+
+  const { register, handleSubmit, setValue, watch, reset } = useForm<FormData>({
+    defaultValues: {
+      reason: "",
+      items: [],
+    },
+  });
+
+  const returnItems = watch("items");
 
   // Initialize form when purchaseReturn changes
   useEffect(() => {
     if (purchaseReturn && isOpen) {
-      setReturnItems(purchaseReturn.items);
-      setReason(purchaseReturn.reason || "");
+      setValue("items", purchaseReturn.items);
+      setValue("reason", purchaseReturn.reason || "");
     }
-  }, [purchaseReturn, isOpen]);
+  }, [purchaseReturn, isOpen, setValue]);
 
   if (!isOpen) return null;
 
   const handleQuantityChange = (index: number, value: string) => {
     const qty = parseInt(value) || 0;
-    const newItems = [...returnItems];
+    const currentItems = [...returnItems];
     const originalItem = purchaseReturn?.items[index];
 
     // Get the original quantity from purchase_item if available
     const maxQuantity =
       originalItem?.purchase_item?.quantity ||
       originalItem?.returned_quantity ||
-      newItems[index].returned_quantity;
+      currentItems[index].returned_quantity;
 
-    newItems[index].returned_quantity = Math.min(qty, maxQuantity);
-    setReturnItems(newItems);
+    currentItems[index].returned_quantity = Math.min(qty, maxQuantity);
+    setValue("items", currentItems);
   };
 
   const getTotalReturnAmount = () => {
@@ -82,16 +95,14 @@ export default function PurchaseReturnEditModal({
     );
   };
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: FormData) => {
     if (!purchaseReturn) return;
 
     try {
       await updatePurchaseReturn({
         id: purchaseReturn.id,
         body: {
-          items: returnItems.map((item) => ({
+          items: data.items.map((item) => ({
             product_id: item.product_id,
             purchase_item_id: item.purchase_item_id,
             returned_quantity: item.returned_quantity,
@@ -100,11 +111,12 @@ export default function PurchaseReturnEditModal({
                 ? parseFloat(item.price)
                 : item.price,
           })),
-          reason: reason.trim(),
+          reason: data.reason.trim(),
         },
       }).unwrap();
 
       toast.success("Purchase return updated successfully");
+      reset();
       onUpdated?.();
       onClose();
     } catch (error: any) {
@@ -208,15 +220,14 @@ export default function PurchaseReturnEditModal({
 
           {/* Form for editing (only if draft status) */}
           {isDraft && (
-            <form onSubmit={handleUpdate} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Reason */}
               <FormField label="Reason for Return *">
                 <TextArea
+                  {...register("reason")}
                   rows={3}
                   className="w-full"
                   placeholder="Enter reason for return..."
-                  value={reason}
-                  onChange={(value) => setReason(value)}
                 />
               </FormField>
 

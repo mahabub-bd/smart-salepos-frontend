@@ -1,20 +1,35 @@
-import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { useState } from "react";
+import Chart from "react-apexcharts";
+import { useGetMonthWiseAnalyticsQuery } from "../../features/sale/saleApi";
+import { MoreDotIcon } from "../../icons";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
-import { useState } from "react";
-import { useGetMonthWiseAnalyticsQuery } from "../../features/sale/saleApi";
 
 export default function MonthlySalesChart() {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const { data, isLoading } = useGetMonthWiseAnalyticsQuery({ year: selectedYear });
+  const { data, isLoading } = useGetMonthWiseAnalyticsQuery({
+    year: selectedYear,
+  });
 
   const analytics = data?.data;
 
   // Prepare all 12 months
-  const allMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const allMonths = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   // Create a map of existing data (month number -> sale data)
   const salesMap = new Map(
@@ -170,12 +185,17 @@ export default function MonthlySalesChart() {
 
       {analytics && (
         <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">
-          Total: <span className="font-semibold text-brand-600 dark:text-brand-400">৳{analytics.totalYearlySales.toLocaleString()}</span> • Orders: <span className="font-semibold">{analytics.totalYearlyOrders}</span>
+          Total:{" "}
+          <span className="font-semibold text-brand-600 dark:text-brand-400">
+            ৳{analytics.totalYearlySales.toLocaleString()}
+          </span>{" "}
+          • Orders:{" "}
+          <span className="font-semibold">{analytics.totalYearlyOrders}</span>
         </div>
       )}
 
       <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="-ml-5 min-w-[650px] xl:min-w-full pl-2">
+        <div className="-ml-5 min-w-162.5 xl:min-w-full pl-2">
           <Chart options={options} series={series} type="bar" height={180} />
         </div>
       </div>

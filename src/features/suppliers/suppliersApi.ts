@@ -1,4 +1,5 @@
-import { ApiResponse, Supplier } from "../../types";
+import { ApiResponse} from "../../types";
+import { Supplier } from "../../types/supplier";
 import { apiSlice } from "../apiSlice";
 
 export interface UpdateSupplierPayload {

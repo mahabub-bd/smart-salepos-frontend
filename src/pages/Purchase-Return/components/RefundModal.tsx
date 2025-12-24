@@ -241,9 +241,8 @@ export default function RefundModal({
               <TextArea
                 rows={2}
                 className="w-full"
+                {...register("refund_notes")}
                 placeholder="Notes about this refund..."
-                value={watch("refund_notes")}
-                onChange={(value) => setValue("refund_notes", value)}
                 disabled={isLoading}
               />
             </div>

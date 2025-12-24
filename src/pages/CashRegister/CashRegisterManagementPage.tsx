@@ -15,9 +15,6 @@ import Badge from "../../components/ui/badge/Badge";
 import Button from "../../components/ui/button/Button";
 import { Modal } from "../../components/ui/modal";
 
-import { useGetCashRegistersQuery } from "../../features/cash-register";
-import { CashRegister, CashRegisterStatus } from "../../types";
-
 import {
   Table,
   TableBody,
@@ -25,6 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
+import { useGetCashRegistersQuery } from "../../features/cash-register/cashRegisterApi";
+import { CashRegister, CashRegisterStatus } from "../../types/cashregister";
 import { formatCurrencyEnglish } from "../../utlis";
 
 const CashRegisterManagementPage: React.FC = () => {

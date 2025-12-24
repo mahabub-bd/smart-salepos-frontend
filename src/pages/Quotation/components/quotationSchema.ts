@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { QuotationStatus } from "../../../types";
+import { QuotationStatus } from "../../../types/quotation";
 
 export const quotationItemSchema = z.object({
   product_id: z.coerce.number().min(0, "Product is required"),

@@ -13,6 +13,7 @@ import {
   UsersRound,
   Wallet,
   Warehouse,
+  Wrench,
 } from "lucide-react";
 import { NavItem } from "../layout/AppSidebar";
 
@@ -46,7 +47,7 @@ const navItems: NavItem[] = [
         requiredPermission: "quotation.view",
       },
       {
-        name: "Sales Orders",
+        name: "Sales List",
         path: "/sales",
         requiredPermission: "sales.view",
       },
@@ -119,6 +120,11 @@ const navItems: NavItem[] = [
         requiredPermission: "inventory.view",
       },
       {
+        name: "Stock - Material Wise",
+        path: "/inventory/stock-material-wise",
+        requiredPermission: "inventory.view",
+      },
+      {
         name: "Stock - Batch Wise",
         path: "/inventory/stock-batch-wise",
         requiredPermission: "inventory.view",
@@ -139,12 +145,17 @@ const navItems: NavItem[] = [
   // ========== PRODUCT CATALOG ==========
   {
     icon: <Package2Icon />,
-    name: "Product Catalog",
+    name: "Products",
     requiredPermission: "product.view",
     subItems: [
       {
-        name: "Products",
+        name: "Products List",
         path: "/products",
+        requiredPermission: "product.view",
+      },
+      {
+        name: "Components List",
+        path: "/components",
         requiredPermission: "product.view",
       },
       {
@@ -166,6 +177,30 @@ const navItems: NavItem[] = [
         name: "Tags",
         path: "/tags",
         requiredPermission: "tag.view",
+      },
+    ],
+  },
+
+  // ========== PRODUCTION ==========
+  {
+    icon: <Wrench />,
+    name: "Production",
+    requiredPermission: "production.view",
+    subItems: [
+      {
+        name: "Production Orders",
+        path: "/production/orders",
+        requiredPermission: "production.view",
+      },
+      {
+        name: "Production Recipes",
+        path: "/production/recipes",
+        requiredPermission: "production.view",
+      },
+      {
+        name: "Material Consumption",
+        path: "/production/material-consumption",
+        requiredPermission: "production.view",
       },
     ],
   },
@@ -423,3 +458,4 @@ const othersItems: NavItem[] = [
 ];
 
 export { navItems, othersItems };
+

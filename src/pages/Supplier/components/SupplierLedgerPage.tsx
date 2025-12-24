@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import LedgerSummaryCard from "../../../components/common/LedgerSummaryCard";
 import Loading from "../../../components/common/Loading";
 import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../components/common/PageMeta";
-import LedgerSummaryCard from "../../../components/common/LedgerSummaryCard";
 import Badge from "../../../components/ui/badge/Badge";
 import Pagination from "../../../components/ui/pagination/Pagination";
 import {
@@ -23,8 +23,8 @@ export default function SupplierLedgerPage() {
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
-  const [currentPage, setCurrentPage] = useState(1);
-  const limit = 20;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const limit = 10;
 
   if (!id) {
     return (

@@ -6,7 +6,7 @@ import {
   useGetUnitsQuery,
 } from "../../../features/unit/unitApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Unit } from "../../../types";
+import { Unit } from "../../../types/product";
 
 import {
   Table,

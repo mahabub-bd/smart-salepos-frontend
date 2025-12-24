@@ -21,7 +21,7 @@ import {
   useGetAvailableCashRegistersQuery,
   useGetCashRegistersQuery,
   useOpenCashRegisterMutation,
-} from "../../features/cash-register";
+} from "../../features/cash-register/cashRegisterApi";
 import { useGetCustomersQuery } from "../../features/customer/customerApi";
 
 import { FormField } from "../../components/form/form-elements/SelectFiled";
@@ -30,17 +30,14 @@ import Select from "../../components/form/Select";
 import ThermalReceipt58mm from "../../components/receipt/ThermalReceipt58mm";
 import Button from "../../components/ui/button/Button";
 import { Modal } from "../../components/ui/modal";
-import { useGetWarehouseWiseReportQuery } from "../../features/inventory/inventoryApi";
+import { useGetProductWiseReportQuery } from "../../features/inventory/inventoryApi";
 import { useCreatePosSaleMutation } from "../../features/pos/posApi";
 import { useGetReceiptPreviewQuery } from "../../features/settings/settingsApi";
 import { useGetWarehousesQuery } from "../../features/warehouse/warehouseApi";
-import {
-  Account,
-  CashRegister,
-  Customer,
-  ReceiptPreviewData,
-  Warehouse,
-} from "../../types";
+import { Account } from "../../types/accounts";
+import { Warehouse } from "../../types/branch";
+import { CashRegister } from "../../types/cashregister";
+import { Customer } from "../../types/customer";
 import {
   CartItem,
   CloseCounterFormData,
@@ -49,10 +46,9 @@ import {
   OpenCashRegisterFormValues,
   openCashRegisterSchema,
   PaymentMethod,
-  Product,
   SaleReceiptData,
-  WarehouseReport,
 } from "../../types/posPage";
+import { ReceiptPreviewData } from "../../types/settings";
 import CustomerFormModal from "../Customer/components/CustomerFormModal";
 
 export default function POSPage() {
@@ -106,9 +102,9 @@ export default function POSPage() {
     useOpenCashRegisterMutation();
   const [closeCashRegister, { isLoading: isClosingRegister }] =
     useCloseCashRegisterMutation();
-  const { data: warehouseReportData } = useGetWarehouseWiseReportQuery({
+  const { data: productReportData } = useGetProductWiseReportQuery({
     search: searchProduct,
-    warehouse_id: selectedWarehouse || undefined,
+    product_type: "finished_good,resale",
   });
   const { data: receiptSettingsData } = useGetReceiptPreviewQuery();
   const [createSale, { isLoading: isCreating }] = useCreatePosSaleMutation();
@@ -154,13 +150,19 @@ export default function POSPage() {
     }
   }, [cashRegisters]);
 
-  // Extract products from warehouse report
+  // Extract products from product report
   const products: ExtendedProduct[] =
-    warehouseReportData?.data?.flatMap((warehouse: WarehouseReport) =>
-      warehouse.products.map((p: Product) => ({
-        ...p,
-        warehouse_id: warehouse.warehouse_id,
-        warehouse_name: warehouse.warehouse.name,
+    productReportData?.data?.flatMap((item: any) =>
+      item.warehouses.map((w: any) => ({
+        product: item.product,
+        purchased_quantity: w.purchased_quantity || 0,
+        sold_quantity: w.sold_quantity || 0,
+        remaining_quantity: w.remaining_quantity,
+        batch_no: w.batch_no || "",
+        purchase_value: w.purchase_value || 0,
+        sale_value: w.sale_value || 0,
+        warehouse_id: w.warehouse_id,
+        warehouse_name: w.warehouse?.name || "",
       }))
     ) || [];
 

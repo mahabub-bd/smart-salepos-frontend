@@ -20,7 +20,6 @@ import {
   useUpdateEmployeeMutation,
 } from "../../../features/employee/employeeApi";
 import {
-  CreateUserPayload,
   useCreateUserMutation,
   useGetUsersQuery,
 } from "../../../features/user/userApi";
@@ -30,6 +29,7 @@ import {
   EmployeeStatus,
   EmployeeType,
 } from "../../../types";
+import { CreateUserPayload } from "../../../types/user";
 
 // Zod schema for employee validation
 const employeeSchema = z

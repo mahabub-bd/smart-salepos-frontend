@@ -11,7 +11,7 @@ import {
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
 } from "../../../features/customer/customerApi";
-import { Customer } from "../../../types";
+import { Customer } from "../../../types/customer";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

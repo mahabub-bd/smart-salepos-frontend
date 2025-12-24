@@ -1,7 +1,6 @@
 import PageMeta from "../../components/common/PageMeta";
 import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
 import Last30DaysSalesChart from "../../components/ecommerce/Last30DaysSalesChart";
-import RecentOrders from "../../components/ecommerce/RecentOrders";
 import YearlyMonthWiseSalesChart from "../../components/ecommerce/YearlyMonthWiseSalesChart";
 
 export default function Home() {
@@ -24,10 +23,6 @@ export default function Home() {
 
         <div className="col-span-12">
           <YearlyMonthWiseSalesChart />
-        </div>
-
-        <div className="col-span-12">
-          <RecentOrders />
         </div>
       </div>
     </>

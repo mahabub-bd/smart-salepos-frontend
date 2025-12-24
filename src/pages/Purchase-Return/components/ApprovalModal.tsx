@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import TextArea from "../../../components/form/input/TextArea";
@@ -19,33 +19,40 @@ interface ApprovalModalProps {
   onSuccess?: () => void;
 }
 
+interface FormData {
+  approval_notes: string;
+}
+
 export default function ApprovalModal({
   isOpen,
   onClose,
   purchaseReturn,
   onSuccess,
 }: ApprovalModalProps) {
-  const [approvalNotes, setApprovalNotes] = useState("");
+  const { register, handleSubmit, reset } = useForm<FormData>({
+    defaultValues: {
+      approval_notes: "",
+    },
+  });
+
   const [approvePurchaseReturn, { isLoading }] =
     useApprovePurchaseReturnMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: FormData) => {
     if (!purchaseReturn) return;
 
     try {
       await approvePurchaseReturn({
         id: purchaseReturn.id,
         body: {
-          approval_notes: approvalNotes.trim() || undefined,
+          approval_notes: data.approval_notes.trim() || undefined,
         },
       }).unwrap();
 
       toast.success(
         `Purchase return ${purchaseReturn.return_no} approved successfully`
       );
-      setApprovalNotes("");
+      reset();
       onSuccess?.();
       onClose();
     } catch (error: any) {
@@ -55,7 +62,7 @@ export default function ApprovalModal({
 
   const handleClose = () => {
     if (!isLoading) {
-      setApprovalNotes("");
+      reset();
       onClose();
     }
   };
@@ -68,7 +75,7 @@ export default function ApprovalModal({
       title="Approve Purchase Return"
     >
       {purchaseReturn ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* Return Information */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-semibold text-gray-900 mb-2">
@@ -98,11 +105,10 @@ export default function ApprovalModal({
               Approval Notes (Optional)
             </Label>
             <TextArea
+              {...register("approval_notes")}
               rows={3}
               className="w-full"
               placeholder="Add any notes about this approval..."
-              value={approvalNotes}
-              onChange={(value) => setApprovalNotes(value)}
               disabled={isLoading}
             />
           </div>

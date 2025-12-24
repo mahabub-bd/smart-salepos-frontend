@@ -7,9 +7,9 @@ import {
 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
+import DatePicker from "../../components/form/date-picker";
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
-import DatePicker from "../../components/form/date-picker";
 import Badge from "../../components/ui/badge/Badge";
 import Button from "../../components/ui/button/Button";
 import { Modal } from "../../components/ui/modal";
@@ -21,9 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
-import { useGetCashRegisterTransactionsQuery } from "../../features/cash-register";
-import { CashRegisterTransaction } from "../../types";
+import { useGetCashRegisterTransactionsQuery } from "../../features/cash-register/cashRegisterApi";
+
 import { formatCurrencyEnglish, formatDateTime } from "../../utlis";
+import { CashRegisterTransaction } from "../../types/cashregister";
 
 const CashRegisterTransactionsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,8 +62,8 @@ const CashRegisterTransactionsPage: React.FC = () => {
             | "opening_balance"
             | "closing_balance")
         : undefined,
-    start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
-    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined,
+    start_date: startDate ? startDate.toISOString().split("T")[0] : undefined,
+    end_date: endDate ? endDate.toISOString().split("T")[0] : undefined,
     page: currentPage,
     limit: itemsPerPage,
   });

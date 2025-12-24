@@ -1,132 +1,190 @@
-import { Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useGetWarehouseWiseReportQuery } from "../../../features/inventory/inventoryApi";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../../components/ui/table";
 import Loading from "../../../components/common/Loading";
-
-
+import Badge from "../../../components/ui/badge/Badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import { useGetWarehouseWiseReportQuery } from "../../../features/inventory/inventoryApi";
 
 export default function InventoryWarehouseList() {
-  const navigate = useNavigate();
   const { data, isLoading, isError } = useGetWarehouseWiseReportQuery({});
-
   const warehouses = data?.data || [];
 
-  if (isLoading) return <Loading message="Loading warehouse inventory..." />;
+  if (isLoading) return <Loading />;
+
   if (isError)
-    return <p className="p-6 text-red-500">Failed to load inventory</p>;
+    return (
+      <div className="p-8 text-center text-red-600">
+        Failed to load inventory
+      </div>
+    );
 
   return (
-    <div className="mt-5">
-      <div className="rounded-xl border bg-white">
-        <div className="overflow-x-auto">
-          <Table className="w-full text-sm">
-            <TableHeader>
-              <TableRow>
-                <TableCell isHeader>Warehouse</TableCell>
-                <TableCell isHeader>Location</TableCell>
-                <TableCell isHeader>Purchased</TableCell>
-                <TableCell isHeader>Sold</TableCell>
-                <TableCell isHeader>Remaining</TableCell>
-                <TableCell isHeader>Purchase Value</TableCell>
-                <TableCell isHeader>Sale Value</TableCell>
-                <TableCell isHeader>Products</TableCell>
-                <TableCell isHeader>Actions</TableCell>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {warehouses ? (
-                warehouses.map((item: any) => (
-                  <TableRow key={item.warehouse_id} className="border-b">
-                    {/* Warehouse Name */}
-                    <TableCell>{item.warehouse.name}</TableCell>
-
-                    {/* Location */}
-                    <TableCell>{item.warehouse.location}</TableCell>
-
-                    {/* Purchased */}
-                    <TableCell>{item.total_stock}</TableCell>
-
-                    {/* Sold */}
-                    <TableCell className=" text-red-500">
-                      {item.total_sold_quantity}
+    <>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50">
+              <TableCell className="font-semibold">Warehouse</TableCell>
+              <TableCell className="font-semibold">Location</TableCell>
+              <TableCell className="font-semibold text-center">
+                Purchased
+              </TableCell>
+              <TableCell className="font-semibold text-center">Sold</TableCell>
+              <TableCell className="font-semibold text-center">
+                Remaining
+              </TableCell>
+              <TableCell className="font-semibold text-right">
+                Purchase Value
+              </TableCell>
+              <TableCell className="font-semibold text-right">
+                Sale Value
+              </TableCell>
+              <TableCell className="font-semibold">Products</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {warehouses.length > 0 ? (
+              warehouses.map((item: any, index: number) => (
+                <>
+                  {/* Warehouse Row */}
+                  <TableRow
+                    key={`warehouse-${index}`}
+                    className="hover:bg-gray-50 border-b-2 border-gray-200"
+                  >
+                    <TableCell className="font-medium">
+                      {item.warehouse.name}
                     </TableCell>
-
-                    {/* Remaining */}
-                    <TableCell className=" text-green-600">
-                      {item.remaining_stock}
+                    <TableCell className="text-gray-600">
+                      {item.warehouse.location}
                     </TableCell>
-
-                    {/* Purchase Value */}
-                    <TableCell className=" font-medium">
-                      {item.purchase_value?.toLocaleString() || 0}
+                    <TableCell className="text-center">
+                      <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.total_stock}
+                      </span>
                     </TableCell>
-
-                    {/* Sale Value */}
-                    <TableCell className=" font-medium">
-                      {item.sale_value?.toLocaleString() || 0}
+                    <TableCell className="text-center">
+                      <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.total_sold_quantity}
+                      </span>
                     </TableCell>
-
-                    {/* Product Details */}
-                    <TableCell className="table-body">
-                      {item.products.map((p: any, index: number) => (
-                        <div key={index} className="mb-2">
-                          <p className="font-medium">{p.product.name}</p>
-                          <p className="text-sm text-gray-500">
-                            SKU: {p.product.sku}
-                          </p>
-
-                          <p className="text-xs">
-                            <span className="text-blue-500">
-                              Purchased: {p.purchased_quantity}
-                            </span>
-                            {" | "}
-                            <span className="text-red-500">
-                              Sold: {p.sold_quantity}
-                            </span>
-                            {" | "}
-                            <span className="text-green-600">
-                              Remaining: {p.remaining_quantity}
-                            </span>
-                            {" | "}
-                            <span>Batch: {p.batch_no}</span>
-                          </p>
-
-                          {index < item.products.lengTableCell - 1 && (
-                            <hr className="my-2" />
-                          )}
-                        </div>
-                      ))}
+                    <TableCell className="text-center">
+                      <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {item.remaining_stock}
+                      </span>
                     </TableCell>
-
-                    {/* Action */}
-                    <TableCell className="table-body text-right">
-                      <button
-                        className="p-2 rounded hover:bg-gray-100"
-                        onClick={() =>
-                          navigate(`/inventory/warehouse/${item.warehouse_id}`)
-                        }
-                      >
-                        <Eye size={18} />
-                      </button>
+                    <TableCell className="text-right font-medium">
+                      ৳{item.purchase_value?.toLocaleString() || 0}
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      ৳{item.sale_value?.toLocaleString() || 0}
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-sm">
+                      {item.products.length} product
+                      {item.products.length !== 1 ? "s" : ""}
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <tr>
-                  <TableCell
-                    colSpan={9}
-                    className="py-6 text-center text-gray-500"
-                  >
-                    No warehouse inventory found
-                  </TableCell>
-                </tr>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+
+                  {/* Product Cards Row */}
+
+                  <TableRow key={`products-${index}`}>
+                    <TableCell colSpan={8} className="p-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                        {item.products.map((p: any, pIndex: number) => (
+                          <div
+                            key={pIndex}
+                            className="bg-white border border-gray-200 rounded-md hover:shadow-sm transition"
+                          >
+                            {/* Header */}
+                            <div className="flex gap-2 p-2">
+                              <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden shrink-0">
+                                {p.product.images?.length ? (
+                                  <img
+                                    src={p.product.images[0].url}
+                                    alt={p.product.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400">
+                                    No Img
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-gray-900 truncate">
+                                  {p.product.name}
+                                </p>
+
+                                {p.product.product_type && (
+                                  <Badge
+                                    variant="light"
+                                    size="sm"
+                                    className="mt-0.5"
+                                    color={
+                                      p.product.product_type === "resale"
+                                        ? "primary"
+                                        : "warning"
+                                    }
+                                  >
+                                    {p.product.product_type}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Meta */}
+                            <div className="px-2 pb-2 space-y-1 text-[11px]">
+                              <div className="flex justify-between">
+                                <span className="text-gray-500">SKU</span>
+                                <span className="font-mono text-gray-700">
+                                  {p.product.sku}
+                                </span>
+                              </div>
+
+                              <div className="flex justify-between">
+                                <span className="text-gray-500">Batch</span>
+                                <span className="font-mono text-gray-700 truncate max-w-30">
+                                  {p.batch_no}
+                                </span>
+                              </div>
+
+                              {/* Quantities */}
+                              <div className="flex justify-between border-t pt-1 mt-1">
+                                <span className="text-blue-600">
+                                  Purchase: <b>{p.purchased_quantity}</b>
+                                </span>
+                                <span className="text-red-600">
+                                  Sold: <b>{p.sold_quantity}</b>
+                                </span>
+                                <span className="text-green-600">
+                                  Remaining: <b>{p.remaining_quantity}</b>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center py-8 text-gray-500"
+                >
+                  No warehouse inventory found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
-    </div>
+    </>
   );
 }

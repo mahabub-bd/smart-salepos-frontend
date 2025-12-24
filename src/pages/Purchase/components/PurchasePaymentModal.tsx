@@ -13,7 +13,7 @@ import { useCreatePaymentMutation } from "../../../features/payment/paymentApi";
 
 const paymentSchema = z.object({
   amount: z.number().positive("Amount must be > 0"),
-  method: z.enum(["cash", "bank", "bkash"]),
+  method: z.enum(["cash", "bank", "mobile"]),
   payment_account_code: z.string().min(1, "Payment account is required"),
   note: z.string().optional(),
 });

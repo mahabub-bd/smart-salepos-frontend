@@ -29,9 +29,6 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import {
-  Backup,
-  BackupStatus,
-  BackupType,
   useCreateBackupMutation,
   useDeleteBackupMutation,
   useDownloadBackupMutation,
@@ -39,6 +36,7 @@ import {
   useRestoreBackupMutation,
 } from "../../../features/backup/backupApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { Backup, BackupStatus, BackupType } from "../../../types/backup";
 import { formatDateTime } from "../../../utlis";
 import BackupFormModal from "./BackupFormModal";
 import RestoreBackupModal from "./RestoreBackupModal";
@@ -210,10 +208,11 @@ export default function BackupList() {
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setShowSchedules(false)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${!showSchedules
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                !showSchedules
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+              }`}
             >
               <div className="flex items-center gap-2">
                 <HardDrive size={16} />
@@ -222,10 +221,11 @@ export default function BackupList() {
             </button>
             <button
               onClick={() => setShowSchedules(true)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${showSchedules
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                showSchedules
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+              }`}
             >
               <div className="flex items-center gap-2">
                 <Calendar size={16} />
@@ -322,12 +322,7 @@ export default function BackupList() {
                     <TableCell>{formatFileSize(backup.file_size)}</TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <div>
-                          {formatDateTime(backup.created_at)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {formatDateTime(backup.created_at)}
-                        </div>
+                        <div>{formatDateTime(backup.created_at)}</div>
                       </div>
                     </TableCell>
                     <TableCell>

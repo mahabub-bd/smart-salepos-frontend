@@ -21,7 +21,7 @@ import {
   useGetExpenseCategoriesQuery,
 } from "../../../features/expense-category/expenseCategoryApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { ExpenseCategory } from "../../../types";
+import { ExpenseCategory } from "../../../types/expenses";
 import ExpenseCategoryFormModal from "./ExpenseCategoryFormModal";
 
 type StatusFilter = "active" | "inactive" | "all";

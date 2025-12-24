@@ -1,4 +1,10 @@
-import { CreditCard, FileDown, PackageCheck, RefreshCcw, RotateCcw } from "lucide-react";
+import {
+  CreditCard,
+  FileDown,
+  PackageCheck,
+  RefreshCcw,
+  RotateCcw,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import IconButton from "../../../components/common/IconButton";
@@ -16,7 +22,10 @@ import {
   PaymentHistory,
   PurchaseItem,
   PurchaseOrderStatus,
-} from "../../../types";
+} from "../../../types/purchase";
+import { formatDateTime } from "../../../utlis";
+
+import Info from "../../../components/common/Info";
 import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchasePaymentModal from "./PurchasePaymentModal";
 import PurchaseReceiveModal from "./PurchaseReceiveModal";
@@ -30,7 +39,8 @@ interface Props {
 export default function PurchaseDetail({ purchaseId }: Props) {
   const { data, isLoading, isError } = useGetPurchaseByIdQuery(purchaseId);
   const purchase = data?.data;
-  const [getInvoicePdf, { isLoading: isDownloadingPdf }] = useLazyGetInvoicePdfQuery();
+  const [getInvoicePdf, { isLoading: isDownloadingPdf }] =
+    useLazyGetInvoicePdfQuery();
 
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -39,9 +49,12 @@ export default function PurchaseDetail({ purchaseId }: Props) {
 
   const handleDownloadPdf = async () => {
     try {
-      const blob = await getInvoicePdf({ type: "purchase", id: Number(purchaseId) }).unwrap();
+      const blob = await getInvoicePdf({
+        type: "purchase",
+        id: Number(purchaseId),
+      }).unwrap();
       const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      window.open(url, "_blank");
       // Clean up the object URL after a short delay
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
@@ -90,13 +103,13 @@ export default function PurchaseDetail({ purchaseId }: Props) {
           />
           <Info
             label="Created At"
-            value={new Date(purchase.created_at).toLocaleDateString()}
+            value={formatDateTime(purchase.created_at)}
           />
           <Info
             label="Expected Delivery"
             value={
               purchase.expected_delivery_date
-                ? new Date(purchase.expected_delivery_date).toLocaleDateString()
+                ? formatDateTime(purchase.expected_delivery_date)
                 : "-"
             }
           />
@@ -281,13 +294,6 @@ const SectionHeader = ({ title }: { title: string }) => (
   <h2 className="text-lg font-medium mb-3">{title}</h2>
 );
 
-const Info = ({ label, value }: { label: string; value: any }) => (
-  <div>
-    <p className="text-gray-500 text-xs uppercase">{label}</p>
-    <p className="font-medium">{value}</p>
-  </div>
-);
-
 const Amount = ({ children }: any) => (
   <span className="font-semibold text-gray-800">
     ৳{Number(children).toLocaleString()}
@@ -395,6 +401,9 @@ const PaymentTable = ({ history, totalPaid }: any) => (
     <TableHeader className="bg-gray-50">
       <TableRow>
         <TableCell isHeader className="py-2">
+          Reference
+        </TableCell>
+        <TableCell isHeader className="py-2">
           Date
         </TableCell>
         <TableCell isHeader className="py-2">
@@ -411,9 +420,8 @@ const PaymentTable = ({ history, totalPaid }: any) => (
     <TableBody>
       {history.map((p: PaymentHistory) => (
         <TableRow key={p.id} className="border-b">
-          <TableCell className="py-1">
-            {new Date(p.created_at).toLocaleDateString()}
-          </TableCell>
+          <TableCell className="py-1">#{p.id}</TableCell>
+          <TableCell className="py-1">{formatDateTime(p.created_at)}</TableCell>
           <TableCell className="py-1 text-green-600 font-medium">
             ৳{Number(p.amount).toLocaleString()}
           </TableCell>

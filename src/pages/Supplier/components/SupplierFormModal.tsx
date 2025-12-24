@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { Modal } from "../../../components/ui/modal";
 
-import Input from "../../../components/form/input/InputField";
 import { FormField } from "../../../components/form/form-elements/SelectFiled";
+import Input from "../../../components/form/input/InputField";
 
 import {
   useCreateSupplierMutation,
   useUpdateSupplierMutation,
 } from "../../../features/suppliers/suppliersApi";
 
-import { Supplier } from "../../../types";
+import { Supplier } from "../../../types/supplier";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -111,7 +111,7 @@ export default function SupplierFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-lg p-6"
+      className="max-w-2xl"
       title={isEdit ? "Update Supplier" : "Add New Supplier"}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
