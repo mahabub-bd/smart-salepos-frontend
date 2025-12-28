@@ -2,8 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import Input from "../../../../components/form/input/InputField";
 import { FormField } from "../../../../components/form/form-elements/SelectFiled";
+import Input from "../../../../components/form/input/InputField";
 import Button from "../../../../components/ui/button/Button";
 import { Modal } from "../../../../components/ui/modal";
 import { useAddBankBalanceMutation } from "../../../../features/accounts/accountsApi";
@@ -59,7 +59,7 @@ export default function AddBalanceModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-lg p-6 min-h-[300px] max-h-screen overflow-y-auto"
+      className="max-w-2xl min-h-75 max-h-screen overflow-y-auto"
     >
       <h2 className="text-lg font-semibold mb-3">Add Balance</h2>
 

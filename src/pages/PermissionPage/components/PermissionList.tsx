@@ -111,15 +111,15 @@ export default function PermissionList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableCell isHeader className="table-header w-[250px]">
+                <TableCell isHeader className="table-header w-62.5">
                   Key
                 </TableCell>
-                <TableCell isHeader className="table-header w-[300px]">
+                <TableCell isHeader className="table-header w-75">
                   Description
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="table-header text-right w-[100px]"
+                  className="table-header text-right w-25"
                 >
                   Actions
                 </TableCell>

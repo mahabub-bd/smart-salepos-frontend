@@ -20,6 +20,7 @@ import {
   useGetDepartmentsQuery,
 } from "../../../features/department/departmentApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Department } from "../../../types";
 import DepartmentFormModal from "./DepartmentFormModal";
 
@@ -28,9 +29,11 @@ export default function DepartmentList() {
   const { data, isLoading, isError } = useGetDepartmentsQuery();
   const [deleteDepartment] = useDeleteDepartmentMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editDepartment, setEditDepartment] = useState<Department | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [departmentToDelete, setDepartmentToDelete] =
     useState<Department | null>(null);
   const [searchInput, setSearchInput] = useState("");
@@ -55,17 +58,17 @@ export default function DepartmentList() {
 
   const openCreateModal = () => {
     setEditDepartment(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (department: Department) => {
     setEditDepartment(department);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (department: Department) => {
     setDepartmentToDelete(department);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const viewDepartment = (department: Department) => {
@@ -80,7 +83,7 @@ export default function DepartmentList() {
     } catch {
       toast.error("Failed to delete department");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -235,21 +238,21 @@ export default function DepartmentList() {
 
       {(canCreate || canUpdate) && (
         <DepartmentFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           department={editDepartment}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Department"
           message={`Are you sure you want to delete "${departmentToDelete?.name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

@@ -19,6 +19,7 @@ import {
   useGetBrandsQuery,
 } from "../../../features/brand/brandApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Brand } from "../../../types";
 import BrandFormModal from "./BrandFormModal";
 
@@ -26,9 +27,11 @@ export default function BrandList() {
   const { data, isLoading, isError } = useGetBrandsQuery();
   const [deleteBrand] = useDeleteBrandMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editBrand, setEditBrand] = useState<Brand | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
 
   const canCreate = useHasPermission("brand.create");
@@ -39,17 +42,17 @@ export default function BrandList() {
 
   const openCreateModal = () => {
     setEditBrand(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (brand: Brand) => {
     setEditBrand(brand);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (brand: Brand) => {
     setBrandToDelete(brand);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -60,7 +63,7 @@ export default function BrandList() {
     } catch {
       toast.error("Failed to delete brand");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -161,21 +164,21 @@ export default function BrandList() {
 
       {(canCreate || canUpdate) && (
         <BrandFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           brand={editBrand}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Brand"
           message={`Are you sure you want to delete "${brandToDelete?.name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

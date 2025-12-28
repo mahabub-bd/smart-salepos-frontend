@@ -21,6 +21,7 @@ import {
   useGetEmployeesQuery,
 } from "../../../features/employee/employeeApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Employee } from "../../../types";
 import { getEmployeeTypeColor, getStatusColor } from "../../../utlis";
 import EmployeeFormModal from "./EmployeeFormModal";
@@ -30,9 +31,11 @@ export default function EmployeeList() {
   const [deleteEmployee] = useDeleteEmployeeMutation();
   const navigate = useNavigate();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
     null
   );
@@ -63,17 +66,17 @@ export default function EmployeeList() {
 
   const openCreateModal = () => {
     setEditEmployee(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (employee: Employee) => {
     setEditEmployee(employee);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (employee: Employee) => {
     setEmployeeToDelete(employee);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -84,7 +87,7 @@ export default function EmployeeList() {
     } catch {
       toast.error("Failed to delete employee");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -231,7 +234,7 @@ export default function EmployeeList() {
                         <Dropdown
                           isOpen={activeDropdown === employee.id}
                           onClose={() => setActiveDropdown(null)}
-                          className="min-w-[140px]"
+                          className="min-w-35"
                         >
                           {/* View Details */}
                           {canView && (
@@ -298,21 +301,21 @@ export default function EmployeeList() {
 
       {(canCreate || canUpdate) && (
         <EmployeeFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           employee={editEmployee}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Employee"
           message={`Are you sure you want to delete "${employeeToDelete?.first_name} ${employeeToDelete?.last_name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

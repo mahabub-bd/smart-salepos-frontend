@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import DatePicker from "../../../components/form/date-picker";
@@ -33,6 +34,7 @@ import {
   useGetLeaveSummaryQuery,
 } from "../../../features/leave/leaveApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { LeaveStatus, LeaveType } from "../../../types";
 import {
   formatDate,
@@ -66,7 +68,15 @@ export default function LeaveRequestList() {
   const [selectedLeaveType, setSelectedLeaveType] = useState<string>("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
+  const [leaveRequestToDelete, setLeaveRequestToDelete] = useState<{
+    id: number;
+    employeeName: string;
+  } | null>(null);
 
   const { data, isLoading, isError } = useGetLeaveRequestsQuery({
     employee_id: selectedEmployee ? Number(selectedEmployee) : undefined,
@@ -110,14 +120,22 @@ export default function LeaveRequestList() {
     );
   });
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this leave request?")) return;
+  const openDeleteDialog = (id: number, employeeName: string) => {
+    setLeaveRequestToDelete({ id, employeeName });
+    deleteModal.openModal();
+  };
+
+  const confirmDelete = async () => {
+    if (!leaveRequestToDelete) return;
 
     try {
-      await deleteLeaveRequest(id).unwrap();
+      await deleteLeaveRequest(leaveRequestToDelete.id).unwrap();
       toast.success("Leave request deleted successfully");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to delete leave request");
+    } finally {
+      deleteModal.closeModal();
+      setLeaveRequestToDelete(null);
     }
   };
 
@@ -132,9 +150,7 @@ export default function LeaveRequestList() {
         title="Leave Requests"
         icon={<Calendar size={16} />}
         addLabel="New Leave Request"
-        onAdd={() => {
-          setIsModalOpen(true);
-        }}
+        onAdd={formModal.openModal}
         permission="leave.create"
       />
 
@@ -433,7 +449,14 @@ export default function LeaveRequestList() {
                         )}
                         {canDelete && (
                           <button
-                            onClick={() => handleDelete(request.id)}
+                            onClick={() =>
+                              openDeleteDialog(
+                                request.id,
+                                request.employee
+                                  ? `${request.employee.first_name} ${request.employee.last_name}`
+                                  : "Unknown Employee"
+                              )
+                            }
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg dark:text-red-400 dark:hover:bg-red-900/20"
                             title="Delete"
                           >
@@ -466,9 +489,22 @@ export default function LeaveRequestList() {
 
       {/* Leave Request Modal */}
       <LeaveRequestModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={formModal.isOpen}
+        onClose={formModal.closeModal}
       />
+
+      {/* Delete Confirmation Dialog */}
+      {canDelete && (
+        <ConfirmDialog
+          isOpen={deleteModal.isOpen}
+          title="Delete Leave Request"
+          message={`Are you sure you want to delete the leave request for "${leaveRequestToDelete?.employeeName}"?`}
+          confirmLabel="Yes, Delete"
+          cancelLabel="Cancel"
+          onConfirm={confirmDelete}
+          onCancel={deleteModal.closeModal}
+        />
+      )}
     </>
   );
 }

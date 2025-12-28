@@ -6,6 +6,7 @@ import {
   useGetDesignationsQuery,
 } from "../../../features/designation/designationApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Designation } from "../../../types";
 
 import {
@@ -28,11 +29,13 @@ export default function DesignationList() {
   const { data, isLoading, isError } = useGetDesignationsQuery();
   const [deleteDesignation] = useDeleteDesignationMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editDesignation, setEditDesignation] = useState<Designation | null>(
     null
   );
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [designationToDelete, setDesignationToDelete] =
     useState<Designation | null>(null);
   const [searchInput, setSearchInput] = useState("");
@@ -56,17 +59,17 @@ export default function DesignationList() {
 
   const openCreateModal = () => {
     setEditDesignation(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (designation: Designation) => {
     setEditDesignation(designation);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (designation: Designation) => {
     setDesignationToDelete(designation);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -77,7 +80,7 @@ export default function DesignationList() {
     } catch {
       toast.error("Failed to delete designation");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -245,21 +248,21 @@ export default function DesignationList() {
 
       {(canCreate || canUpdate) && (
         <DesignationFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           designation={editDesignation}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Designation"
           message={`Are you sure you want to delete "${designationToDelete?.title}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

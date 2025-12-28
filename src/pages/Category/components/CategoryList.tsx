@@ -12,6 +12,7 @@ import IconButton from "../../../components/common/IconButton";
 import Badge from "../../../components/ui/badge/Badge";
 import ResponsiveImage from "../../../components/ui/images/ResponsiveImage";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 
 import Loading from "../../../components/common/Loading";
 import {
@@ -77,18 +78,20 @@ export default function CategoryList() {
   const canUpdate = useHasPermission("category.update");
   const canDelete = useHasPermission("category.delete");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editCategory, setEditCategory] = useState<FlattenedCategory | null>(
     null
   );
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] =
     useState<FlattenedCategory | null>(null);
 
   // Open modal to create a main category
   const openCreateCategoryModal = () => {
     setEditCategory(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   // Open modal to create a subcategory under a parent
@@ -102,19 +105,19 @@ export default function CategoryList() {
       updated_at: "",
       category_id: String(parent.id), // Set parent category ID
     });
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   // Open modal to edit existing category/subcategory
   const openEditModal = (category: FlattenedCategory) => {
     setEditCategory(category);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   // Open delete confirmation dialog
   const openDeleteDialog = (category: FlattenedCategory) => {
     setCategoryToDelete(category);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   // Confirm and execute delete
@@ -130,7 +133,7 @@ export default function CategoryList() {
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete category");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
       setCategoryToDelete(null);
     }
   };
@@ -274,9 +277,9 @@ export default function CategoryList() {
 
       {/* Category / SubCategory Form Modal */}
       <CategoryFormModal
-        isOpen={isModalOpen}
+        isOpen={formModal.isOpen}
         onClose={() => {
-          setIsModalOpen(false);
+          formModal.closeModal();
           setEditCategory(null);
         }}
         category={editCategory}
@@ -284,7 +287,7 @@ export default function CategoryList() {
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
-        isOpen={isDeleteModalOpen}
+        isOpen={deleteModal.isOpen}
         title={`Delete ${
           categoryToDelete?.parent ? "Subcategory" : "Category"
         }`}
@@ -299,7 +302,7 @@ export default function CategoryList() {
         cancelLabel="Cancel"
         onConfirm={confirmDelete}
         onCancel={() => {
-          setIsDeleteModalOpen(false);
+          deleteModal.closeModal();
           setCategoryToDelete(null);
         }}
       />

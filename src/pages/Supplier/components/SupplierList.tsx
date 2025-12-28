@@ -22,6 +22,7 @@ import {
   useDeleteSupplierMutation,
   useGetSuppliersQuery,
 } from "../../../features/suppliers/suppliersApi";
+import { useModal } from "../../../hooks/useModal";
 import { Supplier } from "../../../types/supplier";
 
 import {
@@ -38,9 +39,11 @@ export default function SupplierList() {
 
   const suppliers = data?.data || [];
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editSupplier, setEditSupplier] = useState<Supplier | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(
     null
   );
@@ -53,17 +56,17 @@ export default function SupplierList() {
   ===================== */
   const openCreate = () => {
     setEditSupplier(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEdit = (supplier: Supplier) => {
     setEditSupplier(supplier);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDelete = (supplier: Supplier) => {
     setSupplierToDelete(supplier);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -74,7 +77,7 @@ export default function SupplierList() {
     } catch {
       toast.error("Failed to delete supplier");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -355,19 +358,19 @@ export default function SupplierList() {
          Modals
       ===================== */}
       <SupplierFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={formModal.isOpen}
+        onClose={formModal.closeModal}
         supplier={editSupplier}
       />
 
       <ConfirmDialog
-        isOpen={isDeleteModalOpen}
+        isOpen={deleteModal.isOpen}
         title="Delete Supplier"
         message={`Are you sure you want to delete "${supplierToDelete?.name}"?`}
         confirmLabel="Yes, Delete"
         cancelLabel="Cancel"
         onConfirm={confirmDelete}
-        onCancel={() => setIsDeleteModalOpen(false)}
+        onCancel={deleteModal.closeModal}
       />
     </div>
   );

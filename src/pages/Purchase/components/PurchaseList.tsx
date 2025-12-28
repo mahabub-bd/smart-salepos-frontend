@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetPurchasesQuery } from "../../../features/purchases/purchasesApi";
+import { useModal } from "../../../hooks/useModal";
 import { formatDateTime } from "../../../utlis";
 import PurchaseReturnModal from "../../Purchase-Return/components/PurchaseReturnModal";
 import PurchaseStatusBadge from "./PurchaseStatusBadge";
@@ -30,8 +31,11 @@ import PurchaseStatusBadge from "./PurchaseStatusBadge";
 export default function PurchaseList() {
   const { data, isLoading, isError } = useGetPurchasesQuery();
   const navigate = useNavigate();
+
+  // 🔹 Use the useModal hook for modal state management
+  const returnModal = useModal();
+
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
-  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | number | null>(
     null
   );
@@ -192,7 +196,7 @@ export default function PurchaseList() {
                             <DropdownItem
                               onClick={() => {
                                 setSelectedPurchase(p);
-                                setIsReturnModalOpen(true);
+                                returnModal.openModal();
                                 setActiveDropdown(null);
                               }}
                               disabled={!canReturn}
@@ -239,9 +243,9 @@ export default function PurchaseList() {
 
       {/* Purchase Return Modal */}
       <PurchaseReturnModal
-        isOpen={isReturnModalOpen}
+        isOpen={returnModal.isOpen}
         onClose={() => {
-          setIsReturnModalOpen(false);
+          returnModal.closeModal();
           setSelectedPurchase(null);
         }}
         purchase={selectedPurchase}
