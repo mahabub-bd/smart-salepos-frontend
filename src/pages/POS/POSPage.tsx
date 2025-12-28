@@ -34,6 +34,7 @@ import { useGetProductWiseReportQuery } from "../../features/inventory/inventory
 import { useCreatePosSaleMutation } from "../../features/pos/posApi";
 import { useGetReceiptPreviewQuery } from "../../features/settings/settingsApi";
 import { useGetWarehousesQuery } from "../../features/warehouse/warehouseApi";
+import { useModal } from "../../hooks/useModal";
 import { Account } from "../../types/accounts";
 import { Warehouse } from "../../types/branch";
 import { CashRegister } from "../../types/cashregister";
@@ -63,12 +64,14 @@ export default function POSPage() {
   const [paidAmount, setPaidAmount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [paymentAccountCode, setPaymentAccountCode] = useState("");
-  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
-  const [showReceipt, setShowReceipt] = useState(false);
   const [completedSaleData, setCompletedSaleData] =
     useState<SaleReceiptData | null>(null);
-  const [showOpenRegisterModal, setShowOpenRegisterModal] = useState(false);
-  const [showCloseCounterModal, setShowCloseCounterModal] = useState(false);
+
+  // 🔹 Use the useModal hook for modal state management
+  const customerModal = useModal();
+  const receiptModal = useModal();
+  const openRegisterModal = useModal();
+  const closeCounterModal = useModal();
 
   // Initialize React Hook Form for Open Cash Register
   const {
@@ -326,7 +329,7 @@ export default function POSPage() {
       }).unwrap();
 
       toast.success("Cash register opened successfully!");
-      setShowOpenRegisterModal(false);
+      openRegisterModal.closeModal();
       resetForm(); // Reset form after successful submission
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to open cash register");
@@ -346,7 +349,7 @@ export default function POSPage() {
       }).unwrap();
 
       toast.success("Cash register closed successfully!");
-      setShowCloseCounterModal(false);
+      closeCounterModal.closeModal();
       setSelectedCashRegister(0);
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to close cash register");
@@ -421,7 +424,7 @@ export default function POSPage() {
       };
 
       setCompletedSaleData(receiptData);
-      setShowReceipt(true);
+      receiptModal.openModal();
       clearCart();
     } catch (error: any) {
       toast.error(error?.data?.message || "Sale failed");
@@ -438,9 +441,9 @@ export default function POSPage() {
 
       {/* Customer Modal */}
       <CustomerFormModal
-        isOpen={isCustomerModalOpen}
+        isOpen={customerModal.isOpen}
         onClose={() => {
-          setIsCustomerModalOpen(false);
+          customerModal.closeModal();
           refetchCustomers();
         }}
         customer={null}
@@ -448,7 +451,7 @@ export default function POSPage() {
 
       <div className="flex justify-end mb-4">
         <Button
-          onClick={() => setIsCustomerModalOpen(true)}
+          onClick={customerModal.openModal}
           variant="primary"
           size="sm"
           startIcon={<UserPlus size={18} />}
@@ -586,7 +589,7 @@ export default function POSPage() {
                   </div>
                 </div>
                 <Button
-                  onClick={() => setShowCloseCounterModal(true)}
+                  onClick={closeCounterModal.openModal}
                   variant="warning"
                   size="sm"
                   startIcon={<Lock size={16} />}
@@ -597,7 +600,7 @@ export default function POSPage() {
               </div>
             ) : (
               <Button
-                onClick={() => setShowOpenRegisterModal(true)}
+                onClick={openRegisterModal.openModal}
                 variant="success"
                 size="sm"
                 startIcon={<DollarSign size={16} />}
@@ -932,9 +935,9 @@ export default function POSPage() {
       {/* Open Cash Register Modal */}
       <Modal
         className="max-w-xl"
-        isOpen={showOpenRegisterModal}
+        isOpen={openRegisterModal.isOpen}
         onClose={() => {
-          setShowOpenRegisterModal(false);
+          openRegisterModal.closeModal();
           resetForm();
         }}
         title="Open Cash Register"
@@ -995,7 +998,7 @@ export default function POSPage() {
             <Button
               type="button"
               onClick={() => {
-                setShowOpenRegisterModal(false);
+                openRegisterModal.closeModal();
                 resetForm();
               }}
               variant="outline"
@@ -1018,8 +1021,8 @@ export default function POSPage() {
       {/* Close Counter Modal */}
       <Modal
         className="max-w-xl"
-        isOpen={showCloseCounterModal}
-        onClose={() => setShowCloseCounterModal(false)}
+        isOpen={closeCounterModal.isOpen}
+        onClose={closeCounterModal.closeModal}
         title="Close Cash Register"
       >
         <form
@@ -1082,7 +1085,7 @@ export default function POSPage() {
           <div className="flex justify-end gap-3 pt-2">
             <Button
               type="button"
-              onClick={() => setShowCloseCounterModal(false)}
+              onClick={closeCounterModal.closeModal}
               variant="outline"
               size="sm"
             >
@@ -1102,12 +1105,12 @@ export default function POSPage() {
       </Modal>
 
       {/* Thermal Receipt Modal */}
-      {showReceipt && completedSaleData && (
+      {receiptModal.isOpen && completedSaleData && (
         <ThermalReceipt58mm
           receiptSettings={receiptSettings}
           saleData={completedSaleData}
           onClose={() => {
-            setShowReceipt(false);
+            receiptModal.closeModal();
             setCompletedSaleData(null);
           }}
         />

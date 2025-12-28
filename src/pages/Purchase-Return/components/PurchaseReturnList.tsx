@@ -17,14 +17,18 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import { useModal } from "../../../hooks/useModal";
 
 export default function PurchaseReturnList() {
   const { data, isLoading, isError, refetch } = useGetPurchaseReturnsQuery();
   const navigate = useNavigate();
+
+  // 🔹 Use the useModal hook for modal state management
+  const editModal = useModal();
+  const approvalModal = useModal();
+
   const [selectedReturn, setSelectedReturn] = useState<any>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedApproveReturn, setSelectedApproveReturn] = useState<any>(null);
-  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
 
   const purchaseReturns = data?.data || [];
 
@@ -35,7 +39,7 @@ export default function PurchaseReturnList() {
       supplier_name: purchaseReturn.supplier?.name,
       total: purchaseReturn.total || "0",
     });
-    setIsApprovalModalOpen(true);
+    approvalModal.openModal();
   };
 
   if (isLoading) return <Loading message="Loading Purchase Returns..." />;
@@ -118,7 +122,7 @@ export default function PurchaseReturnList() {
                             tooltip="Edit"
                             onClick={() => {
                               setSelectedReturn(pr);
-                              setIsEditModalOpen(true);
+                              editModal.openModal();
                             }}
                           />
                         )}
@@ -150,9 +154,9 @@ export default function PurchaseReturnList() {
 
       {/* Purchase Return Edit Modal */}
       <PurchaseReturnEditModal
-        isOpen={isEditModalOpen}
+        isOpen={editModal.isOpen}
         onClose={() => {
-          setIsEditModalOpen(false);
+          editModal.closeModal();
           setSelectedReturn(null);
         }}
         purchaseReturn={selectedReturn}
@@ -163,9 +167,9 @@ export default function PurchaseReturnList() {
 
       {/* Approval Modal */}
       <ApprovalModal
-        isOpen={isApprovalModalOpen}
+        isOpen={approvalModal.isOpen}
         onClose={() => {
-          setIsApprovalModalOpen(false);
+          approvalModal.closeModal();
           setSelectedApproveReturn(null);
         }}
         purchaseReturn={selectedApproveReturn}

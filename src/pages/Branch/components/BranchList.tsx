@@ -18,6 +18,7 @@ import {
   useGetBranchesQuery,
 } from "../../../features/branch/branchApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Branch } from "../../../types/branch";
 import BranchFormModal from "./BranchFormModal";
 
@@ -26,9 +27,11 @@ export default function BranchList() {
 
   const [deleteBranch] = useDeleteBranchMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editBranch, setEditBranch] = useState<Branch | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState<Branch | null>(null);
 
   const canCreate = useHasPermission("branch.create");
@@ -39,17 +42,17 @@ export default function BranchList() {
 
   const openCreateModal = () => {
     setEditBranch(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (branch: Branch) => {
     setEditBranch(branch);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (branch: Branch) => {
     setBranchToDelete(branch);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -60,7 +63,7 @@ export default function BranchList() {
     } catch {
       toast.error("Failed to delete branch");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -173,21 +176,21 @@ export default function BranchList() {
 
       {(canCreate || canUpdate) && (
         <BranchFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           branch={editBranch}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Branch"
           message={`Are you sure you want to delete "${branchToDelete?.name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

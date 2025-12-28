@@ -6,6 +6,7 @@ import {
   useGetUnitsQuery,
 } from "../../../features/unit/unitApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Unit } from "../../../types/product";
 
 import {
@@ -27,9 +28,11 @@ export default function UnitList() {
   const { data, isLoading, isError } = useGetUnitsQuery();
   const [deleteUnit] = useDeleteUnitMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editUnit, setEditUnit] = useState<Unit | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
 
   const canCreate = useHasPermission("unit.create");
@@ -40,17 +43,17 @@ export default function UnitList() {
 
   const openCreateModal = () => {
     setEditUnit(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (unit: Unit) => {
     setEditUnit(unit);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (unit: Unit) => {
     setUnitToDelete(unit);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -61,7 +64,7 @@ export default function UnitList() {
     } catch {
       toast.error("Failed to delete unit");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -151,21 +154,21 @@ export default function UnitList() {
 
       {(canCreate || canUpdate) && (
         <UnitFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           unit={editUnit}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Unit"
           message={`Are you sure you want to delete "${unitToDelete?.name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

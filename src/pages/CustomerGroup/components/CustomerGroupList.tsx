@@ -19,14 +19,16 @@ import {
   useGetCustomerGroupsQuery,
 } from "../../../features/customer-group/customerGroupApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { CustomerGroup } from "../../../types/customer";
 import CustomerGroupFormModal from "./CustomerGroupFormModal";
 
 export default function CustomerGroupList() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editGroup, setEditGroup] = useState<CustomerGroup | null>(null);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editGroup, setEditGroup] = useState<CustomerGroup | null>(null);
   const [groupToDelete, setGroupToDelete] = useState<CustomerGroup | null>(
     null
   );
@@ -48,7 +50,7 @@ export default function CustomerGroupList() {
     } catch {
       toast.error("Failed to delete customer group");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -64,7 +66,7 @@ export default function CustomerGroupList() {
         addLabel="Add Group"
         onAdd={() => {
           setEditGroup(null);
-          setIsModalOpen(true);
+          formModal.openModal();
         }}
         permission="customergroup.create"
       />
@@ -102,7 +104,7 @@ export default function CustomerGroupList() {
                         tooltip="Edit"
                         onClick={() => {
                           setEditGroup(group);
-                          setIsModalOpen(true);
+                          formModal.openModal();
                         }}
                         color="blue"
                       />
@@ -113,7 +115,7 @@ export default function CustomerGroupList() {
                         tooltip="Delete"
                         onClick={() => {
                           setGroupToDelete(group);
-                          setIsDeleteModalOpen(true);
+                          deleteModal.openModal();
                         }}
                         color="red"
                       />
@@ -128,19 +130,19 @@ export default function CustomerGroupList() {
 
       {canCreate || canUpdate ? (
         <CustomerGroupFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           group={editGroup}
         />
       ) : null}
 
       <ConfirmDialog
-        isOpen={isDeleteModalOpen}
+        isOpen={deleteModal.isOpen}
         title="Delete Customer Group"
         message={`Are you sure you want to delete "${groupToDelete?.name}"?`}
         confirmLabel="Delete"
         onConfirm={confirmDelete}
-        onCancel={() => setIsDeleteModalOpen(false)}
+        onCancel={deleteModal.closeModal}
       />
     </>
   );

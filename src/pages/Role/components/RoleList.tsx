@@ -22,6 +22,7 @@ import IconButton from "../../../components/common/IconButton";
 import Loading from "../../../components/common/Loading";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import RoleFormModal from "./RoleFormModal";
 
 export default function RoleList() {
@@ -29,10 +30,11 @@ export default function RoleList() {
   const { data, isLoading, isError } = useGetRolesQuery();
   const [deleteRole] = useDeleteRoleMutation();
 
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editRole, setEditRole] = useState<Role | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
   // Permission checks
@@ -44,24 +46,24 @@ export default function RoleList() {
   // Handlers
   const openCreateModal = () => {
     setEditRole(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (role: Role) => {
     setEditRole(role);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (role: Role) => {
     setRoleToDelete(role);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
     if (!roleToDelete) return;
     await deleteRole(roleToDelete.id);
     toast.success("Role deleted successfully");
-    setIsDeleteModalOpen(false);
+    deleteModal.closeModal();
   };
 
   // Loading & Error states
@@ -163,20 +165,20 @@ export default function RoleList() {
 
       {/* CREATE / EDIT MODAL */}
       <RoleFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={formModal.isOpen}
+        onClose={formModal.closeModal}
         role={editRole}
       />
 
       {/* DELETE CONFIRM */}
       <ConfirmDialog
-        isOpen={isDeleteModalOpen}
+        isOpen={deleteModal.isOpen}
         title="Delete Role"
         message={`Are you sure you want to delete "${roleToDelete?.name}"?`}
         confirmLabel="Yes, Delete"
         cancelLabel="Cancel"
         onConfirm={confirmDelete}
-        onCancel={() => setIsDeleteModalOpen(false)}
+        onCancel={deleteModal.closeModal}
       />
     </>
   );

@@ -20,6 +20,7 @@ import {
   useGetExpensesQuery,
 } from "../../../features/expenses/expensesApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Expense } from "../../../types/expenses";
 import ExpenseFormModal from "./ExpenseFormModal";
 
@@ -27,9 +28,11 @@ export default function ExpenseList() {
   const { data, isLoading, isError } = useGetExpensesQuery({});
   const [deleteExpense] = useDeleteExpenseMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editExpense, setEditExpense] = useState<Expense | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
 
   const canCreate = useHasPermission("expense.create");
@@ -40,17 +43,17 @@ export default function ExpenseList() {
 
   const openCreateModal = () => {
     setEditExpense(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (expense: Expense) => {
     setEditExpense(expense);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (expense: Expense) => {
     setExpenseToDelete(expense);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -61,7 +64,7 @@ export default function ExpenseList() {
     } catch {
       toast.error("Failed to delete expense");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -201,21 +204,21 @@ export default function ExpenseList() {
 
       {(canCreate || canUpdate) && (
         <ExpenseFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           expense={editExpense}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Expense"
           message={`Are you sure you want to delete "${expenseToDelete?.title}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

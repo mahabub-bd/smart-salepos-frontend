@@ -20,6 +20,7 @@ import {
   useGetCustomersQuery,
 } from "../../../features/customer/customerApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { Customer } from "../../../types/customer";
 
 export default function CustomerList() {
@@ -29,7 +30,9 @@ export default function CustomerList() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const deleteModal = useModal();
+
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
     null
   );
@@ -61,7 +64,7 @@ export default function CustomerList() {
 
   const openDeleteDialog = (customer: Customer) => {
     setCustomerToDelete(customer);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -72,7 +75,7 @@ export default function CustomerList() {
     } catch {
       toast.error("Failed to delete customer");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -229,13 +232,13 @@ export default function CustomerList() {
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Customer"
           message={`Are you sure you want to delete "${customerToDelete?.name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

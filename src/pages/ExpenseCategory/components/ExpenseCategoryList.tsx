@@ -21,6 +21,7 @@ import {
   useGetExpenseCategoriesQuery,
 } from "../../../features/expense-category/expenseCategoryApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 import { ExpenseCategory } from "../../../types/expenses";
 import ExpenseCategoryFormModal from "./ExpenseCategoryFormModal";
 
@@ -42,11 +43,13 @@ export default function ExpenseCategoryList() {
 
   const [deleteExpenseCategory] = useDeleteExpenseCategoryMutation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editCategory, setEditCategory] = useState<ExpenseCategory | null>(
     null
   );
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] =
     useState<ExpenseCategory | null>(null);
 
@@ -76,17 +79,17 @@ export default function ExpenseCategoryList() {
 
   const openCreateModal = () => {
     setEditCategory(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEditModal = (category: ExpenseCategory) => {
     setEditCategory(category);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDeleteDialog = (category: ExpenseCategory) => {
     setCategoryToDelete(category);
-    setIsDeleteModalOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -99,7 +102,7 @@ export default function ExpenseCategoryList() {
     } catch {
       toast.error("Failed to delete expense category");
     } finally {
-      setIsDeleteModalOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -246,21 +249,21 @@ export default function ExpenseCategoryList() {
 
       {(canCreate || canUpdate) && (
         <ExpenseCategoryFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           category={editCategory}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteModalOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Expense Category"
           message={`Are you sure you want to delete "${categoryToDelete?.name}"?`}
           confirmLabel="Yes, Delete"
           cancelLabel="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteModalOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

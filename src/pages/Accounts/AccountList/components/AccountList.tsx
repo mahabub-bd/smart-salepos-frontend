@@ -21,6 +21,7 @@ import {
   useGetAccountBalancesQuery,
   useGetAccountsQuery,
 } from "../../../../features/accounts/accountsApi";
+import { useModal } from "../../../../hooks/useModal";
 import AddBalanceModal from "./AddBalanceModal";
 import AddCashModal from "./AddCashModal";
 import FundTransferModal from "./FundTransferModal";
@@ -48,9 +49,11 @@ export default function AccountListPage({
     ? accounts.filter((acc: any) => acc.isCash || acc.isBank)
     : accounts;
 
-  const [modalType, setModalType] = useState<
-    "cash" | "bank" | "transfer" | null
-  >(null);
+  // 🔹 Use the useModal hook for each modal
+  const cashModal = useModal();
+  const bankModal = useModal();
+  const transferModal = useModal();
+
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
 
   if (isLoading) return <Loading message="Loading accounts..." />;
@@ -58,11 +61,19 @@ export default function AccountListPage({
     return <p className="text-red-500 p-4">Failed to load accounts.</p>;
 
   const openModal = (account: any, type: "cash" | "bank" | "transfer") => {
-    setSelectedAccount({
+    const accountWithBalance = {
       ...account,
       balance: balances.find((b) => b.code === account.code)?.balance || 0,
-    });
-    setModalType(type);
+    };
+    setSelectedAccount(accountWithBalance);
+
+    if (type === "cash") {
+      cashModal.openModal();
+    } else if (type === "bank") {
+      bankModal.openModal();
+    } else if (type === "transfer") {
+      transferModal.openModal();
+    }
   };
 
   const viewLedger = (accountCode: string) => {
@@ -172,27 +183,25 @@ export default function AccountListPage({
       </div>
 
       {/* 🔹 Modal Manager */}
-      {modalType &&
-        selectedAccount &&
-        (modalType === "cash" ? (
+      {selectedAccount && (
+        <>
           <AddCashModal
-            isOpen
+            isOpen={cashModal.isOpen}
             account={selectedAccount}
-            onClose={() => setModalType(null)}
+            onClose={cashModal.closeModal}
           />
-        ) : modalType === "bank" ? (
           <AddBalanceModal
-            isOpen
+            isOpen={bankModal.isOpen}
             account={selectedAccount}
-            onClose={() => setModalType(null)}
+            onClose={bankModal.closeModal}
           />
-        ) : (
           <FundTransferModal
-            isOpen
+            isOpen={transferModal.isOpen}
             fromAccount={selectedAccount}
-            onClose={() => setModalType(null)}
+            onClose={transferModal.closeModal}
           />
-        ))}
+        </>
+      )}
     </div>
   );
 }

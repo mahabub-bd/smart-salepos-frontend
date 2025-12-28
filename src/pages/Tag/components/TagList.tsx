@@ -7,6 +7,7 @@ import {
   useGetTagsQuery,
 } from "../../../features/tag/tagApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
@@ -34,22 +35,24 @@ export default function TagList() {
   const canUpdate = useHasPermission("tag.update");
   const canDelete = useHasPermission("tag.delete");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editTag, setEditTag] = useState<Tag | null>(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [tagToDelete, setTagToDelete] = useState<Tag | null>(null);
 
   const openCreate = () => {
     setEditTag(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
   const openEdit = (t: Tag) => {
     setEditTag(t);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
   const openDelete = (t: Tag) => {
     setTagToDelete(t);
-    setIsDeleteOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -60,7 +63,7 @@ export default function TagList() {
     } catch {
       toast.error("Failed to delete tag");
     } finally {
-      setIsDeleteOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -141,19 +144,19 @@ export default function TagList() {
 
       {(canCreate || canUpdate) && (
         <TagFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           tag={editTag}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Tag"
           message={`Are you sure to delete "${tagToDelete?.name}"?`}
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>

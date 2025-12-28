@@ -7,6 +7,7 @@ import {
   useGetWarehousesQuery,
 } from "../../../features/warehouse/warehouseApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
+import { useModal } from "../../../hooks/useModal";
 
 import ConfirmDialog from "../../../components/common/ConfirmDialog";
 import IconButton from "../../../components/common/IconButton";
@@ -34,26 +35,28 @@ export default function WarehouseList() {
   const canUpdate = useHasPermission("warehouse.update");
   const canDelete = useHasPermission("warehouse.delete");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 🔹 Use the useModal hook for modal state management
+  const formModal = useModal();
+  const deleteModal = useModal();
+
   const [editWarehouse, setEditWarehouse] = useState<Warehouse | null>(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [warehouseToDelete, setWarehouseToDelete] = useState<Warehouse | null>(
     null
   );
 
   const openCreate = () => {
     setEditWarehouse(null);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openEdit = (w: Warehouse) => {
     setEditWarehouse(w);
-    setIsModalOpen(true);
+    formModal.openModal();
   };
 
   const openDelete = (w: Warehouse) => {
     setWarehouseToDelete(w);
-    setIsDeleteOpen(true);
+    deleteModal.openModal();
   };
 
   const confirmDelete = async () => {
@@ -64,7 +67,7 @@ export default function WarehouseList() {
     } catch {
       toast.error("Failed to delete warehouse");
     } finally {
-      setIsDeleteOpen(false);
+      deleteModal.closeModal();
     }
   };
 
@@ -158,19 +161,19 @@ export default function WarehouseList() {
 
       {(canCreate || canUpdate) && (
         <WarehouseFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={formModal.isOpen}
+          onClose={formModal.closeModal}
           warehouse={editWarehouse}
         />
       )}
 
       {canDelete && (
         <ConfirmDialog
-          isOpen={isDeleteOpen}
+          isOpen={deleteModal.isOpen}
           title="Delete Warehouse"
           message={`Are you sure to delete "${warehouseToDelete?.name}"?`}
           onConfirm={confirmDelete}
-          onCancel={() => setIsDeleteOpen(false)}
+          onCancel={deleteModal.closeModal}
         />
       )}
     </>
