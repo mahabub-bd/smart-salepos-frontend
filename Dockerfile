@@ -1,55 +1,35 @@
-gi# Build stage
-FROM node:22-alpine AS builder
 
-# Update packages to patch vulnerabilities
-RUN apk update && apk upgrade --no-cache
+# ----------------- Stage 1: Build -----------------
+FROM node:24-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
-
-# Install pnpm
+# pnpm ইনস্টল করা
 RUN npm install -g pnpm
 
-# Install dependencies
+WORKDIR /app
+
+# pnpm-lock.yaml ফাইল কপি করা
+COPY package.json pnpm-lock.yaml ./
+
+# ডিপেনডেন্সি ইনস্টল করা (--frozen-lockfile ব্যবহার করলে লক ফাইল আপডেট হবে না)
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# বাকি সোর্স কোড কপি করা
 COPY . .
 
-# Build the application
-RUN npm run build
+# অ্যাপটি বিল্ড করা
+RUN pnpm build
 
-# Production stage
+# ----------------- Stage 2: Production -----------------
 FROM nginx:alpine
 
-# Copy custom nginx config (optional - create nginx.conf if needed)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Nginx কনফিগারেশন কপি করা (আগের মতোই)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built assets from builder stage
+# বিল্ডার স্টেজ থেকে dist ফোল্ডার কপি করা
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy a simple nginx configuration for SPA
-RUN echo 'server { \
-    listen 80; \
-    server_name localhost; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-    location /assets/ { \
-        expires 1y; \
-        add_header Cache-Control "public, immutable"; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+EXPOSE 80
 
-# Expose port 5000
-EXPOSE 5000
-
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
+
+ 
