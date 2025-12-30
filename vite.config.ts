@@ -28,98 +28,73 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // React core libraries
-          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
-            return "react-core";
-          }
-
-          // React Router
-          if (id.includes("node_modules/react-router")) {
-            return "react-router";
-          }
-
-          // Redux and state management
+        manualChunks(id) {
+          // Core React packages - MUST load first with highest priority
           if (
-            id.includes("node_modules/@reduxjs") ||
-            id.includes("node_modules/react-redux") ||
-            id.includes("node_modules/redux-persist")
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')
           ) {
-            return "redux";
+            return '0-react-core';
           }
 
-          // Form libraries
+          // React ecosystem - depends on React
+          if (id.includes('node_modules/react-router')) {
+            return 'react-router';
+          }
+
           if (
-            id.includes("node_modules/react-hook-form") ||
-            id.includes("node_modules/@hookform") ||
-            id.includes("node_modules/zod")
+            id.includes('node_modules/@reduxjs') ||
+            id.includes('node_modules/react-redux') ||
+            id.includes('node_modules/redux')
           ) {
-            return "forms";
+            return 'redux';
           }
 
-          // Charts library (heavy dependency)
           if (
-            id.includes("node_modules/apexcharts") ||
-            id.includes("node_modules/react-apexcharts")
+            id.includes('node_modules/react-hook-form') ||
+            id.includes('node_modules/@hookform') ||
+            id.includes('node_modules/zod')
           ) {
-            return "charts";
+            return 'forms';
           }
 
-          // Calendar library (heavy dependency)
-          if (id.includes("node_modules/@fullcalendar")) {
-            return "calendar";
+          // Heavy UI libraries
+          if (id.includes('node_modules/apexcharts') || id.includes('node_modules/react-apexcharts')) {
+            return 'charts';
           }
 
-          // PDF library (heavy dependency)
-          if (id.includes("node_modules/@react-pdf")) {
-            return "pdf";
+          if (id.includes('node_modules/@fullcalendar')) {
+            return 'calendar';
           }
 
-          // Maps library
-          if (id.includes("node_modules/@react-jvectormap")) {
-            return "maps";
+          if (id.includes('node_modules/@react-pdf')) {
+            return 'pdf';
           }
 
-          // Date utilities
+          if (id.includes('node_modules/@react-jvectormap')) {
+            return 'maps';
+          }
+
+          // Utility libraries
           if (
-            id.includes("node_modules/date-fns") ||
-            id.includes("node_modules/flatpickr")
+            id.includes('node_modules/date-fns') ||
+            id.includes('node_modules/flatpickr')
           ) {
-            return "date-utils";
+            return 'date-utils';
           }
 
-          // UI utilities
           if (
-            id.includes("node_modules/lucide-react") ||
-            id.includes("node_modules/react-toastify") ||
-            id.includes("node_modules/clsx") ||
-            id.includes("node_modules/tailwind-merge")
+            id.includes('node_modules/react-toastify') ||
+            id.includes('node_modules/clsx') ||
+            id.includes('node_modules/tailwind-merge')
           ) {
-            return "ui-utils";
+            return 'ui-utils';
           }
 
-          // Drag and drop
-          if (
-            id.includes("node_modules/react-dnd") ||
-            id.includes("node_modules/react-dropzone")
-          ) {
-            return "dnd";
-          }
-
-          // Other libraries
-          if (
-            id.includes("node_modules/swiper") ||
-            id.includes("node_modules/react-helmet-async") ||
-            id.includes("node_modules/react-qr-code") ||
-            id.includes("node_modules/jsbarcode") ||
-            id.includes("node_modules/react-to-print")
-          ) {
-            return "misc-libs";
-          }
-
-          // All other node_modules
-          if (id.includes("node_modules")) {
-            return "vendor";
+          // lucide-react and other third-party libraries - load AFTER React
+          if (id.includes('node_modules/')) {
+            return 'z-vendor';
           }
         },
       },

@@ -2,8 +2,8 @@ import { lazy, Suspense } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
-import { ScrollToTop } from "./components/common/ScrollToTop";
 import Loading from "./components/common/Loading";
+import { ScrollToTop } from "./components/common/ScrollToTop";
 import AppLayout from "./layout/AppLayout";
 import ProtectedRoute from "./route/protected";
 import PublicRoute from "./route/public-route";
@@ -134,8 +134,8 @@ const LeaveApprovalsPage = lazy(() => import("./pages/LeaveApprovals"));
 const ProductionOrderList = lazy(() => import("./pages/Production/Order"));
 const ProductionOrderDetailPage = lazy(() => import("./pages/Production/Order/ProductionOrderDetailPage"));
 const ProductionOrderFormPage = lazy(() => import("./pages/Production/Order/ProductionOrderFormPage"));
-const ProductionRecipeList = lazy(() => import("./pages/Production/Recipe").then(m => ({ default: m.default })));
-const ProductionRecipeFormPage = lazy(() => import("./pages/Production/Recipe").then(m => ({ default: m.ProductionRecipeFormPage })));
+const ProductionRecipeList = lazy(() => import("./pages/Production/Recipe/ProductionRecipeList"));
+const ProductionRecipeFormPage = lazy(() => import("./pages/Production/Recipe/ProductionRecipeFormPage"));
 
 export default function App() {
   return (
