@@ -449,6 +449,11 @@ const othersItems: NavItem[] = [
         requiredPermission: "report.inventory",
       },
       {
+        name: "Profit & Loss Report",
+        path: "/reports/profit-loss",
+        requiredPermission: "report.profitloss",
+      },
+      {
         name: "Customer Report",
         path: "/reports/customers",
         requiredPermission: "report.customer",

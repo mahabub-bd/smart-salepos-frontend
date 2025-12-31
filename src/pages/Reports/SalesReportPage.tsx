@@ -1,6 +1,6 @@
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import PageMeta from "../../components/common/PageMeta";
-import SalesReportView from "./components/SalesReportView";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import PageMeta from "@/components/common/PageMeta";
+import SalesReportView from "./components/sales-report/SalesReportView";
 
 export default function SalesReportPage() {
   return (

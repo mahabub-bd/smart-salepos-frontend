@@ -1,7 +1,6 @@
+import Select from "@/components/form/Select";
+import DatePicker from "@/components/form/date-picker";
 import { ReactNode, useEffect, useState } from "react";
-import Select from "../../../../components/form/Select";
-import DatePicker from "../../../../components/form/date-picker";
-
 
 interface DateRangeOption {
   value: string;
@@ -157,7 +156,7 @@ export default function ReportFilters({
   };
 
   // Calculate grid columns based on number of filters
-  const filterCount = 3 + filters.length; // date range + start date + end date + filters
+  const filterCount = 4 + filters.length; // date range + start date + end date + filters
   const gridCols =
     filterCount <= 4
       ? "md:grid-cols-2 lg:grid-cols-4"

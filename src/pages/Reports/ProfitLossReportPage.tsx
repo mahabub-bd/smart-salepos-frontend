@@ -1,6 +1,6 @@
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import PageMeta from "../../components/common/PageMeta";
-import ProfitLossReportView from "./components/ProfitLossReportView";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import PageMeta from "@/components/common/PageMeta";
+import ProfitLossReportView from "./components/profit-loss/ProfitLossReportView";
 
 export default function ProfitLossReportPage() {
   return (

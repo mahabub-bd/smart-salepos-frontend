@@ -9,20 +9,20 @@ import {
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-import Loading from "../../../../components/common/Loading";
-import PageHeader from "../../../../components/common/PageHeader";
+import Loading from "@/components/common/Loading";
+import PageHeader from "@/components/common/PageHeader";
 import {
   Table,
   TableBody,
   TableCell,
   TableHeader,
   TableRow,
-} from "../../../../components/common/Table";
+} from "@/components/common/Table";
 
-import StatCard from "../../../../components/ui/badge/StatCard";
-import Button from "../../../../components/ui/button";
-import { useLazyGetPurchaseReportQuery } from "../../../../features/report/reportApi";
-import { formatDate } from "../../../../utlis";
+import StatCard from "@/components/ui/badge/StatCard";
+import Button from "@/components/ui/button";
+import { useLazyGetPurchaseReportQuery } from "@/features/report/reportApi";
+import { formatDate } from "@/utlis";
 import ReportFilters, { useDateRangeCalculation } from "../common/ReportFilters";
 import { useBranchOptions } from "../hooks/useBranchOptions";
 import { useSupplierOptions } from "../hooks/useSupplierOptions";

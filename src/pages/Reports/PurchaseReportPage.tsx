@@ -1,6 +1,6 @@
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import PageMeta from "../../components/common/PageMeta";
-import PurchaseReportView from "./components/PurchaseReportView";
+import PageBreadcrumb from "@/components/common/PageBreadCrumb";
+import PageMeta from "@/components/common/PageMeta";
+import PurchaseReportView from "./components/purchase-report/PurchaseReportView";
 
 
 export default function PurchaseReportPage() {

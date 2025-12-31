@@ -3,7 +3,7 @@ import { cn } from "../../../utlis";
 
 interface BadgeProps {
   children: React.ReactNode;
-  color?: "success" | "warning" | "danger" | "info" | "default";
+  color?: "success" | "warning" | "danger" | "info" | "error" | "default";
   className?: string;
 }
 
@@ -14,6 +14,7 @@ export function Badge({ children, color = "default", className }: BadgeProps) {
     warning:
       "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
     danger: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+    error: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     info: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     default: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
   };
@@ -38,7 +39,7 @@ interface StatCardProps {
   badge?: {
     icon?: React.ComponentType<{ className?: string }>;
     text: string;
-    color?: "success" | "warning" | "danger" | "info" | "default";
+    color?: "success" | "warning" | "danger" | "info" | "error" | "default";
   };
   bgColor?:
     | "blue"
@@ -47,6 +48,8 @@ interface StatCardProps {
     | "orange"
     | "pink"
     | "indigo"
+    | "red"
+    | "cyan"
     | "default";
   className?: string;
   compact?: boolean;
@@ -72,6 +75,8 @@ export default function StatCard({
     pink: "bg-gradient-to-br from-pink-50 to-pink-100/50 dark:from-pink-950/20 dark:to-pink-900/10 border-pink-200 dark:border-pink-800/30",
     indigo:
       "bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/20 dark:to-indigo-900/10 border-indigo-200 dark:border-indigo-800/30",
+    red: "bg-gradient-to-br from-red-50 to-red-100/50 dark:from-red-950/20 dark:to-red-900/10 border-red-200 dark:border-red-800/30",
+    cyan: "bg-gradient-to-br from-cyan-50 to-cyan-100/50 dark:from-cyan-950/20 dark:to-cyan-900/10 border-cyan-200 dark:border-cyan-800/30",
     default:
       "bg-white dark:bg-white/[0.03] border-gray-200 dark:border-gray-800",
   };
@@ -83,6 +88,8 @@ export default function StatCard({
     orange: "bg-orange-100/80 dark:bg-orange-800/50",
     pink: "bg-pink-100/80 dark:bg-pink-800/50",
     indigo: "bg-indigo-100/80 dark:bg-indigo-800/50",
+    red: "bg-red-100/80 dark:bg-red-800/50",
+    cyan: "bg-cyan-100/80 dark:bg-cyan-800/50",
     default: "bg-gray-100/80 dark:bg-gray-800/50",
   };
 
