@@ -672,7 +672,6 @@ export default function ProductList() {
             totalPages: meta.totalPages,
             total: meta.total,
           }}
-          currentPage={page}
           onPageChange={handlePageChange}
           currentPageItems={products.length}
           itemsPerPage={limit}

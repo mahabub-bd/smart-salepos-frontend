@@ -206,7 +206,6 @@ export default function PaymentList() {
             totalPages: meta.totalPages,
             total: meta.total,
           }}
-          currentPage={meta.page}
           onPageChange={handlePageChange}
           currentPageItems={payments.length}
           itemsPerPage={filters.limit || 10}

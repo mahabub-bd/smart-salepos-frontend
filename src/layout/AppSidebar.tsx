@@ -189,10 +189,10 @@ const AppSidebar: React.FC = () => {
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 h-screen transition-all duration-300 ease-in-out z-50 border-r
       ${
         isExpanded || isMobileOpen
-          ? "w-[260px]"
+          ? "w-65"
           : isHovered
-          ? "w-[260px]"
-          : "w-[90px]"
+          ? "w-65"
+          : "w-22.5"
       }
       ${
         isMobileOpen

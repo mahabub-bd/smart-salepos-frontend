@@ -1,5 +1,3 @@
-import { lazy } from 'react';
-
-const ProductionOrderList = lazy(() => import('./ProductionOrderList'));
+import ProductionOrderList from './ProductionOrderList';
 
 export default ProductionOrderList;

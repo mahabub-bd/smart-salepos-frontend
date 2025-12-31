@@ -237,7 +237,6 @@ export default function PosSalesListPage() {
                   totalPages: meta.totalPages,
                   total: meta.total,
                 }}
-                currentPage={currentPage}
                 onPageChange={handlePageChange}
                 currentPageItems={filteredSales.length}
                 itemsPerPage={limit}

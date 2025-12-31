@@ -618,7 +618,6 @@ export default function ProductionOrderList() {
             totalPages: meta.totalPages,
             total: meta.total,
           }}
-          currentPage={page}
           onPageChange={handlePageChange}
           currentPageItems={productionOrders.length}
           itemsPerPage={limit}

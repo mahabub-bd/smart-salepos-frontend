@@ -129,7 +129,6 @@ export default function JournalList() {
             totalPages: meta.totalPages,
             total: meta.total,
           }}
-          currentPage={currentPage}
           onPageChange={handlePageChange}
           currentPageItems={journal.length}
           itemsPerPage={limit}

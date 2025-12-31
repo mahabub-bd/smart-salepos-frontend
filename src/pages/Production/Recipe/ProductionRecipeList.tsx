@@ -489,7 +489,6 @@ export default function ProductionRecipeList() {
             totalPages: meta.totalPages,
             total: meta.total,
           }}
-          currentPage={page}
           onPageChange={handlePageChange}
           currentPageItems={recipes.length}
           itemsPerPage={limit}

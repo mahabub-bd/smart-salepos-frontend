@@ -1,11 +1,10 @@
 import {
-  Calendar,
+  Clock,
   Download,
   FileText,
   HardDrive,
   MoreHorizontal,
   Plus,
-  RefreshCw,
   Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -17,7 +16,6 @@ import PageHeader from "../../../components/common/PageHeader";
 import { SelectField } from "../../../components/form/form-elements/SelectFiled";
 import Input from "../../../components/form/input/InputField";
 import Badge from "../../../components/ui/badge/Badge";
-import Button from "../../../components/ui/button";
 
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
@@ -29,94 +27,66 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import {
-  useCreateBackupMutation,
-  useDeleteBackupMutation,
-  useDownloadBackupMutation,
-  useListBackupsQuery,
-  useRestoreBackupMutation,
+  useCreateManualBackupMutation,
+  useDeleteBackupRecordMutation,
+  useGetAllBackupsQuery,
 } from "../../../features/backup/backupApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Backup, BackupStatus, BackupType } from "../../../types/backup";
+import { BackupResponseDto, BackupStatus } from "../../../types/backup";
 import { formatDateTime } from "../../../utlis";
 import BackupFormModal from "./BackupFormModal";
-import RestoreBackupModal from "./RestoreBackupModal";
-import ScheduleList from "./ScheduleList";
 
 export default function BackupList() {
   /* ================= FILTER STATES ================= */
   const [searchInput, setSearchInput] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit] = useState(10);
 
   /* ================= MODAL STATES ================= */
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [backupToDelete, setBackupToDelete] = useState<Backup | null>(null);
-  const [showSchedules, setShowSchedules] = useState(false);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [backupToDelete, setBackupToDelete] = useState<BackupResponseDto | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
   /* ================= API ================= */
-  const queryParams = {
-    page: currentPage,
-    limit,
-    status: (selectedStatus as BackupStatus) || undefined,
-    type: (selectedType as BackupType) || undefined,
-  };
-
-  const { data, isLoading, isError, error } = useListBackupsQuery(queryParams);
-  const [createBackup] = useCreateBackupMutation();
-  const [deleteBackup] = useDeleteBackupMutation();
-  const [downloadBackup] = useDownloadBackupMutation();
-  const [restoreBackup] = useRestoreBackupMutation();
+  const { data: backups = [], isLoading, isError, error } = useGetAllBackupsQuery();
+  const [createManualBackup] = useCreateManualBackupMutation();
+  const [deleteBackupRecord] = useDeleteBackupRecordMutation();
 
   /* ================= PERMISSIONS ================= */
   const canCreate = useHasPermission("backup.create");
   const canDelete = useHasPermission("backup.delete");
-  const canDownload = useHasPermission("backup.download");
-  const canRestore = useHasPermission("backup.restore");
-
-  /* ================= DATA ================= */
-  const backupsData = data?.data;
-  const backups = backupsData?.backups || [];
-  const total = backupsData?.total || 0;
-  const totalPages = Math.ceil(total / limit);
 
   /* ================= DERIVED ================= */
   const filteredBackups = useMemo(() => {
-    if (!searchInput) return backups;
+    let result = backups;
 
-    const search = searchInput.toLowerCase();
-    return backups.filter(
-      (backup) =>
-        backup.filename.toLowerCase().includes(search) ||
-        backup.type.toLowerCase().includes(search) ||
-        backup.status.toLowerCase().includes(search)
-    );
-  }, [backups, searchInput]);
+    // Filter by status
+    if (selectedStatus) {
+      result = result.filter((b) => b.status === selectedStatus);
+    }
+
+    // Filter by search
+    if (searchInput) {
+      const search = searchInput.toLowerCase();
+      result = result.filter(
+        (backup) =>
+          backup.file_name.toLowerCase().includes(search) ||
+          backup.status.toLowerCase().includes(search)
+      );
+    }
+
+    return result;
+  }, [backups, searchInput, selectedStatus]);
 
   const getStatusColor = (status: BackupStatus) => {
     switch (status) {
-      case BackupStatus.COMPLETED:
+      case "completed":
         return "success";
-      case BackupStatus.IN_PROGRESS:
+      case "in_progress":
         return "warning";
-      case BackupStatus.FAILED:
+      case "failed":
         return "error";
-      case BackupStatus.PENDING:
-        return "info";
-      default:
-        return "light";
-    }
-  };
-
-  const getTypeColor = (type: BackupType) => {
-    switch (type) {
-      case BackupType.FULL:
-        return "primary";
-      case BackupType.SELECTIVE:
+      case "pending":
         return "info";
       default:
         return "light";
@@ -133,7 +103,7 @@ export default function BackupList() {
   /* ================= HANDLERS ================= */
   const handleCreateBackup = async (data: any) => {
     try {
-      await createBackup(data).unwrap();
+      await createManualBackup(data).unwrap();
       toast.success("Backup created successfully");
       setIsCreateModalOpen(false);
     } catch (err: any) {
@@ -141,48 +111,29 @@ export default function BackupList() {
     }
   };
 
-  const handleDownload = async (backup: Backup) => {
-    try {
-      const response = await downloadBackup(backup.id).unwrap();
-      // Create download link
-      const url = window.URL.createObjectURL(response);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = backup.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      toast.success("Backup downloaded successfully");
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to download backup");
+  const handleDownload = (backup: BackupResponseDto) => {
+    // For S3 URL, open in new tab or trigger download
+    if (backup.s3_url) {
+      window.open(backup.s3_url, '_blank');
+      toast.success("Opening backup download");
+    } else {
+      toast.error("No download URL available");
     }
   };
 
   const confirmDelete = async () => {
     if (!backupToDelete) return;
     try {
-      await deleteBackup(backupToDelete.id).unwrap();
+      await deleteBackupRecord(backupToDelete.id).unwrap();
       toast.success("Backup deleted successfully");
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to delete backup");
-    } finally {
       setIsDeleteModalOpen(false);
       setBackupToDelete(null);
-    }
-  };
-
-  const handleRestore = async (backupId: string, confirm: boolean) => {
-    try {
-      await restoreBackup({ backup_id: backupId, confirm }).unwrap();
-      toast.success("Database restored successfully");
-      setIsRestoreModalOpen(false);
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to restore database");
+      toast.error(err?.data?.message || "Failed to delete backup");
     }
   };
 
-  if (isLoading && currentPage === 1)
+  if (isLoading)
     return <Loading message="Loading Backup Records" />;
   if (isError)
     return (
@@ -196,245 +147,167 @@ export default function BackupList() {
     <>
       <PageHeader
         title="Database Backup"
+        subtitle="Manage and download database backups"
         icon={<Plus size={16} />}
         addLabel="Create Backup"
         onAdd={() => setIsCreateModalOpen(true)}
         permission="backup.create"
       />
 
-      {/* ================= TABS ================= */}
-      <div className="mb-6">
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setShowSchedules(false)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                !showSchedules
-                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <HardDrive size={16} />
-                Backups
-              </div>
-            </button>
-            <button
-              onClick={() => setShowSchedules(true)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                showSchedules
-                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Calendar size={16} />
-                Scheduled Backups
-              </div>
-            </button>
-          </nav>
+      {/* ================= HEADER INFO ================= */}
+      <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+            <HardDrive className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Backup Management
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Create manual backups of your PostgreSQL database
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <Clock size={16} />
+            <span>Automatic backup scheduled daily at 2:00 AM UTC</span>
+          </div>
         </div>
       </div>
 
       {/* ================= FILTERS ================= */}
-      {!showSchedules && (
-        <div className="mb-4 flex flex-wrap items-center gap-4">
-          <div className="flex-1 max-w-md">
-            <Input
-              placeholder="Search backups..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full"
-            />
-          </div>
-
-          <SelectField
-            label=""
-            placeholder="All Status"
-            value={selectedStatus}
-            onChange={setSelectedStatus}
-            data={[
-              { id: "", name: "All Status" },
-              { id: BackupStatus.PENDING, name: "Pending" },
-              { id: BackupStatus.IN_PROGRESS, name: "In Progress" },
-              { id: BackupStatus.COMPLETED, name: "Completed" },
-              { id: BackupStatus.FAILED, name: "Failed" },
-            ]}
-          />
-
-          <SelectField
-            label=""
-            placeholder="All Types"
-            value={selectedType}
-            onChange={setSelectedType}
-            data={[
-              { id: "", name: "All Types" },
-              { id: BackupType.FULL, name: "Full Backup" },
-              { id: BackupType.SELECTIVE, name: "Selective Backup" },
-            ]}
+      <div className="mb-4 flex flex-wrap items-center gap-4">
+        <div className="flex-1 max-w-md">
+          <Input
+            placeholder="Search backups..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full"
           />
         </div>
-      )}
+
+        <SelectField
+          label=""
+          placeholder="All Status"
+          value={selectedStatus}
+          onChange={setSelectedStatus}
+          data={[
+            { id: "", name: "All Status" },
+            { id: "pending", name: "Pending" },
+            { id: "in_progress", name: "In Progress" },
+            { id: "completed", name: "Completed" },
+            { id: "failed", name: "Failed" },
+          ]}
+        />
+      </div>
 
       {/* ================= CONTENT ================= */}
-      {!showSchedules ? (
-        /* BACKUPS LIST */
-        <div className="overflow-hidden rounded-xl border bg-white dark:bg-[#1e1e1e] dark:border-white/5">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell isHeader>Backup Name</TableCell>
-                <TableCell isHeader>Type</TableCell>
-                <TableCell isHeader>Status</TableCell>
-                <TableCell isHeader>Size</TableCell>
-                <TableCell isHeader>Created</TableCell>
-                <TableCell isHeader>Actions</TableCell>
-              </TableRow>
-            </TableHeader>
+      <div className="overflow-hidden rounded-xl border bg-white dark:bg-[#1e1e1e] dark:border-white/5">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableCell isHeader>Backup Name</TableCell>
+              <TableCell isHeader>Status</TableCell>
+              <TableCell isHeader>Size</TableCell>
+              <TableCell isHeader>Created</TableCell>
+              <TableCell isHeader>Completed</TableCell>
+              <TableCell isHeader>Actions</TableCell>
+            </TableRow>
+          </TableHeader>
 
-            <TableBody>
-              {filteredBackups.length ? (
-                filteredBackups.map((backup) => (
-                  <TableRow key={backup.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-gray-400" />
-                        <div>
-                          <div className="font-medium">{backup.filename}</div>
-                          {backup.description && (
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {backup.description}
-                            </div>
+          <TableBody>
+            {filteredBackups.length ? (
+              filteredBackups.map((backup) => (
+                <TableRow key={backup.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <div className="font-medium">{backup.file_name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          by {backup.created_by}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge color={getStatusColor(backup.status)} size="sm">
+                      {backup.status.replace("_", " ").toUpperCase()}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatFileSize(backup.file_size)}</TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      {formatDateTime(backup.created_at)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      {backup.status === "completed" ? formatDateTime(backup.created_at) : "-"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === backup.id ? null : backup.id
+                            )
+                          }
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                        >
+                          <MoreHorizontal size={16} />
+                        </button>
+                        <Dropdown
+                          isOpen={openDropdownId === backup.id}
+                          onClose={() => setOpenDropdownId(null)}
+                          className="min-w-40"
+                        >
+                          {backup.status === "completed" && (
+                            <DropdownItem
+                              onClick={() => {
+                                handleDownload(backup);
+                                setOpenDropdownId(null);
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <Download size={16} />
+                              Download
+                            </DropdownItem>
                           )}
-                        </div>
+                          {canDelete && (
+                            <DropdownItem
+                              onClick={() => {
+                                setBackupToDelete(backup);
+                                setIsDeleteModalOpen(true);
+                                setOpenDropdownId(null);
+                              }}
+                              className="flex items-center gap-2 text-red-600 dark:text-red-400"
+                            >
+                              <Trash2 size={16} />
+                              Delete
+                            </DropdownItem>
+                          )}
+                        </Dropdown>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge color={getTypeColor(backup.type)} size="sm">
-                        {backup.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge color={getStatusColor(backup.status)} size="sm">
-                        {backup.status.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{formatFileSize(backup.file_size)}</TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div>{formatDateTime(backup.created_at)}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="relative">
-                          <button
-                            onClick={() =>
-                              setOpenDropdownId(
-                                openDropdownId === backup.id ? null : backup.id
-                              )
-                            }
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-                          >
-                            <MoreHorizontal size={16} />
-                          </button>
-                          <Dropdown
-                            isOpen={openDropdownId === backup.id}
-                            onClose={() => setOpenDropdownId(null)}
-                            className="min-w-40"
-                          >
-                            {canDownload &&
-                              backup.status === BackupStatus.COMPLETED && (
-                                <DropdownItem
-                                  onClick={() => {
-                                    handleDownload(backup);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Download size={16} />
-                                  Download
-                                </DropdownItem>
-                              )}
-                            {canRestore &&
-                              backup.status === BackupStatus.COMPLETED && (
-                                <DropdownItem
-                                  onClick={() => {
-                                    setIsRestoreModalOpen(true);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="flex items-center gap-2"
-                                >
-                                  <RefreshCw size={16} />
-                                  Restore
-                                </DropdownItem>
-                              )}
-                            {canDelete && (
-                              <DropdownItem
-                                onClick={() => {
-                                  setBackupToDelete(backup);
-                                  setIsDeleteModalOpen(true);
-                                  setOpenDropdownId(null);
-                                }}
-                                className="flex items-center gap-2 text-red-600 dark:text-red-400"
-                              >
-                                <Trash2 size={16} />
-                                Delete
-                              </DropdownItem>
-                            )}
-                          </Dropdown>
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-12 text-gray-500"
-                  >
-                    No backup records found
+                    </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-
-          {/* PAGINATION */}
-          {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700 dark:text-gray-300">
-                  Showing {(currentPage - 1) * limit + 1} to{" "}
-                  {Math.min(currentPage * limit, total)} of {total} results
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        /* SCHEDULED BACKUPS */
-        <ScheduleList />
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-12 text-gray-500"
+                >
+                  No backup records found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* ================= MODALS ================= */}
       {canCreate && (
@@ -445,20 +318,11 @@ export default function BackupList() {
         />
       )}
 
-      {canRestore && (
-        <RestoreBackupModal
-          isOpen={isRestoreModalOpen}
-          onClose={() => setIsRestoreModalOpen(false)}
-          onConfirm={handleRestore}
-          backups={backups.filter((b) => b.status === BackupStatus.COMPLETED)}
-        />
-      )}
-
       {canDelete && (
         <ConfirmDialog
           isOpen={isDeleteModalOpen}
           title="Delete Backup"
-          message={`Are you sure you want to delete "${backupToDelete?.filename}"? This action cannot be undone.`}
+          message={`Are you sure you want to delete "${backupToDelete?.file_name}"? This action cannot be undone.`}
           onConfirm={confirmDelete}
           onCancel={() => {
             setIsDeleteModalOpen(false);

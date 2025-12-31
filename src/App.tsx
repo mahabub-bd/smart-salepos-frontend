@@ -137,6 +137,19 @@ const ProductionOrderFormPage = lazy(() => import("./pages/Production/Order/Prod
 const ProductionRecipeList = lazy(() => import("./pages/Production/Recipe/ProductionRecipeList"));
 const ProductionRecipeFormPage = lazy(() => import("./pages/Production/Recipe/ProductionRecipeFormPage"));
 
+// Reports Management
+const ReportsPage = lazy(() => import("./pages/Reports"));
+const SalesReportPage = lazy(() => import("./pages/Reports/SalesReportPage"));
+const PurchaseReportPage = lazy(() => import("./pages/Reports/PurchaseReportPage"));
+const InventoryReportPage = lazy(() => import("./pages/Reports/InventoryReportPage"));
+const ProfitLossReportPage = lazy(() => import("./pages/Reports/ProfitLossReportPage"));
+const StockReportPage = lazy(() => import("./pages/Reports/StockReportPage"));
+const ProductsReportPage = lazy(() => import("./pages/Reports/ProductsReportPage"));
+const EmployeesReportPage = lazy(() => import("./pages/Reports/EmployeesReportPage"));
+const ExpenseReportPage = lazy(() => import("./pages/Reports/ExpenseReportPage"));
+const SummaryReportPage = lazy(() => import("./pages/Reports/SummaryReportPage"));
+const CustomersReportPage = lazy(() => import("./pages/Reports/CustomersReportPage"));
+
 export default function App() {
   return (
     <Router>
@@ -354,6 +367,18 @@ export default function App() {
             path="/production/recipes/:id/edit"
             element={<ProductionRecipeFormPage />}
           />
+          {/* Reports Routes */}
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/reports/sales" element={<SalesReportPage />} />
+          <Route path="/reports/purchase" element={<PurchaseReportPage />} />
+          <Route path="/reports/inventory" element={<InventoryReportPage />} />
+          <Route path="/reports/profit-loss" element={<ProfitLossReportPage />} />
+          <Route path="/reports/stock" element={<StockReportPage />} />
+          <Route path="/reports/products" element={<ProductsReportPage />} />
+          <Route path="/reports/employees" element={<EmployeesReportPage />} />
+          <Route path="/reports/expense" element={<ExpenseReportPage />} />
+          <Route path="/reports/summary" element={<SummaryReportPage />} />
+          <Route path="/reports/customers" element={<CustomersReportPage />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
           <Route path="/badge" element={<Badges />} />

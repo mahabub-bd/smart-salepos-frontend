@@ -238,7 +238,6 @@ export default function ExpenseCategoryList() {
                 totalPages: meta.totalPages,
                 total: meta.total,
               }}
-              currentPage={currentPage}
               onPageChange={handlePageChange}
               currentPageItems={categories.length}
               itemsPerPage={limit}

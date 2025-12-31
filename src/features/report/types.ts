@@ -2,10 +2,17 @@ import { DateRangeParams } from "../../types";
 
 export type ReportType =
   | "sales"
+  | "sales_daily"
   | "purchase"
   | "inventory"
+  | "inventory_stock"
   | "profit_loss"
+  | "stock"
+  | "products"
+  | "employees"
   | "expense"
+  | "summary"
+  | "customers"
   | "attendance";
 
 export type ReportStatus = "pending" | "processing" | "completed" | "failed";
@@ -18,12 +25,35 @@ export interface Report {
   title: string;
   description?: string;
   status: ReportStatus;
+  format?: string;
   file_path?: string;
   file_url?: string;
-  generated_by: number;
+  generated_by?: number;
   generated_at?: string;
   branch_id?: number;
+  branch?: {
+    id: number;
+    code: string;
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    is_active: boolean;
+  };
+  created_by?: number;
+  created_by_user?: {
+    id: number;
+    username: string;
+    email: string;
+    full_name: string;
+    phone: string;
+    status: string;
+  };
   parameters?: Record<string, any>;
+  data?: Record<string, any>;
+  total_records?: number | null;
+  error_message?: string | null;
+  expires_at?: string | null;
   created_at: string;
   updated_at: string;
 }

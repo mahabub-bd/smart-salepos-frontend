@@ -222,7 +222,6 @@ export default function CustomerList() {
                 totalPages: totalPages,
                 total: totalItems,
               }}
-              currentPage={page}
               onPageChange={setPage}
               currentPageItems={customers.length}
             />

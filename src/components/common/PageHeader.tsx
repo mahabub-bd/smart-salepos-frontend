@@ -26,6 +26,7 @@ interface PageHeaderProps {
   permission?: string;
   action?: ActionButton;
   children?: ReactNode;
+  className?: string;
 }
 
 export default function PageHeader({
@@ -38,12 +39,13 @@ export default function PageHeader({
   permission,
   action,
   children,
+  className,
 }: PageHeaderProps) {
   const canAdd = permission ? useHasPermission(permission) : true;
   const canAction = action?.permission ? useHasPermission(action.permission) : true;
 
   return (
-    <div className="mb-6">
+    <div className={className || "mb-6"}>
       {/* Breadcrumb */}
       {breadcrumb && breadcrumb.length > 0 && (
         <nav className="mb-3">

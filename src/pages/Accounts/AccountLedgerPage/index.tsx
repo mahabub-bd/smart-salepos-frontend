@@ -266,7 +266,6 @@ export default function AccountLedgerPage() {
               totalPages: meta.totalPages,
               total: meta.total,
             }}
-            currentPage={currentPage}
             onPageChange={handlePageChange}
             currentPageItems={entries.length}
             itemsPerPage={limit}

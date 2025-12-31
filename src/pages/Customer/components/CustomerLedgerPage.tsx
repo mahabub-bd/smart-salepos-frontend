@@ -228,7 +228,6 @@ export default function CustomerLedgerPage() {
               totalPages: meta.totalPages,
               total: meta.total,
             }}
-            currentPage={currentPage}
             onPageChange={handlePageChange}
             currentPageItems={entries.length}
             itemsPerPage={limit}

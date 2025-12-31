@@ -2,14 +2,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "../button/Button";
 
 interface PaginationMeta {
-  currentPage: number;
-  totalPages: number;
   total: number;
+  totalPages: number;
+  page?: number;
+  currentPage?: number;
+  limit?: number;
 }
 
 interface PaginationProps {
   meta: PaginationMeta;
-  currentPage: number;
   onPageChange: (page: number) => void;
   currentPageItems?: number;
   itemsPerPage?: number;
@@ -17,10 +18,11 @@ interface PaginationProps {
 
 export default function Pagination({
   meta,
-  currentPage,
   onPageChange,
   currentPageItems = 0,
 }: PaginationProps) {
+  const currentPage = meta.currentPage || meta.page || 1;
+
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);

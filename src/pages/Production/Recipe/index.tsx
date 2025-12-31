@@ -1,7 +1,5 @@
-import { lazy } from 'react';
-
-const ProductionRecipeList = lazy(() => import('./ProductionRecipeList'));
-const ProductionRecipeFormPage = lazy(() => import('./ProductionRecipeFormPage'));
+import ProductionRecipeList from './ProductionRecipeList';
+import ProductionRecipeFormPage from './ProductionRecipeFormPage';
 
 export { ProductionRecipeFormPage };
 export default ProductionRecipeList;

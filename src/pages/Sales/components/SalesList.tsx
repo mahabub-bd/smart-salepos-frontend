@@ -152,7 +152,7 @@ export default function SaleList() {
       <div className="mb-6 rounded-xl border bg-white p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
         <div className="flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-45">
             <SelectField
               label="Sale Type"
               data={saleTypeOptions}
@@ -164,7 +164,7 @@ export default function SaleList() {
             />
           </div>
 
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-45">
             <SelectField
               label="Status"
               data={statusOptions}
@@ -176,7 +176,7 @@ export default function SaleList() {
             />
           </div>
 
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-45">
             <SelectField
               label="Branch"
               data={branches}
@@ -188,7 +188,7 @@ export default function SaleList() {
             />
           </div>
 
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-45">
             <SelectField
               label="Customer"
               data={customers}
@@ -200,7 +200,7 @@ export default function SaleList() {
             />
           </div>
 
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-45">
             <DatePicker
               id="sale-from-date"
               label="From Date"
@@ -215,7 +215,7 @@ export default function SaleList() {
             />
           </div>
 
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-45">
             <DatePicker
               id="sale-to-date"
               label="To Date"
@@ -385,7 +385,6 @@ export default function SaleList() {
             totalPages: meta.totalPages,
             total: meta.total,
           }}
-          currentPage={page}
           onPageChange={handlePageChange}
           currentPageItems={sales.length}
           itemsPerPage={limit}

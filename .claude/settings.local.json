@@ -6,7 +6,10 @@
       "Bash(mkdir:*)",
       "Bash(npm install:*)",
       "Bash(npm run dev:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git -C \"d:/Web/Project/smart-sale-pos/frontend\" diff:*)",
+      "Bash(git -C \"d:/Web/Project/smart-sale-pos/frontend\" status --short)",
+      "Bash(tree:*)"
     ]
   }
 }
