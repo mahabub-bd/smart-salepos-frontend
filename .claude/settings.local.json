@@ -9,7 +9,9 @@
       "Bash(findstr:*)",
       "Bash(git -C \"d:/Web/Project/smart-sale-pos/frontend\" diff:*)",
       "Bash(git -C \"d:/Web/Project/smart-sale-pos/frontend\" status --short)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(touch:*)",
+      "Bash(ls:*)"
     ]
   }
 }

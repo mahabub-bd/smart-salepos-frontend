@@ -27,33 +27,9 @@ import ReportFilters, { useDateRangeCalculation } from "../common/ReportFilters"
 import { useBranchOptions } from "../hooks/useBranchOptions";
 import { useSupplierOptions } from "../hooks/useSupplierOptions";
 import { useWarehouseOptions } from "../hooks/useWarehouseOptions";
+import { PurchaseReportData } from "@/types/report";
 
-interface PurchaseReportData {
-  summary: {
-    totalOrders: number;
-    totalItems: number;
-    totalValue: number;
-    totalTax: number;
-    totalDiscount: number;
-    netValue: number;
-  };
-  details: Array<{
-    quantity: number;
-    totalValue: string;
-    poNumber: string;
-    status: string;
-    orderDate: string;
-    supplierName: string;
-    warehouseName: string;
-  }>;
-  meta: {
-    dateRange: {
-      from: string;
-      to: string;
-    };
-  };
-  file_url?: string;
-}
+
 
 export default function PurchaseReportView() {
   const [dateRange, setDateRange] = useState<string>("custom");

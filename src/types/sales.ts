@@ -1,9 +1,14 @@
-import { BaseEntity, ListResponse } from ".";
+import { BaseEntity, ListResponse, PaginationParams } from ".";
 import { JournalTransaction } from "./accounts";
 import { BranchBasic } from "./branch";
 import { Customer, CustomerBasic } from "./customer";
 import { Product } from "./product";
 import { User, UserWithRoles } from "./user";
+
+// ============================================================================
+// ENUMS & TYPES
+// ============================================================================
+
 export type SaleStatus =
   | "held"
   | "completed"
@@ -12,6 +17,55 @@ export type SaleStatus =
   | "draft"
   | "pending"
   | "cancelled";
+
+// ============================================================================
+// API QUERY PARAMETERS
+// ============================================================================
+
+/**
+ * Query parameters for getting sales list
+ */
+export interface GetSalesParams extends PaginationParams {
+  search?: string;
+  status?: SaleStatus;
+  saleType?: string;
+  customer_id?: number;
+  branch_id?: number;
+  start_date?: string;
+  end_date?: string;
+  fromDate?: string;
+  toDate?: string;
+}
+
+/**
+ * Payload for creating a new sale
+ */
+export interface CreateSalePayload {
+  customer_id?: number;
+  items: Array<{
+    product_id: number;
+    quantity: number;
+    unit_price: string | number;
+    discount?: string | number;
+    tax?: string | number;
+    warehouse_id?: number;
+  }>;
+  payments?: Array<{
+    method: string;
+    amount: string | number;
+    account_code: string;
+    reference?: string;
+  }>;
+  discount?: string | number;
+  tax?: string | number;
+  status?: SaleStatus;
+  sale_type?: string;
+  notes?: string;
+}
+
+// ============================================================================
+// ENTITIES
+// ============================================================================
 export interface SaleItem {
   id: number;
   product: Product;

@@ -5,6 +5,8 @@ import PageBreadcrumb from "../../../../components/common/PageBreadCrumb";
 import PageMeta from "../../../../components/common/PageMeta";
 import Button from "../../../../components/ui/button/Button";
 import { useGetPaymentByIdQuery } from "../../../../features/payment/paymentApi";
+import { Customer } from "../../../../types/customer";
+import { Supplier } from "../../../../types/supplier";
 
 export default function PaymentDetailsPage() {
   const { id } = useParams();
@@ -17,6 +19,36 @@ export default function PaymentDetailsPage() {
 
   const isSupplierPayment = payment.type === "supplier";
   const displayParty = isSupplierPayment ? payment.supplier : payment.customer;
+
+  // Helper function to render address based on party type
+  const renderAddress = (party: Supplier | Customer | undefined) => {
+    if (!party) return null;
+
+    // Supplier has a simple address string
+    if ('address' in party && party.address) {
+      return (
+        <p>
+          <strong>Address:</strong> {party.address}
+        </p>
+      );
+    }
+
+    // Customer has billing_address and shipping_address objects
+    if ('billing_address' in party && party.billing_address) {
+      const addr = party.billing_address;
+      const addressParts = [addr.street, addr.city, addr.country].filter(Boolean);
+
+      if (addressParts.length > 0) {
+        return (
+          <p>
+            <strong>Billing Address:</strong> {addressParts.join(', ')}
+          </p>
+        );
+      }
+    }
+
+    return null;
+  };
 
   return (
     <div>
@@ -75,11 +107,7 @@ export default function PaymentDetailsPage() {
                   <strong>Email:</strong> {displayParty.email}
                 </p>
               )}
-              {displayParty?.address && (
-                <p>
-                  <strong>Address:</strong> {displayParty.address}
-                </p>
-              )}
+              {renderAddress(displayParty)}
             </div>
           )}
         </div>

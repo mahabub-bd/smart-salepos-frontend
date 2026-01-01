@@ -46,7 +46,7 @@ import {
   ExtendedProduct,
   OpenCashRegisterFormValues,
   openCashRegisterSchema,
-  PaymentMethod,
+  PaymentMethodExtended,
   SaleReceiptData,
 } from "../../types/posPage";
 import { ReceiptPreviewData } from "../../types/settings";
@@ -62,7 +62,7 @@ export default function POSPage() {
   const [discountValue, setDiscountValue] = useState(0);
   const [taxPercentage, setTaxPercentage] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodExtended>("cash");
   const [paymentAccountCode, setPaymentAccountCode] = useState("");
   const [completedSaleData, setCompletedSaleData] =
     useState<SaleReceiptData | null>(null);
@@ -806,7 +806,7 @@ export default function POSPage() {
                   className="h-8"
                   value={paymentMethod}
                   onChange={(value) => {
-                    setPaymentMethod(value as "cash" | "bank" | "bkash");
+                    setPaymentMethod(value as PaymentMethodExtended);
                     setPaymentAccountCode("");
                   }}
                   options={[

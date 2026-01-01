@@ -2,13 +2,36 @@ import { ApiResponse } from "../../types/index.ts";
 import {
   GetInventoryJournalParams,
   GetStockMovementsParams,
-  Inventory,
+  ProductInventory,
   InventoryItem,
   InventoryJournalEntry,
   StockMovement,
 } from "../../types/inventory.ts";
 import { apiSlice } from "../apiSlice";
+import {
+  generateListTags,
+  generateItemTag,
+  invalidateItemAndList,
+} from "../../utlis";
 
+// ============================================================================
+// API PAYLOAD TYPES
+// ============================================================================
+
+/**
+ * Payload for creating a new inventory record
+ */
+export interface CreateInventoryPayload {
+  product_id: number;
+  warehouse_id: number;
+  quantity: number;
+  unit_cost?: string | number;
+  notes?: string;
+}
+
+/**
+ * Payload for adjusting inventory quantity
+ */
 export interface AdjustInventoryPayload {
   id: number | string;
   body: {
@@ -17,6 +40,9 @@ export interface AdjustInventoryPayload {
   };
 }
 
+/**
+ * Payload for transferring inventory between warehouses
+ */
 export interface TransferPayload {
   product_id: number;
   from_warehouse_id: number;
@@ -24,25 +50,36 @@ export interface TransferPayload {
   quantity: number;
   note?: string;
 }
-interface WarehouseReportParams {
+
+// ============================================================================
+// QUERY PARAMETERS
+// ============================================================================
+
+/**
+ * Query parameters for warehouse-wise inventory report
+ */
+export interface WarehouseReportParams {
   warehouse_id?: number;
   search?: string;
   product_type?: string;
 }
 
-interface ProductReportParams {
+/**
+ * Query parameters for product-wise inventory report
+ */
+export interface ProductReportParams {
   search?: string;
   product_type?: string;
 }
 export const inventoryApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 Get All Inventory
-    getInventory: builder.query<ApiResponse<Inventory[]>, void>({
+    getInventory: builder.query<ApiResponse<ProductInventory[]>, void>({
       query: () => ({
         url: "/inventory",
         method: "GET",
       }),
-      providesTags: ["Inventory"],
+      providesTags: (result) => generateListTags(result, "Inventory"),
     }),
 
     // 🔹 Get Inventory by Product ID
@@ -54,24 +91,26 @@ export const inventoryApi = apiSlice.injectEndpoints({
         url: `/inventory/product/${productId}`,
         method: "GET",
       }),
-      providesTags: (_res, _err, productId) => [
-        { type: "Inventory", id: productId },
-      ],
+      providesTags: (_res, _err, productId) =>
+        generateItemTag("Inventory", productId),
     }),
 
     // 🔹 Create New Inventory Record
-    createInventory: builder.mutation<ApiResponse<Inventory>, any>({
+    createInventory: builder.mutation<
+      ApiResponse<ProductInventory>,
+      CreateInventoryPayload
+    >({
       query: (body) => ({
         url: "/inventory",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Inventory"],
+      invalidatesTags: [{ type: "Inventory", id: "LIST" }],
     }),
 
     // 🔹 Adjust Inventory
     adjustInventory: builder.mutation<
-      ApiResponse<Inventory>,
+      ApiResponse<ProductInventory>,
       AdjustInventoryPayload
     >({
       query: ({ id, body }) => ({
@@ -79,10 +118,8 @@ export const inventoryApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: (_res, _err, { id }) => [
-        "Inventory",
-        { type: "Inventory", id },
-      ],
+      invalidatesTags: (_res, _err, { id }) =>
+        invalidateItemAndList("Inventory", id),
     }),
 
     // 🔹 Transfer Inventory between warehouses
@@ -92,7 +129,7 @@ export const inventoryApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Inventory"],
+      invalidatesTags: [{ type: "Inventory", id: "LIST" }],
     }),
 
     // 🔹 PRODUCT-WISE REPORT

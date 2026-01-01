@@ -10,22 +10,23 @@ import {
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-import Loading from "../../../../components/common/Loading";
-import PageHeader from "../../../../components/common/PageHeader";
+import Loading from "@/components/common/Loading";
+import PageHeader from "@/components/common/PageHeader";
 import {
   Table,
   TableBody,
   TableCell,
   TableHeader,
   TableRow,
-} from "../../../../components/common/Table";
+} from "@/components/common/Table";
 
-import Checkbox from "../../../../components/form/input/Checkbox";
-import StatCard from "../../../../components/ui/badge/StatCard";
-import Button from "../../../../components/ui/button";
-import { useLazyGetSalesReportQuery } from "../../../../features/report/reportApi";
-import { formatDate } from "../../../../utlis";
+import Checkbox from "@/components/form/input/Checkbox";
+import StatCard from "@/components/ui/badge/StatCard";
+import Button from "@/components/ui/button";
+import { useLazyGetSalesReportQuery } from "@/features/report/reportApi";
+import { formatDate } from "@/utlis";
 
+import { SalesReportData } from "@/types/report";
 import ComparisonSection from "../common/ComparisonSection";
 import ReportFilters, {
   useDateRangeCalculation,
@@ -33,54 +34,6 @@ import ReportFilters, {
 import { useBranchOptions } from "../hooks/useBranchOptions";
 import { useCustomerOptions } from "../hooks/useCustomerOptions";
 import { useProductOptions } from "../hooks/useProductOptions";
-
-interface SalesReportData {
-  summary: {
-    totalOrders: number;
-    totalItemsSold: number;
-    totalRevenue: number;
-    totalDiscount: number;
-    totalTax: number;
-    averageOrderValue: number;
-    netRevenue: number;
-  };
-  details: Array<{
-    quantity: number;
-    unitPrice: string;
-    lineTotal: string;
-    saleId: number;
-    invoiceNo: string;
-    saleDate: string;
-    productName: string;
-    customerName: string;
-  }>;
-  comparison?: {
-    current: {
-      revenue: number;
-      orders: number;
-    };
-    previous: {
-      revenue: number;
-      orders: number;
-    };
-    growth: {
-      revenue: {
-        value: number;
-        percentage: number;
-      };
-      orders: {
-        value: number;
-        percentage: number;
-      };
-    };
-  };
-  meta: {
-    dateRange: {
-      from: string;
-      to: string;
-    };
-  };
-}
 
 export default function SalesReportView() {
   const [dateRange, setDateRange] = useState<string>("custom");

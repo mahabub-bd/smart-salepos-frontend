@@ -7,6 +7,13 @@ import {
 import { Branch } from "./branch";
 import { User } from "./user";
 
+export type CashRegisterStatus =
+  | "active"
+  | "inactive"
+  | "closed"
+  | "open"
+  | "maintenance";
+
 export interface CashRegister extends BaseEntity {
   register_code?: string;
   name: string;
@@ -133,9 +140,3 @@ export interface GetTransactionsParams extends PaginationParams {
   start_date?: string;
   end_date?: string;
 }
-export type CashRegisterStatus =
-  | "active"
-  | "inactive"
-  | "closed"
-  | "open"
-  | "maintenance";

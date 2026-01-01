@@ -1,22 +1,10 @@
 import {
-  ApiResponse,
+  CreatePaymentPayload,
   GetPaymentsParams,
-  GetPaymentsResponse,
   Payment,
-} from "../../types";
+} from "@/types/payment";
+import { ApiResponse } from "../../types";
 import { apiSlice } from "../apiSlice";
-
-export interface CreatePaymentPayload {
-  type: "supplier" | "customer";
-  supplier_id?: number;
-  customer_id?: number;
-  purchase_id?: number;
-  sale_id?: number;
-  amount: number;
-  payment_account_code: string;
-  method: "cash" | "bank" | "mobile";
-  note?: string;
-}
 
 export const paymentsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -28,7 +16,7 @@ export const paymentsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Purchases", "Sales", "Suppliers", "Payments"],
     }),
-    getPayments: builder.query<GetPaymentsResponse, GetPaymentsParams>({
+    getPayments: builder.query<ApiResponse<Payment[]>, GetPaymentsParams>({
       query: (params) => {
         const searchParams = new URLSearchParams();
         if (params.page) searchParams.append("page", params.page.toString());

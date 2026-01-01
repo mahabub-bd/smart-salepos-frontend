@@ -62,6 +62,35 @@ export enum ProductType {
   SERVICE = "service",
 }
 
+/**
+ * Variable product option configuration
+ */
+export interface VariableOption {
+  name: string;
+  values: string[];
+}
+
+/**
+ * Product variant for variable products
+ */
+export interface ProductVariant {
+  id?: number;
+  combination: Record<string, string>;
+  sku: string;
+  barcode?: string;
+  selling_price: number;
+  purchase_price: number;
+  stock?: number;
+}
+
+/**
+ * Variable options structure for products
+ */
+export interface VariableOptions {
+  options: VariableOption[];
+  variants?: ProductVariant[];
+}
+
 export interface Product extends BaseEntity {
   name: string;
   sku: string;
@@ -82,7 +111,7 @@ export interface Product extends BaseEntity {
   origin?: string;
   expire_date?: string | null;
   is_variable: boolean;
-  variable_options?: any;
+  variable_options?: VariableOptions;
   parent_product_id?: number | null;
   inventories?: ProductInventory[];
   purchase_value?: number;
@@ -126,4 +155,24 @@ export interface ProductBasic {
   status: boolean;
   created_at: string;
   updated_at: string;
+}
+export interface UpdateProductPayload {
+  id: string | number;
+  body: ProductRequest;
+}
+
+export interface ProductFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  brandId?: number;
+  supplierId?: number;
+  categoryId?: number;
+  subcategoryId?: number;
+  origin?: string;
+  isVariable?: boolean;
+  hasExpiry?: boolean;
+  status?: boolean;
+  product_type?: string;
+  [key: string]: unknown;
 }

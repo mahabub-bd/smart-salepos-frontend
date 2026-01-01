@@ -1,6 +1,6 @@
 import { BaseEntity } from ".";
 import { Branch } from "./branch";
-import { Role } from "./role";
+import { Role, RoleBasic } from "./role";
 
 export interface User extends BaseEntity {
   username: string;
@@ -38,7 +38,7 @@ export interface UserBasic {
 }
 
 export interface UserWithRoles extends UserBasic {
-  roles: Role[];
+  roles: RoleBasic[];
 }
 
 export interface CreateUserPayload {

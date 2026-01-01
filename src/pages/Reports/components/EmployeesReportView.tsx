@@ -1,18 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import Loading from "../../../components/common/Loading";
-import PageHeader from "../../../components/common/PageHeader";
-import DatePicker from "../../../components/form/date-picker";
-import Select from "../../../components/form/Select";
-import Badge from "../../../components/ui/badge/Badge";
-import { Modal } from "../../../components/ui/modal";
+import Loading from "@/components/common/Loading";
+import PageHeader from "@/components/common/PageHeader";
+import DatePicker from "@/components/form/date-picker";
+import Select from "@/components/form/Select";
+import Badge from "@/components/ui/badge/Badge";
+import { Modal } from "@/components/ui/modal";
 
-import {
-  useLazyGetEmployeesReportQuery,
-} from "../../../features/report/reportApi";
-import { Report } from "../../../features/report/types";
-import { formatDate } from "../../../utlis";
+import { useLazyGetEmployeesReportQuery } from "@/features/report/reportApi";
+import { Report } from "@/features/report/types";
+import { formatDate } from "@/utlis";
 
 export default function EmployeesReportView() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -23,12 +21,17 @@ export default function EmployeesReportView() {
   const [reportData, setReportData] = useState<Report | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [fetchReport, { isLoading, isError }] = useLazyGetEmployeesReportQuery();
+  const [fetchReport, { isLoading, isError }] =
+    useLazyGetEmployeesReportQuery();
 
   // Set default date range to last month on mount
   useEffect(() => {
     const now = new Date();
-    const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const firstDayLastMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1
+    );
     const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     setStartDate(firstDayLastMonth);
@@ -43,8 +46,8 @@ export default function EmployeesReportView() {
 
     try {
       const result = await fetchReport({
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
+        start_date: startDate.toISOString().split("T")[0],
+        end_date: endDate.toISOString().split("T")[0],
         branch_id: branchId,
         department_id: departmentId,
         employee_id: employeeId,
@@ -56,7 +59,9 @@ export default function EmployeesReportView() {
         toast.success("Employees report generated successfully");
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to generate employees report");
+      toast.error(
+        error?.data?.message || "Failed to generate employees report"
+      );
     }
   };
 
@@ -87,7 +92,9 @@ export default function EmployeesReportView() {
             <DatePicker
               id="employees-start-date"
               value={startDate}
-              onChange={(dates) => setStartDate(Array.isArray(dates) ? dates[0] || null : dates)}
+              onChange={(dates) =>
+                setStartDate(Array.isArray(dates) ? dates[0] || null : dates)
+              }
               placeholder="Select start date"
             />
           </div>
@@ -99,7 +106,9 @@ export default function EmployeesReportView() {
             <DatePicker
               id="employees-end-date"
               value={endDate}
-              onChange={(dates) => setEndDate(Array.isArray(dates) ? dates[0] || null : dates)}
+              onChange={(dates) =>
+                setEndDate(Array.isArray(dates) ? dates[0] || null : dates)
+              }
               placeholder="Select end date"
             />
           </div>
@@ -126,7 +135,9 @@ export default function EmployeesReportView() {
             </label>
             <Select
               value={departmentId?.toString() || ""}
-              onChange={(val) => setDepartmentId(val ? parseInt(val) : undefined)}
+              onChange={(val) =>
+                setDepartmentId(val ? parseInt(val) : undefined)
+              }
               options={[
                 { value: "", label: "All Departments" },
                 { value: "1", label: "Sales" },

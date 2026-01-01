@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useGetPaymentsQuery } from "../../../features/payment/paymentApi";
-import { GetPaymentsParams } from "../../../types";
+import { GetPaymentsParams } from "../../../types/payment";
 
 const badgeColors: Record<string, string> = {
   cash: "text-green-600 Capitalized bg-green-50 px-2 py-1 rounded-full text-xs",
@@ -31,7 +31,6 @@ const paymentMethodOptions = [
   { id: "", name: "All Methods" },
   { id: "cash", name: "Cash" },
   { id: "bank", name: "Bank" },
-  { id: "mobile", name: "Mobile" },
 ];
 
 export default function PaymentList() {

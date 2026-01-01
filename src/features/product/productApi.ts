@@ -1,61 +1,27 @@
 import { ApiResponse } from "../../types";
-import { Product, ProductRequest } from "../../types/product";
+import { Product, ProductFilters, ProductRequest, UpdateProductPayload } from "../../types/product";
+import {
+  buildQueryString,
+  generateItemTag,
+  generateListTags,
+  invalidateItemAndList,
+} from "../../utlis";
 import { apiSlice } from "../apiSlice";
 
-export interface UpdateProductPayload {
-  id: string | number;
-  body: ProductRequest;
-}
 
-export interface ProductFilters {
-  page?: number;
-  limit?: number;
-  search?: string;
-  brandId?: number;
-  supplierId?: number;
-  categoryId?: number;
-  subcategoryId?: number;
-  origin?: string;
-  isVariable?: boolean;
-  hasExpiry?: boolean;
-  status?: boolean;
-  product_type?: string;
-}
 
 export const productApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 GET ALL PRODUCTS
     getProducts: builder.query<ApiResponse<Product[]>, ProductFilters>({
       query: (params) => {
-        const searchParams = new URLSearchParams();
-
-        if (params.page) searchParams.append("page", params.page.toString());
-        if (params.limit) searchParams.append("limit", params.limit.toString());
-        if (params.search) searchParams.append("search", params.search);
-        if (params.brandId)
-          searchParams.append("brandId", params.brandId.toString());
-        if (params.supplierId)
-          searchParams.append("supplierId", params.supplierId.toString());
-        if (params.categoryId)
-          searchParams.append("categoryId", params.categoryId.toString());
-        if (params.subcategoryId)
-          searchParams.append("subcategoryId", params.subcategoryId.toString());
-        if (params.origin) searchParams.append("origin", params.origin);
-        if (params.isVariable !== undefined)
-          searchParams.append("isVariable", params.isVariable.toString());
-        if (params.hasExpiry !== undefined)
-          searchParams.append("hasExpiry", params.hasExpiry.toString());
-        if (params.status !== undefined)
-          searchParams.append("status", params.status.toString());
-        if (params.product_type)
-          searchParams.append("product_type", params.product_type);
-
+        const queryString = buildQueryString(params);
         return {
-          url: `/product?${searchParams.toString()}`,
+          url: `/product?${queryString}`,
           method: "GET",
         };
       },
-      providesTags: ["Products"],
+      providesTags: (result) => generateListTags(result, "Products"),
     }),
 
     // 🔹 GET PRODUCT BY ID
@@ -64,7 +30,7 @@ export const productApi = apiSlice.injectEndpoints({
         url: `/product/${id}`,
         method: "GET",
       }),
-      providesTags: (_result, _error, id) => [{ type: "Products", id }],
+      providesTags: (_result, _error, id) => generateItemTag("Products", id),
     }),
 
     // 🔹 CREATE PRODUCT
@@ -74,7 +40,7 @@ export const productApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Products", "Suppliers"],
+      invalidatesTags: [{ type: "Products", id: "LIST" }],
     }),
 
     // 🔹 UPDATE PRODUCT
@@ -85,11 +51,8 @@ export const productApi = apiSlice.injectEndpoints({
           method: "PATCH",
           body,
         }),
-        invalidatesTags: (_result, _error, { id }) => [
-          "Products",
-          "Suppliers",
-          { type: "Products", id },
-        ],
+        invalidatesTags: (_result, _error, { id }) =>
+          invalidateItemAndList("Products", id),
       }
     ),
 
@@ -102,7 +65,8 @@ export const productApi = apiSlice.injectEndpoints({
         url: `/product/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Products", "Suppliers"],
+      invalidatesTags: (_result, _error, id) =>
+        invalidateItemAndList("Products", id),
     }),
 
     // 🔹 GET COMPONENT PRODUCTS
@@ -111,16 +75,16 @@ export const productApi = apiSlice.injectEndpoints({
       { page?: number; limit?: number }
     >({
       query: (params) => {
-        const searchParams = new URLSearchParams();
-        searchParams.append("page", (params.page || 1).toString());
-        searchParams.append("limit", (params.limit || 20).toString());
-
+        const queryString = buildQueryString({
+          page: params.page || 1,
+          limit: params.limit || 20,
+        });
         return {
-          url: `/product/type/component?${searchParams.toString()}`,
+          url: `/product/type/component?${queryString}`,
           method: "GET",
         };
       },
-      providesTags: ["Products"],
+      providesTags: (result) => generateListTags(result, "Products"),
     }),
 
     // 🔹 GET FINISHED GOOD PRODUCTS
@@ -129,16 +93,16 @@ export const productApi = apiSlice.injectEndpoints({
       { page?: number; limit?: number }
     >({
       query: (params) => {
-        const searchParams = new URLSearchParams();
-        searchParams.append("page", (params.page || 1).toString());
-        searchParams.append("limit", (params.limit || 20).toString());
-
+        const queryString = buildQueryString({
+          page: params.page || 1,
+          limit: params.limit || 20,
+        });
         return {
-          url: `/product/type/finished-good?${searchParams.toString()}`,
+          url: `/product/type/finished-good?${queryString}`,
           method: "GET",
         };
       },
-      providesTags: ["Products"],
+      providesTags: (result) => generateListTags(result, "Products"),
     }),
   }),
 });

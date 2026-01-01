@@ -193,7 +193,10 @@ export default function SaleDetailPage() {
             <Info label="Name" value={sale.customer.name} />
             <Info label="Phone" value={sale.customer.phone} />
             <Info label="Email" value={sale.customer.email || "-"} />
-            <Info label="Address" value={sale.customer.address || "-"} />
+            <Info
+              label="Address"
+              value={sale.customer.billing_address?.street || "-"}
+            />
           </div>
         </div>
 

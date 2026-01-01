@@ -1,3 +1,5 @@
+import { RoleBasic } from "./role";
+
 export interface PosSaleItem {
   id: number;
   product: {
@@ -50,11 +52,7 @@ export interface PosSaleUser {
   email: string;
   full_name: string;
   phone: string;
-  roles: Array<{
-    id: number;
-    name: string;
-    description: string;
-  }>;
+  roles: RoleBasic[];
   status: string;
   last_login_at: string;
   created_at: string;
@@ -96,19 +94,6 @@ export interface PosSale {
 }
 
 export interface PosSalesResponse {
-  statusCode: number;
-  message: string;
-  data: PosSale[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
-// The API response from your example
-export interface PosSalesApiResponse {
   statusCode: number;
   message: string;
   data: PosSale[];

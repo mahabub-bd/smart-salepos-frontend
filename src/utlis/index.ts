@@ -313,3 +313,101 @@ export const calculateBusinessDays = (
 
   return businessDays;
 };
+
+// ============================================================================
+// RTK QUERY UTILITIES
+// ============================================================================
+
+/**
+ * Build URL query string from parameters object
+ * Automatically filters out undefined/null values
+ *
+ * @example
+ * buildQueryString({ page: 1, search: 'test', empty: undefined })
+ * // Returns: "page=1&search=test"
+ *
+ * @param params - Object containing query parameters
+ * @returns Formatted query string (without leading '?')
+ */
+export function buildQueryString(
+  params: Record<string, unknown>
+): string {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.append(key, String(value));
+    }
+  });
+
+  return searchParams.toString();
+}
+
+/**
+ * Generate cache tags for list items with individual IDs
+ * Useful for optimistic updates and granular cache invalidation
+ *
+ * @example
+ * generateListTags(productsResponse, 'Products')
+ * // Returns: [
+ * //   { type: 'Products', id: 1 },
+ * //   { type: 'Products', id: 2 },
+ * //   { type: 'Products', id: 'LIST' }
+ * // ]
+ *
+ * @param result - API response with data array
+ * @param tagType - The tag type to use
+ * @returns Array of cache tags
+ */
+export function generateListTags<
+  TagType extends string,
+  T extends { id: string | number }
+>(result: { data: T[] } | undefined, tagType: TagType) {
+  return result?.data
+    ? ([
+        ...result.data.map((item) => ({ type: tagType, id: item.id })),
+        { type: tagType, id: "LIST" as const },
+      ] as const)
+    : ([{ type: tagType, id: "LIST" as const }] as const);
+}
+
+/**
+ * Generate cache tag for a single item
+ *
+ * @param tagType - The tag type to use
+ * @param id - The item ID
+ * @returns Array with single cache tag
+ */
+export function generateItemTag<TagType extends string>(
+  tagType: TagType,
+  id: string | number
+) {
+  return [{ type: tagType, id }] as const;
+}
+
+/**
+ * Invalidate both the item and the list cache
+ * Use this for create/update/delete mutations
+ *
+ * @example
+ * invalidatesTags: (_result, _error, { id }) =>
+ *   invalidateItemAndList('Products', id)
+ *
+ * @param tagType - The tag type to invalidate
+ * @param id - The item ID (optional, for create operations)
+ * @returns Array of cache tags to invalidate
+ */
+export function invalidateItemAndList<TagType extends string>(
+  tagType: TagType,
+  id?: string | number
+) {
+  if (id !== undefined) {
+    return [
+      tagType,
+      { type: tagType, id: "LIST" as const },
+      { type: tagType, id },
+    ] as const;
+  }
+
+  return [tagType, { type: tagType, id: "LIST" as const }] as const;
+}

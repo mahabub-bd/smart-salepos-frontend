@@ -16,31 +16,11 @@ import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/ui/badge/StatCard";
 import Button from "@/components/ui/button";
 import { useLazyGetProfitLossReportQuery } from "@/features/report/reportApi";
+import { ProfitLossReportData } from "@/types/report";
 import ReportFilters, {
   useDateRangeCalculation,
 } from "../common/ReportFilters";
 import { useBranchOptions } from "../hooks/useBranchOptions";
-
-interface ProfitLossReportData {
-  summary: {
-    revenue: number;
-    cogs: number;
-    grossProfit: number;
-    grossProfitMargin: number;
-    totalDiscount: number;
-    totalTax: number;
-    totalExpenses: number;
-    operatingProfit: number;
-    netProfit: number;
-    purchases: number;
-  };
-  meta: {
-    dateRange: {
-      from: string;
-      to: string;
-    };
-  };
-}
 
 export default function ProfitLossReportView() {
   const [dateRange, setDateRange] = useState<string>("custom");

@@ -31,7 +31,6 @@ import {
   useGetSubCategoriesByCategoryIdQuery,
 } from "../../../features/category/categoryApi";
 import {
-  ProductFilters,
   useDeleteProductMutation,
   useGetProductsQuery,
 } from "../../../features/product/productApi";
@@ -40,7 +39,7 @@ import { useGetSuppliersQuery } from "../../../features/suppliers/suppliersApi";
 import { Link } from "react-router-dom";
 import PageHeader from "../../../components/common/PageHeader";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Product } from "../../../types/product";
+import { Product, ProductFilters } from "../../../types/product";
 import { getProductTypeBadge } from "../../../utlis/index";
 
 // Helper function to map badge colors to Tailwind classes

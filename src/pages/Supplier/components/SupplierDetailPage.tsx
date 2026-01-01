@@ -16,6 +16,7 @@ import {
 import { useGetSupplierByIdQuery } from "../../../features/suppliers/suppliersApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
 
+import { Purchase } from "../../../types/purchase";
 import {
   DetailCard,
   Info,
@@ -24,7 +25,6 @@ import {
 } from "../../Customer/components/ReuseableComponent";
 import PurchaseStatusBadge from "../../Purchase/components/PurchaseStatusBadge";
 import SupplierFormModal from "./SupplierFormModal";
-import { Purchase } from "../../../types/purchase";
 
 export default function SupplierDetailPage() {
   const { id } = useParams<{ id: string }>();

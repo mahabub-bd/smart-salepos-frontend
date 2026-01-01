@@ -1,41 +1,42 @@
 import { ApiResponse } from "../../types";
 import { Last30DaysAnalytics, MonthWiseAnalytics } from "../../types/analytics";
+import {
+  CreateSalePayload,
+  GetSalesParams,
+  SaleListResponse,
+  SaleResponse,
+} from "../../types/sales";
+import { generateItemTag, generateListTags } from "../../utlis";
 import { apiSlice } from "../apiSlice";
 
 export const salesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // 🔹 GET ALL SALES
-    getSales: builder.query({
-      query: ({ page = 1, limit = 10 }) => ({
+    getSales: builder.query<SaleListResponse, GetSalesParams>({
+      query: ({ page = 1, limit = 10, ...filters }) => ({
         url: `/sales/list`,
-        params: { page, limit },
+        params: { page, limit, ...filters },
       }),
-      providesTags: (result) =>
-        result?.data
-          ? [
-              ...result.data.map(({ id }: any) => ({
-                type: "Sales" as const,
-                id,
-              })),
-              { type: "Sales", id: "LIST" },
-            ]
-          : [{ type: "Sales", id: "LIST" }],
+      providesTags: (result) => generateListTags(result, "Sales"),
     }),
 
     // 🔹 GET SALE BY ID
-    getSaleById: builder.query({
+    getSaleById: builder.query<ApiResponse<SaleResponse>, string | number>({
       query: (id) => `/sales/${id}`,
-      providesTags: (_result, _error, id) => [{ type: "Sales", id }], // Added here
+      providesTags: (_result, _error, id) => generateItemTag("Sales", id),
     }),
 
     // 🔹 CREATE SALE
-    createSale: builder.mutation({
+    createSale: builder.mutation<
+      ApiResponse<SaleResponse>,
+      CreateSalePayload
+    >({
       query: (data) => ({
         url: "/sales",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Sales"], // Added here
+      invalidatesTags: [{ type: "Sales", id: "LIST" }],
     }),
 
     // 🔹 GET LAST 30 DAYS ANALYTICS

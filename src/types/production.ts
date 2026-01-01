@@ -1,5 +1,5 @@
 import { Warehouse } from "./branch";
-import { BaseEntity, Brand,  } from "./index";
+import { BaseEntity, Brand } from "./index";
 
 // Production Order Status
 export enum ProductionOrderStatus {
@@ -37,6 +37,17 @@ export enum ProductionLogType {
   QUALITY_CHECK = "quality_check",
 }
 
+/**
+ * Production Order Metadata
+ * Contains additional information about production order state changes and quality control
+ */
+export interface ProductionMetadata {
+  status_changed_at?: string;
+  status_change_reason?: string;
+  quality_check_passed?: boolean;
+  defect_reason?: string;
+  production_notes?: string;
+}
 
 // Production Order Item
 export interface ProductionOrderItem extends BaseEntity {
@@ -78,7 +89,7 @@ export interface ProductionOrderLog extends BaseEntity {
   production_order_id: number;
   log_type: ProductionLogType;
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: ProductionMetadata;
   user: {
     id: number;
     name: string;

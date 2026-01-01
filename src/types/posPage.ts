@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Warehouse } from "./branch";
+import { PaymentMethod as BasePaymentMethod } from "./index";
 
 // Cart item interface (specific to POS page)
 export interface CartItem {
@@ -41,7 +42,7 @@ export interface ProductData {
 }
 
 // Product interface with inventory data (specific to POS page)
-export interface Product {
+export interface POSProduct {
   product: ProductData;
   purchased_quantity: number;
   sold_quantity: number;
@@ -60,11 +61,11 @@ export interface WarehouseReport {
   remaining_stock: number;
   purchase_value: number;
   sale_value: number;
-  products: Product[];
+  products: POSProduct[];
 }
 
 // Extended product interface
-export interface ExtendedProduct extends Product {
+export interface ExtendedProduct extends POSProduct {
   warehouse_id: number;
   warehouse_name: string;
 }
@@ -91,6 +92,10 @@ export interface CloseCounterFormData {
   notes?: string;
 }
 
+// POS state management types
+export type DiscountType = "fixed" | "percentage";
+export type PaymentMethodExtended = BasePaymentMethod | "bkash";
+
 // Sale receipt data type
 export interface SaleReceiptData {
   invoice_no: string;
@@ -108,15 +113,11 @@ export interface SaleReceiptData {
   due_amount: number;
   customer_name: string;
   customer_phone?: string;
-  payment_method?: "cash" | "bank" | "bkash";
+  payment_method?: PaymentMethodExtended;
   branch_name: string;
   served_by: string;
   created_at: string;
 }
-
-// POS state management types
-export type DiscountType = "fixed" | "percentage";
-export type PaymentMethod = "cash" | "bank" | "bkash";
 
 // API payload types for POS operations
 export interface CreatePosSalePayload {
@@ -133,7 +134,7 @@ export interface CreatePosSalePayload {
   discount: number;
   tax_percentage: number;
   paid_amount: number;
-  payment_method?: PaymentMethod;
+  payment_method?: PaymentMethodExtended;
   account_code?: string;
 }
 

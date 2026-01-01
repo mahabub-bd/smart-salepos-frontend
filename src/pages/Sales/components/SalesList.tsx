@@ -21,7 +21,7 @@ import { useGetBranchesQuery } from "../../../features/branch/branchApi";
 import { useGetCustomersQuery } from "../../../features/customer/customerApi";
 import { useGetSalesQuery } from "../../../features/sale/saleApi";
 import { useHasPermission } from "../../../hooks/useHasPermission";
-import { Sale } from "../../../types/sales";
+import { SaleResponse, SaleStatus } from "../../../types/sales";
 import { formatCurrencyEnglish, formatDate } from "../../../utlis";
 import SalePaymentModal from "./SalePaymentModal";
 
@@ -50,7 +50,7 @@ export default function SaleList() {
 
   const [filters, setFilters] = useState({
     saleType: undefined as string | undefined,
-    status: undefined as string | undefined,
+    status: undefined as SaleStatus | undefined,
     branch_id: undefined as number | undefined,
     customer_id: undefined as number | undefined,
     fromDate: undefined as string | undefined,
@@ -59,7 +59,7 @@ export default function SaleList() {
 
   // Modal State
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [selectedSale, setSelectedSale] = useState<SaleResponse | null>(null);
 
   // Fetch dropdown data
   const { data: branchesData } = useGetBranchesQuery();
@@ -269,7 +269,7 @@ export default function SaleList() {
 
             <TableBody>
               {sales.length > 0 ? (
-                sales.map((sale: Sale) => {
+                sales.map((sale: SaleResponse) => {
                   const dueAmount =
                     Number(sale.total) - Number(sale.paid_amount);
 
