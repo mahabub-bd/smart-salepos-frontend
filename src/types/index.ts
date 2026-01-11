@@ -207,6 +207,7 @@ export interface Address {
   street?: string;
   city?: string;
   country?: string;
+  postal_code?: string;
 }
 
 // ============================================================================

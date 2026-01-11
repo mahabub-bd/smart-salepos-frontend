@@ -560,12 +560,12 @@ export default function EmployeeFormModal({
             {isCreatingUser
               ? "Creating User..."
               : isCreating
-              ? "Creating Employee..."
-              : isUpdating
-              ? "Updating Employee..."
-              : isEdit
-              ? "Update Employee"
-              : "Create Employee"}
+                ? "Creating Employee..."
+                : isUpdating
+                  ? "Updating Employee..."
+                  : isEdit
+                    ? "Update Employee"
+                    : "Create Employee"}
           </Button>
         </div>
       </form>

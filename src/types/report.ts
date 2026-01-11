@@ -230,3 +230,53 @@ export interface ReportQueryParams {
   department_id?: number;
   employee_id?: number;
 }
+
+// ============================================================================
+// DASHBOARD REPORT
+// ============================================================================
+
+export interface DashboardPeriodData {
+  salesCount: number;
+  revenue: number;
+  profit: number;
+  expense: number;
+  netProfit: number;
+  purchaseCount: number;
+  purchaseAmount: number;
+}
+
+export interface DashboardInventoryData {
+  totalProducts: number;
+  lowStockCount: number;
+}
+
+export interface DashboardData {
+  today: DashboardPeriodData;
+  period: DashboardPeriodData;
+  previousPeriod: DashboardPeriodData;
+  inventory: DashboardInventoryData;
+  meta: {
+    dateRange: {
+      from: string;
+      to: string;
+    };
+  };
+}
+
+export interface DashboardResponse {
+  statusCode: number;
+  message: string;
+  data: DashboardData;
+  meta: {
+    dateRange: {
+      from: string;
+      to: string;
+    };
+  };
+}
+
+export interface DashboardQuery {
+  fromDate?: string;
+  toDate?: string;
+  branch_id?: number;
+}

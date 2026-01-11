@@ -193,11 +193,39 @@ export default function SaleDetailPage() {
             <Info label="Name" value={sale.customer.name} />
             <Info label="Phone" value={sale.customer.phone} />
             <Info label="Email" value={sale.customer.email || "-"} />
-            <Info
-              label="Address"
-              value={sale.customer.billing_address?.street || "-"}
-            />
+            <Info label="Reward Points" value={`${sale.customer.reward_points || 0}`} />
           </div>
+        </div>
+
+        {/* Billing & Shipping Address */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Billing Address */}
+          {sale.customer.billing_address && (
+            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+              <h2 className="text-lg font-medium mb-3">Billing Address</h2>
+              <div className="space-y-2 text-sm">
+                <Info label="Contact Name" value={sale.customer.billing_address.contact_name || "-"} />
+                <Info label="Phone" value={sale.customer.billing_address.phone || "-"} />
+                <Info label="Street" value={sale.customer.billing_address.street || "-"} />
+                <Info label="City" value={sale.customer.billing_address.city || "-"} />
+                <Info label="Country" value={sale.customer.billing_address.country || "-"} />
+              </div>
+            </div>
+          )}
+
+          {/* Shipping Address */}
+          {sale.customer.shipping_address && (
+            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+              <h2 className="text-lg font-medium mb-3">Shipping Address</h2>
+              <div className="space-y-2 text-sm">
+                <Info label="Contact Name" value={sale.customer.shipping_address.contact_name || "-"} />
+                <Info label="Phone" value={sale.customer.shipping_address.phone || "-"} />
+                <Info label="Street" value={sale.customer.shipping_address.street || "-"} />
+                <Info label="City" value={sale.customer.shipping_address.city || "-"} />
+                <Info label="Country" value={sale.customer.shipping_address.country || "-"} />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sale Item List */}

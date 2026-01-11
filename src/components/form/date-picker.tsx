@@ -20,6 +20,7 @@ type PropsType = {
   time_24hr?: boolean;
   minuteIncrement?: number;
   hourIncrement?: number;
+  disabled?: boolean;
 };
 
 export default function DatePicker({
@@ -38,12 +39,22 @@ export default function DatePicker({
   time_24hr = true,
   minuteIncrement = 1,
   hourIncrement = 1,
+  disabled = false,
 }: PropsType) {
   const flatpickrRef = useRef<Instance | null>(null);
 
   useEffect(() => {
     const element = document.getElementById(id);
     if (!element) return;
+
+    // If disabled, don't initialize flatpickr
+    if (disabled) {
+      if (flatpickrRef.current) {
+        flatpickrRef.current.destroy();
+        flatpickrRef.current = null;
+      }
+      return;
+    }
 
     const config: any = {
       mode: mode === "datetime" ? "single" : mode,
@@ -85,7 +96,7 @@ export default function DatePicker({
         flatpickrRef.current = null;
       }
     };
-  }, [id, mode, disableFuture]);
+  }, [id, mode, disableFuture, disabled]);
 
   useEffect(() => {
     if (flatpickrRef.current && value !== undefined) {
@@ -104,7 +115,9 @@ export default function DatePicker({
   const getInputClasses = () => {
     let inputClasses = `h-10 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800`;
 
-    if (error) {
+    if (disabled) {
+      inputClasses += ` border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500`;
+    } else if (error) {
       inputClasses += ` border-error-500 focus:border-error-300 focus:ring-error-500/20 dark:text-error-400 dark:border-error-500 dark:focus:border-error-800`;
     } else {
       inputClasses += ` border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-800`;
@@ -132,6 +145,7 @@ export default function DatePicker({
           id={id}
           placeholder={placeholder}
           readOnly
+          disabled={disabled}
           className={getInputClasses()}
         />
 

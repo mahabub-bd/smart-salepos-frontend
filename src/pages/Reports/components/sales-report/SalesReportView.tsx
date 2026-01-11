@@ -4,6 +4,7 @@ import {
   DollarSign,
   Package,
   Percent,
+  RotateCcw,
   ShoppingBag,
   TrendingUp,
 } from "lucide-react";
@@ -61,20 +62,48 @@ export default function SalesReportView() {
     }
 
     try {
-      await fetchReport({
-        fromDate: autoStartDate.toISOString().split("T")[0],
-        toDate: autoEndDate.toISOString().split("T")[0],
-        dateRange: dateRange === "custom" ? undefined : dateRange,
+      // Format dates to YYYY-MM-DD using local date components (not UTC)
+      const formatDateLocal = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
+      // Build params: only include dateRange if it's not custom
+      // If dateRange is a preset (like last_year), only send dateRange without dates
+      // If dateRange is custom, only send from/to dates without dateRange
+      const params: any = {
         branch_id: branchId,
         customer_id: customerId,
         product_id: productId,
         includeComparison,
-      }).unwrap();
+      };
+
+      if (dateRange === "custom") {
+        // Manual date selection: only send from/to dates
+        params.fromDate = formatDateLocal(autoStartDate);
+        params.toDate = formatDateLocal(autoEndDate);
+      } else {
+        // Preset selected: only send dateRange
+        params.dateRange = dateRange;
+      }
+
+      await fetchReport(params).unwrap();
 
       toast.success("Sales report generated successfully");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to generate sales report");
     }
+  };
+
+  const handleReset = () => {
+    setDateRange("custom");
+    setBranchId(undefined);
+    setCustomerId(undefined);
+    setProductId(undefined);
+    setIncludeComparison(false);
+    toast.info("Filters have been reset");
   };
 
   const reportData = data?.data as SalesReportData | undefined;
@@ -125,6 +154,15 @@ export default function SalesReportView() {
               className="flex-1"
             >
               {isLoading ? "Generating..." : "Generate"}
+            </Button>
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              disabled={isLoading}
+              className="whitespace-nowrap"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
             </Button>
             <Checkbox
               id="include-comparison"

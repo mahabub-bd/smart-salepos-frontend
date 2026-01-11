@@ -24,6 +24,15 @@ interface Props {
 
 /* -------------------------- ZOD VALIDATION SCHEMA -------------------------- */
 
+const addressSchema = z.object({
+  contact_name: z.string().optional(),
+  phone: z.string().optional(),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  postal_code: z.string().optional(),
+});
+
 const supplierSchema = z.object({
   name: z.string().min(1, "Name is required"),
   contact_person: z.string().optional(),
@@ -31,6 +40,8 @@ const supplierSchema = z.object({
   email: z.string().email("Invalid email format").optional().or(z.literal("")),
   address: z.string().optional(),
   payment_terms: z.string().optional(),
+  billing_address: addressSchema.optional(),
+  shipping_address: addressSchema.optional(),
 });
 
 type SupplierFormType = z.infer<typeof supplierSchema>;
@@ -63,6 +74,22 @@ export default function SupplierFormModal({
       email: "",
       address: "",
       payment_terms: "",
+      billing_address: {
+        contact_name: "",
+        phone: "",
+        street: "",
+        city: "",
+        country: "",
+        postal_code: "",
+      },
+      shipping_address: {
+        contact_name: "",
+        phone: "",
+        street: "",
+        city: "",
+        country: "",
+        postal_code: "",
+      },
     },
   });
 
@@ -77,6 +104,22 @@ export default function SupplierFormModal({
         email: supplier.email || "",
         address: supplier.address || "",
         payment_terms: supplier.payment_terms || "",
+        billing_address: {
+          contact_name: supplier.billing_address?.contact_name || "",
+          phone: supplier.billing_address?.phone || "",
+          street: supplier.billing_address?.street || "",
+          city: supplier.billing_address?.city || "",
+          country: supplier.billing_address?.country || "",
+          postal_code: supplier.billing_address?.postal_code || "",
+        },
+        shipping_address: {
+          contact_name: supplier.shipping_address?.contact_name || "",
+          phone: supplier.shipping_address?.phone || "",
+          street: supplier.shipping_address?.street || "",
+          city: supplier.shipping_address?.city || "",
+          country: supplier.shipping_address?.country || "",
+          postal_code: supplier.shipping_address?.postal_code || "",
+        },
       });
     } else {
       reset({
@@ -86,6 +129,22 @@ export default function SupplierFormModal({
         email: "",
         address: "",
         payment_terms: "",
+        billing_address: {
+          contact_name: "",
+          phone: "",
+          street: "",
+          city: "",
+          country: "",
+          postal_code: "",
+        },
+        shipping_address: {
+          contact_name: "",
+          phone: "",
+          street: "",
+          city: "",
+          country: "",
+          postal_code: "",
+        },
       });
     }
   }, [supplier, reset, isOpen]);
@@ -111,39 +170,114 @@ export default function SupplierFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="max-w-2xl"
+      className="max-w-4xl  max-h-[90vh] overflow-y-auto  scrollbar-hide"
       title={isEdit ? "Update Supplier" : "Add New Supplier"}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {/* Name */}
-        <FormField label="Name *" error={errors.name?.message}>
-          <Input {...register("name")} />
-        </FormField>
+        {/* Basic Information */}
+        <div className="border-b border-gray-200 pb-2 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Basic Information
+          </h3>
+        </div>
 
-        {/* Contact Person */}
-        <FormField label="Contact Person">
-          <Input {...register("contact_person")} />
-        </FormField>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Name */}
+          <FormField label="Name *" error={errors.name?.message}>
+            <Input {...register("name")} />
+          </FormField>
 
-        {/* Phone */}
-        <FormField label="Phone">
-          <Input {...register("phone")} />
-        </FormField>
+          {/* Contact Person */}
+          <FormField label="Contact Person">
+            <Input {...register("contact_person")} />
+          </FormField>
 
-        {/* Email */}
-        <FormField label="Email" error={errors.email?.message}>
-          <Input {...register("email")} />
-        </FormField>
+          {/* Phone */}
+          <FormField label="Phone">
+            <Input {...register("phone")} />
+          </FormField>
 
-        {/* Address */}
-        <FormField label="Address">
-          <Input {...register("address")} />
-        </FormField>
+          {/* Email */}
+          <FormField label="Email" error={errors.email?.message}>
+            <Input {...register("email")} />
+          </FormField>
 
-        {/* Payment Terms */}
-        <FormField label="Payment Terms">
-          <Input {...register("payment_terms")} />
-        </FormField>
+          {/* Address */}
+          <FormField label="Address">
+            <Input {...register("address")} />
+          </FormField>
+
+          {/* Payment Terms */}
+          <FormField label="Payment Terms">
+            <Input {...register("payment_terms")} />
+          </FormField>
+        </div>
+
+        {/* Billing Address */}
+        <div className="border-b border-gray-200 pb-2 mb-2 mt-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Billing Address
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <FormField label="Contact Name">
+            <Input {...register("billing_address.contact_name")} />
+          </FormField>
+
+          <FormField label="Phone">
+            <Input {...register("billing_address.phone")} />
+          </FormField>
+
+          <FormField label="Postal Code">
+            <Input {...register("billing_address.postal_code")} />
+          </FormField>
+
+          <FormField label="Street">
+            <Input {...register("billing_address.street")} />
+          </FormField>
+
+          <FormField label="City">
+            <Input {...register("billing_address.city")} />
+          </FormField>
+
+          <FormField label="Country">
+            <Input {...register("billing_address.country")} />
+          </FormField>
+        </div>
+
+        {/* Shipping Address */}
+        <div className="border-b border-gray-200 pb-2 mb-2 mt-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Shipping Address
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <FormField label="Contact Name">
+            <Input {...register("shipping_address.contact_name")} />
+          </FormField>
+
+          <FormField label="Phone">
+            <Input {...register("shipping_address.phone")} />
+          </FormField>
+
+          <FormField label="Postal Code">
+            <Input {...register("shipping_address.postal_code")} />
+          </FormField>
+
+          <FormField label="Street">
+            <Input {...register("shipping_address.street")} />
+          </FormField>
+
+          <FormField label="City">
+            <Input {...register("shipping_address.city")} />
+          </FormField>
+
+          <FormField label="Country">
+            <Input {...register("shipping_address.country")} />
+          </FormField>
+        </div>
 
         <div className="flex gap-3 justify-end mt-2">
           <Button type="button" variant="outline" onClick={onClose}>

@@ -206,8 +206,8 @@ export default function EmployeesReportView() {
                     reportData.status === "completed"
                       ? "success"
                       : reportData.status === "failed"
-                      ? "error"
-                      : "warning"
+                        ? "error"
+                        : "warning"
                   }
                 >
                   {reportData.status?.toUpperCase() || "N/A"}

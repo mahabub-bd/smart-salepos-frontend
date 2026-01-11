@@ -97,11 +97,11 @@ export default function StatCard({
       >
         <div
           className={cn(
-            "flex items-center justify-center w-8 h-8 rounded-md shrink-0",
+            "flex items-center justify-center w-7 h-7 rounded-md shrink-0",
             iconBgClasses[bgColor]
           )}
         >
-          <Icon className="text-gray-700 dark:text-white/90 text-sm" />
+          <Icon className="text-gray-700 dark:text-white/90 text-xs" />
         </div>
 
         <div className="min-w-0 flex-1">

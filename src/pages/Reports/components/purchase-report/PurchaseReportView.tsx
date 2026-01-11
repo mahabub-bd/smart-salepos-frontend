@@ -5,6 +5,7 @@ import {
   ShoppingCart,
   TrendingUp,
   Truck,
+  RotateCcw,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -56,18 +57,46 @@ export default function PurchaseReportView() {
     }
 
     try {
-      await fetchReport({
-        start_date: autoStartDate.toISOString().split("T")[0],
-        end_date: autoEndDate.toISOString().split("T")[0],
+      // Format dates to YYYY-MM-DD using local date components (not UTC)
+      const formatDateLocal = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      // Build params: only include dateRange if it's not custom
+      // If dateRange is a preset (like last_year), only send dateRange without dates
+      // If dateRange is custom, only send start/end dates without dateRange
+      const params: any = {
         branch_id: branchId,
         supplier_id: supplierId,
         warehouse_id: warehouseId,
-      }).unwrap();
+      };
+
+      if (dateRange === "custom") {
+        // Manual date selection: only send start/end dates
+        params.start_date = formatDateLocal(autoStartDate);
+        params.end_date = formatDateLocal(autoEndDate);
+      } else {
+        // Preset selected: only send dateRange
+        params.dateRange = dateRange;
+      }
+
+      await fetchReport(params).unwrap();
 
       toast.success("Purchase report generated successfully");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to generate purchase report");
     }
+  };
+
+  const handleReset = () => {
+    setDateRange("custom");
+    setBranchId(undefined);
+    setSupplierId(undefined);
+    setWarehouseId(undefined);
+    toast.info("Filters have been reset");
   };
 
   const reportData = data?.data as PurchaseReportData | undefined;
@@ -111,13 +140,24 @@ export default function PurchaseReportView() {
           },
         ]}
         actions={
-          <Button
-            onClick={handleGenerateReport}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? "Generating..." : "Generate Report"}
-          </Button>
+          <div className="flex items-end gap-2 w-full">
+            <Button
+              onClick={handleGenerateReport}
+              disabled={isLoading}
+              className="flex-1"
+            >
+              {isLoading ? "Generating..." : "Generate"}
+            </Button>
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              disabled={isLoading}
+              className="whitespace-nowrap"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
+          </div>
         }
       />
 

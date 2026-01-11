@@ -3,6 +3,7 @@ import {
   DollarSign,
   Package,
   Percent,
+  RotateCcw,
   ShoppingCart,
   TrendingDown,
   TrendingUp,
@@ -43,11 +44,31 @@ export default function ProfitLossReportView() {
     }
 
     try {
-      await fetchReport({
-        start_date: autoStartDate.toISOString().split("T")[0],
-        end_date: autoEndDate.toISOString().split("T")[0],
+      // Format dates to YYYY-MM-DD using local date components (not UTC)
+      const formatDateLocal = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
+      // Build params: only include dateRange if it's not custom
+      // If dateRange is a preset (like last_year), only send dateRange without dates
+      // If dateRange is custom, only send start/end dates without dateRange
+      const params: any = {
         branch_id: branchId,
-      }).unwrap();
+      };
+
+      if (dateRange === "custom") {
+        // Manual date selection: only send start/end dates
+        params.start_date = formatDateLocal(autoStartDate);
+        params.end_date = formatDateLocal(autoEndDate);
+      } else {
+        // Preset selected: only send dateRange
+        params.dateRange = dateRange;
+      }
+
+      await fetchReport(params).unwrap();
 
       toast.success("Profit & Loss report generated successfully");
     } catch (error: any) {
@@ -55,6 +76,12 @@ export default function ProfitLossReportView() {
         error?.data?.message || "Failed to generate profit & loss report"
       );
     }
+  };
+
+  const handleReset = () => {
+    setDateRange("custom");
+    setBranchId(undefined);
+    toast.info("Filters have been reset");
   };
 
   const reportData = data?.data as ProfitLossReportData | undefined;
@@ -84,13 +111,24 @@ export default function ProfitLossReportView() {
           },
         ]}
         actions={
-          <Button
-            onClick={handleGenerateReport}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? "Generating..." : "Generate Report"}
-          </Button>
+          <div className="flex items-end gap-2 w-full">
+            <Button
+              onClick={handleGenerateReport}
+              disabled={isLoading}
+              className="flex-1"
+            >
+              {isLoading ? "Generating..." : "Generate"}
+            </Button>
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              disabled={isLoading}
+              className="whitespace-nowrap"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
+          </div>
         }
       />
 
@@ -106,17 +144,17 @@ export default function ProfitLossReportView() {
 
       {/* Report Data Display */}
       {reportData && reportData.summary && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Revenue & Profit Metrics */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <StatCard
               icon={DollarSign}
-              title="Total Revenue"
+              title="Revenue"
               value={`৳${(reportData.summary.revenue || 0).toLocaleString()}`}
               bgColor="green"
               badge={{
                 icon: TrendingUp,
-                text: "Gross Revenue",
+                text: "Gross",
                 color: "success",
               }}
               compact
@@ -128,7 +166,7 @@ export default function ProfitLossReportView() {
               value={`৳${(reportData.summary.cogs || 0).toLocaleString()}`}
               bgColor="orange"
               badge={{
-                text: "Cost of Goods",
+                text: "Cost",
                 color: "warning",
               }}
               compact
@@ -144,7 +182,7 @@ export default function ProfitLossReportView() {
               badge={{
                 text: `${
                   reportData.summary.grossProfitMargin?.toFixed(1) || 0
-                }% Margin`,
+                }%`,
                 color: "info",
               }}
               compact
@@ -157,7 +195,7 @@ export default function ProfitLossReportView() {
               bgColor="indigo"
               badge={{
                 icon: TrendingUp,
-                text: "Bottom Line",
+                text: "Bottom",
                 color: "success",
               }}
               compact
@@ -165,14 +203,14 @@ export default function ProfitLossReportView() {
           </div>
 
           {/* Additional Metrics */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <StatCard
               icon={ShoppingCart}
-              title="Total Purchases"
+              title="Purchases"
               value={`৳${(reportData.summary.purchases || 0).toLocaleString()}`}
               bgColor="purple"
               badge={{
-                text: "Purchases",
+                text: "Orders",
                 color: "default",
               }}
               compact
@@ -180,13 +218,13 @@ export default function ProfitLossReportView() {
 
             <StatCard
               icon={TrendingDown}
-              title="Total Expenses"
+              title="Expenses"
               value={`৳${(
                 reportData.summary.totalExpenses || 0
               ).toLocaleString()}`}
               bgColor="red"
               badge={{
-                text: "Operating Costs",
+                text: "Operating",
                 color: "error",
               }}
               compact
@@ -208,14 +246,14 @@ export default function ProfitLossReportView() {
 
             <StatCard
               icon={Percent}
-              title="Gross Profit Margin"
+              title="Gross Margin"
               value={`${
-                reportData.summary.grossProfitMargin?.toFixed(2) || 0
+                reportData.summary.grossProfitMargin?.toFixed(1) || 0
               }%`}
               bgColor="green"
               badge={{
                 icon: TrendingUp,
-                text: "Margin %",
+                text: "Margin",
                 color: "success",
               }}
               compact
@@ -223,7 +261,7 @@ export default function ProfitLossReportView() {
           </div>
 
           {/* Secondary Metrics */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3">
             <StatCard
               icon={Percent}
               title="Total Discount"
@@ -253,15 +291,15 @@ export default function ProfitLossReportView() {
 
           {/* Profit & Loss Summary */}
           <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-800 dark:bg-gray-800">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-800">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                 Profit & Loss Summary
               </h3>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
+            <div className="p-4">
+              <div className="space-y-3">
                 {/* Revenue Section */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Total Revenue
@@ -273,96 +311,90 @@ export default function ProfitLossReportView() {
                 </div>
 
                 {/* Cost of Goods Sold */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Less: Cost of Goods Sold (COGS)
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Less: Cost of Goods Sold
                     </p>
                   </div>
-                  <p className="text-lg font-semibold text-orange-600 dark:text-orange-400">
+                  <p className="text-base font-semibold text-orange-600 dark:text-orange-400">
                     ৳{(reportData.summary.cogs || 0).toLocaleString()}
                   </p>
                 </div>
 
                 {/* Gross Profit */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-4 rounded-lg">
+                <div className="flex justify-between items-center py-2 px-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded">
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-sm text-gray-900 dark:text-white">
                       Gross Profit
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
                       {reportData.summary.grossProfitMargin?.toFixed(1) || 0}%
                       margin
                     </p>
                   </div>
-                  <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
                     ৳{(reportData.summary.grossProfit || 0).toLocaleString()}
                   </p>
                 </div>
 
                 {/* Discounts */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Less: Total Discounts
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Less: Discounts
                     </p>
                   </div>
-                  <p className="text-lg font-semibold text-red-600 dark:text-red-400">
+                  <p className="text-base font-semibold text-red-600 dark:text-red-400">
                     ৳{(reportData.summary.totalDiscount || 0).toLocaleString()}
                   </p>
                 </div>
 
                 {/* Taxes */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Plus: Total Taxes
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Plus: Taxes
                     </p>
                   </div>
-                  <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                  <p className="text-base font-semibold text-green-600 dark:text-green-400">
                     ৳{(reportData.summary.totalTax || 0).toLocaleString()}
                   </p>
                 </div>
 
                 {/* Total Expenses */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Less: Total Expenses
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Less: Expenses
                     </p>
                   </div>
-                  <p className="text-lg font-semibold text-red-600 dark:text-red-400">
+                  <p className="text-base font-semibold text-red-600 dark:text-red-400">
                     ৳{(reportData.summary.totalExpenses || 0).toLocaleString()}
                   </p>
                 </div>
 
                 {/* Operating Profit */}
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 px-4 rounded-lg">
+                <div className="flex justify-between items-center py-2 px-3 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20 rounded">
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-sm text-gray-900 dark:text-white">
                       Operating Profit (EBIT)
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Before interest & taxes
-                    </p>
                   </div>
-                  <p className="text-xl font-bold text-cyan-600 dark:text-cyan-400">
+                  <p className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
                     ৳
                     {(reportData.summary.operatingProfit || 0).toLocaleString()}
                   </p>
                 </div>
 
                 {/* Net Profit */}
-                <div className="flex justify-between items-center py-4 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 px-6 rounded-xl">
+                <div className="flex justify-between items-center py-3 px-4 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg">
                   <div>
-                    <p className="font-bold text-lg text-gray-900 dark:text-white">
+                    <p className="font-bold text-base text-gray-900 dark:text-white">
                       Net Profit
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Bottom line profit
-                    </p>
                   </div>
-                  <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                  <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
                     ৳{(reportData.summary.netProfit || 0).toLocaleString()}
                   </p>
                 </div>

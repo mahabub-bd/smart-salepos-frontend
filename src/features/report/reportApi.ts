@@ -3,6 +3,9 @@
 import { ApiResponse, DateRangeParams } from "../../types";
 import { apiSlice } from "../apiSlice";
 import type {
+  DashboardResponse,
+} from "../../types/report";
+import type {
   Report,
   ReportType,
   ReportStatus,
@@ -11,6 +14,13 @@ import type {
 // ============================================================================
 // REPORT QUERY PARAMETERS
 // ============================================================================
+
+export interface DashboardQuery {
+  fromDate?: string;
+  toDate?: string;
+  dateRange?: string;
+  branch_id?: number;
+}
 
 export interface SalesReportQuery {
   fromDate?: string;
@@ -23,6 +33,7 @@ export interface SalesReportQuery {
 }
 
 export interface PurchaseReportQuery extends DateRangeParams {
+  dateRange?: string;
   branch_id?: number;
   supplier_id?: number;
   warehouse_id?: number;
@@ -53,6 +64,7 @@ export interface EmployeesReportQuery extends DateRangeParams {
 }
 
 export interface ProfitLossReportQuery extends DateRangeParams {
+  dateRange?: string;
   branch_id?: number;
 }
 
@@ -146,6 +158,7 @@ export const reportApi = apiSlice.injectEndpoints({
         if (params) {
           if (params.start_date) searchParams.append("start_date", params.start_date);
           if (params.end_date) searchParams.append("end_date", params.end_date);
+          if (params.dateRange) searchParams.append("dateRange", params.dateRange);
           if (params.branch_id) searchParams.append("branch_id", params.branch_id.toString());
           if (params.supplier_id) searchParams.append("supplier_id", params.supplier_id.toString());
           if (params.warehouse_id) searchParams.append("warehouse_id", params.warehouse_id.toString());
@@ -183,6 +196,7 @@ export const reportApi = apiSlice.injectEndpoints({
         if (params) {
           if (params.start_date) searchParams.append("start_date", params.start_date);
           if (params.end_date) searchParams.append("end_date", params.end_date);
+          if (params.dateRange) searchParams.append("dateRange", params.dateRange);
           if (params.branch_id) searchParams.append("branch_id", params.branch_id.toString());
         }
         return {
@@ -314,6 +328,24 @@ export const reportApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
       providesTags: [{ type: "Reports", id: "DASHBOARD" }],
+    }),
+
+    // 🔹 GET DASHBOARD DATA
+    getDashboardData: builder.query<DashboardResponse, DashboardQuery>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params) {
+          if (params.fromDate) searchParams.append("fromDate", params.fromDate);
+          if (params.toDate) searchParams.append("toDate", params.toDate);
+          if (params.dateRange) searchParams.append("dateRange", params.dateRange);
+          if (params.branch_id) searchParams.append("branch_id", params.branch_id.toString());
+        }
+        return {
+          url: `/reports/dashboard${searchParams.toString() ? `?${searchParams.toString()}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: [{ type: "Reports", id: "DASHBOARD_DATA" }],
     }),
 
     // ========================================================================
@@ -476,6 +508,8 @@ export const {
   useGetCustomersReportQuery,
   useLazyGetCustomersReportQuery,
   useGetReportDashboardSummaryQuery,
+  useGetDashboardDataQuery,
+  useLazyGetDashboardDataQuery,
 
   // Generate report mutations
   useGenerateSalesReportMutation,
